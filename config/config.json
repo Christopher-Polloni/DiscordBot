@@ -6,6 +6,7 @@
   "mongoUri": "mongodb+srv://discord-bot:zYsxbBaV4BNoc4jm@cluster0.gbs3p.mongodb.net/DiscordBot?retryWrites=true&w=majority",
   "translationEndpoint": "https://api.cognitive.microsofttranslator.com",
   "translationSubscriptionKey": "1d547be03e284e388dd912397f2bee6c",
+  "testing": "1",
   "languages": {
     "🇺🇸": {
       "language": "English",
