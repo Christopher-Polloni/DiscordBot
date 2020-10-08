@@ -1,0 +1,19 @@
+{
+  "name": "discord-bot",
+  "version": "1.0.0",
+  "description": "Discord Bot",
+  "main": "bot.js",
+  "scripts": {
+    "start": "node bot.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Christopher-Polloni/DiscordBot.git"
+  },
+  "author": "Christopher Polloni",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Christopher-Polloni/DiscordBot/issues"
+  },
+  "homepage": "https://github.com/Christopher-Polloni/DiscordBot#readme"
+}
