@@ -25,27 +25,31 @@ module.exports = class queueCommand extends Commando.Command {
       return receivedMessage.reply('there is no song playing right now and the queue is empty!');
     }
     else if (args.length == 0) {
-      console.log(receivedMessage.guild.name)
-      const videoEmbed = new Discord.MessageEmbed()
+      // console.log(receivedMessage.guild.name)
+      const embed = new Discord.MessageEmbed()
       .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
       .setTitle(`Queue for ${receivedMessage.guild.name}`)
       .setColor('#ff1500')
       .setTimestamp()
-      for (let i = 0; i < 10; i++) {
-        if (i < results.length) {
-          let title = i + 1;
-          let time = results[i].date;
-          let id = results[i]._id;
-          let reminder = results[i].reminder;
-          let info = `Date: ${time.toLocaleString()} EDT\nID: ${id}\nReminder: ${reminder}`
-          embed.addField(title, info)
-          embed.setFooter(`Showing ${title}/${results.length} Reminders`)
+      for (let i = 0; i < 11; i++) {
+        if (i < queue.length) {
+          if (i == 0){
+            console.log(queue[0])
+            embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink})`)
+            if (queue.length >= 2){
+              embed.addField(`\u200b`, `**Up Next:**`)
+            }
+          }
+          else{
+            embed.addField(`${i}.`,`[${queue[i].title}](${queue[i].videoLink})`)
+          }
+          embed.setFooter(`Showing ${i+1}/${queue.length} Songs in Queue`)
         }
         else {
           break
         }
       }
-      return receivedMessage.say(videoEmbed);
+      return receivedMessage.say(embed);
     }
   }
 };
