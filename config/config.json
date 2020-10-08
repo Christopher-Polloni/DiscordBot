@@ -1,0 +1,27 @@
+{
+  "token" : "NTc1NDE2MjQ5NDAwNDI2NTA2.XNI2Pg.7PfXb7CF66xH1XnZXSQikbWFNZE",
+  "botName" : "FirstBot!",
+  "youtubeAPI": "AIzaSyCwyNmZTJR58v7vREK7XvtiU5kgPlBeopU",
+  "mongoPassword": "zYsxbBaV4BNoc4jm",
+  "mongoUri": "mongodb+srv://discord-bot:zYsxbBaV4BNoc4jm@cluster0.gbs3p.mongodb.net/DiscordBot?retryWrites=true&w=majority",
+  "translationEndpoint": "https://api.cognitive.microsofttranslator.com",
+  "translationSubscriptionKey": "1d547be03e284e388dd912397f2bee6c",
+  "languages": {
+    "🇺🇸": {
+      "language": "English",
+      "abbreviation": "en"
+    },
+    "🇪🇸": {
+      "language": "Spanish",
+      "abbreviation": "es"
+    },
+    "🇧🇷": {
+      "language": "Portuguese",
+      "abbreviation": "pt"
+    },
+    "🇮🇹": {
+      "language": "Italian",
+      "abbreviation": "it"
+    }
+  }
+}
