@@ -25,25 +25,24 @@ module.exports = class queueCommand extends Commando.Command {
       return receivedMessage.reply('there is no song playing right now and the queue is empty!');
     }
     else if (args.length == 0) {
-      // console.log(receivedMessage.guild.name)
       const embed = new Discord.MessageEmbed()
-      .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
-      .setTitle(`Queue for ${receivedMessage.guild.name}`)
-      .setColor('#ff1500')
-      .setTimestamp()
+        .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+        .setTitle(`Queue for ${receivedMessage.guild.name}`)
+        .setColor('#ff1500')
+        .setTimestamp()
       for (let i = 0; i < 11; i++) {
         if (i < queue.length) {
-          if (i == 0){
+          if (i == 0) {
             console.log(queue[0])
-            embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink})`)
-            if (queue.length >= 2){
+            embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink}) \n${getSongDuration(queue[0].songLength)} | ${queue[0].author}`)
+            if (queue.length >= 2) {
               embed.addField(`\u200b`, `**Up Next:**`)
             }
           }
-          else{
-            embed.addField(`${i}.`,`[${queue[i].title}](${queue[i].videoLink})`)
+          else {
+            embed.addField(`${i}.`, `[${queue[i].title}](${queue[i].videoLink}) \n${getSongDuration(queue[i].songLength)} | ${queue[i].author}`)
           }
-          embed.setFooter(`Showing ${i+1}/${queue.length} Songs in Queue`)
+          embed.setFooter(`Showing ${i + 1}/${queue.length} Songs in Queue \nTotal Duration of Songs in Queue: ${getTotalDuration(receivedMessage)}`)
         }
         else {
           break
@@ -53,3 +52,69 @@ module.exports = class queueCommand extends Commando.Command {
     }
   }
 };
+
+function getSongDuration(songLength) {
+  let seconds = Number(songLength);
+
+  let date = new Date(seconds * 1000);
+  let hh = date.getUTCHours();
+  let mm = date.getUTCMinutes();
+  let ss = date.getSeconds();
+
+  if (seconds > 86399) {
+    console.log("Duration is longer than 24 hours")
+  }
+  else if (hh == "00") {
+    if (ss < 10) {
+      ss = "0" + ss;
+    }
+    let t = `${mm}:${ss}`;
+    return t;
+  }
+  else {
+    if (mm < 10) {
+      mm = "0" + mm;
+    }
+    if (ss < 10) {
+      ss = "0" + ss;
+    }
+    let t = `${hh}:${mm}:${ss}`
+    console.log(t)
+    return t;
+  }
+}
+
+function getTotalDuration(receivedMessage) {
+  let seconds = 0;
+  for (let i = 0; i < receivedMessage.guild.musicData.queue.length; i++) {
+    seconds = seconds + Number(receivedMessage.guild.musicData.queue[i].songLength);
+    console.log(seconds)
+  }
+
+  let date = new Date(seconds * 1000);
+  let hh = date.getUTCHours();
+  let mm = date.getUTCMinutes();
+  let ss = date.getSeconds();
+
+  if (seconds > 86399) {
+    console.log("Duration is longer than 24 hours")
+  }
+  else if (hh == "00") {
+    if (ss < 10) {
+      ss = "0" + ss;
+    }
+    let t = `${mm}:${ss}`;
+    return t;
+  }
+  else {
+    if (mm < 10) {
+      mm = "0" + mm;
+    }
+    if (ss < 10) {
+      ss = "0" + ss;
+    }
+    let t = `${hh}:${mm}:${ss}`
+    console.log(t)
+    return t;
+  }
+}

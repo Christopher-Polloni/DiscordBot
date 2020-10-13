@@ -4,7 +4,6 @@ const config = require(path.join(__dirname, '../../config', 'config.json'))
 const Discord = require('discord.js');
 const ytdl = require('ytdl-core');
 const search = require('youtube-search');
-const timeFormat = require('hh-mm-ss');
 const opts = {
   maxResults: 5,
   type: 'video',
@@ -109,27 +108,22 @@ module.exports = class playCommand extends Commando.Command{
         const reaction = collected.first();
 
         if (reaction.emoji.name == '1️⃣') {
-          receivedMessage.reply('you reacted with 1');
           var i=0;
           playSelection(results[i].link)
         }
         else if (reaction.emoji.name == '2️⃣') {
-          receivedMessage.reply('you reacted with 2');
           var i=1;
           playSelection(results[i].link)
         }
         else if (reaction.emoji.name == '3️⃣') {
-          receivedMessage.reply('you reacted with 3');
           var i=2;
           playSelection(results[i].link)
         }
         else if (reaction.emoji.name == '4️⃣') {
-          receivedMessage.reply('you reacted with 4');
           var i=3;
           playSelection(results[i].link)
         }
         else {
-          receivedMessage.reply('you reacted with 5');
           var i=4;
           playSelection(results[i].link)
         }
@@ -195,7 +189,7 @@ module.exports = class playCommand extends Commando.Command{
           .setColor('#2c7a26')
           .addField('Now Playing:', queue[0].title)
           .setURL(queue[0].link)
-          .addField('Duration:', getSongLength(queue[0].songLength))
+          .addField('Duration:', getSongDuration(queue[0].songLength))
           .setTimestamp()
           // also display next song title, if there is one in queue
           if (queue[1]) videoEmbed.addField('Next Song:', queue[1].title);
@@ -227,18 +221,36 @@ module.exports = class playCommand extends Commando.Command{
       });
     };
 
-    function getSongLength(seconds){
-      const convertThis = Number(seconds)
-      if (convertThis < 3600){
-          const result = timeFormat.fromS(convertThis, 'mm:ss')
-          console.log(result)
-          return result
+    function getSongDuration(songLength) {
+      let seconds = Number(songLength);
+    
+      let date = new Date(seconds * 1000);
+      let hh = date.getUTCHours();
+      let mm = date.getUTCMinutes();
+      let ss = date.getSeconds();
+    
+      if (seconds > 86399) {
+        console.log("Duration is longer than 24 hours")
+      }
+      else if (hh == "00") {
+        if (ss < 10) {
+          ss = "0" + ss;
+        }
+        let t = `${mm}:${ss}`;
+        return t;
       }
       else {
-          const result = timeFormat.fromS(convertThis, 'hh:mm:ss')
-          return result
+        if (mm < 10) {
+          mm = "0" + mm;
+        }
+        if (ss < 10) {
+          ss = "0" + ss;
+        }
+        let t = `${hh}:${mm}:${ss}`
+        console.log(t)
+        return t;
       }
-    };
+    }
 
   }
 };
