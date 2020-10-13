@@ -12,7 +12,7 @@ module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
       name: 'remindme',
-      group: 'miscellaneous',
+      group: 'reminders',
       memberName: 'remindme',
       description: 'Schedule a reminder',
       examples: ['$remindme MM/DD/YY HH:MM message'],

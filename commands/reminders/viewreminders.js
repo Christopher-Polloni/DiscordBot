@@ -12,7 +12,7 @@ module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
       name: 'viewreminders',
-      group: 'miscellaneous',
+      group: 'reminders',
       memberName: 'viewreminders',
       description: 'View your scheduled reminders',
       examples: ['$viewreminders'],

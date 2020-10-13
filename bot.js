@@ -38,7 +38,8 @@ client.registry
   .registerGroups([
     ['miscellaneous', 'Miscellaneous Commands'],
     ['music', 'Music Commands'],
-    ['reddit', 'Reddit Image Commands']
+    ['reddit', 'Reddit Image Commands'],
+    ['reminders', 'Personal Reminder Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
