@@ -19,18 +19,18 @@ module.exports = class memeCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        let subreddits = ["TrippinThroughTime", "wholesomememes", "memes", "funny"];
-        let subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
+        // let subreddits = ["TrippinThroughTime", "wholesomememes", "memes", "funny"];
+        // let subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
         
-        randomPuppy(subreddit).then(async url => {
-            await receivedMessage.channel.send({
-                files: [{
-                    attachment: url,
-                    name: 'meme.png'
-                }]
-            })
-        }).catch(err => console.error(err));
-
+        // randomPuppy(subreddit).then(async url => {
+        //     await receivedMessage.channel.send({
+        //         files: [{
+        //             attachment: url,
+        //             name: 'meme.png'
+        //         }]
+        //     })
+        // }).catch(err => console.error(err));
+        receivedMessage.channel.send("This command is temporarily unavailable while changes are being made to it.")
     };
 
 };
