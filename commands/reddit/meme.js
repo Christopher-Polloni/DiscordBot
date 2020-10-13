@@ -12,13 +12,14 @@ module.exports = class memeCommand extends Commando.Command {
             group: 'reddit',
             memberName: 'meme',
             description: 'Retrieve a meme from r/TrippinThroughTime or r/wholesomememes',
+            nsfw: true,
             examples: ['$meme'],
             guildOnly: false,
             argsType: 'multiple'
         })
     }
     async run(receivedMessage, args) {
-        let subreddits = ["TrippinThroughTime", "wholesomememes"];
+        let subreddits = ["TrippinThroughTime", "wholesomememes", "memes", "funny"];
         let subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
         
         randomPuppy(subreddit).then(async url => {
