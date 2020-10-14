@@ -12,7 +12,7 @@ module.exports = class memeCommand extends Commando.Command {
             name: 'meme',
             group: 'reddit',
             memberName: 'meme',
-            description: 'Retrieve a meme from r/TrippinThroughTime or r/wholesomememes',
+            description: 'Retrieve a meme from a variety of subreddits',
             nsfw: true,
             examples: ['$meme'],
             guildOnly: false,
@@ -31,12 +31,27 @@ module.exports = class memeCommand extends Commando.Command {
             .then(response => response.json())
             .then(response => {
                 let i = Math.floor(Math.random() * response.data.children.length)
-                receivedMessage.channel.send({
-                            files: [{
-                                attachment: response.data.children[i].data.url,
-                                name: 'meme.png'
-                            }]
-                        })
+                console.log(response.data.children[i].data.url)
+                if (response.data.children[i].data.url.endsWith('.jpg')){
+                    receivedMessage.channel.send({
+                        files: [{
+                            attachment: response.data.children[i].data.url,
+                            name: 'meme.jpg'
+                        }]
+                    })
+                }
+                else if (response.data.children[i].data.url.endsWith('.png')){
+                    receivedMessage.channel.send({
+                        files: [{
+                            attachment: response.data.children[i].data.url,
+                            name: 'meme.png'
+                        }]
+                    })
+                }
+                else {
+                    receivedMessage.channel.send("Reddit didn't return an image. Please try again.")
+                }
+                
             });
 
         
