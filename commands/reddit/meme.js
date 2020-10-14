@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require(path.join(__dirname, '../../config', 'config.json'))
 // const redditApi = require("imageapi.js");
+const fetch = require("node-fetch");
 const randomPuppy = require('random-puppy');
 const Discord = require('discord.js');
 
@@ -19,18 +20,26 @@ module.exports = class memeCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        // let subreddits = ["TrippinThroughTime", "wholesomememes", "memes", "funny"];
-        // let subreddit = subreddits[Math.floor(Math.random() * subreddits.length)];
+
+        const sortByTimeOptions = ["hour", "day", "week", "month", "year", "all"];
+        const sortByTime = sortByTimeOptions[Math.floor(Math.random() * sortByTimeOptions.length)];
+
+        const subredditOptions = ["meme", "memes", "TrippinThroughTime", "funny"];
+        const selectedSubreddit = subredditOptions[Math.floor(Math.random() * subredditOptions.length)];
+
+        fetch(`https://api.reddit.com/r/${selectedSubreddit}/top.json?sort=top&t=${sortByTime}&limit=100`)
+            .then(response => response.json())
+            .then(response => {
+                let i = Math.floor(Math.random() * response.data.children.length)
+                receivedMessage.channel.send({
+                            files: [{
+                                attachment: response.data.children[i].data.url,
+                                name: 'meme.png'
+                            }]
+                        })
+            });
+
         
-        // randomPuppy(subreddit).then(async url => {
-        //     await receivedMessage.channel.send({
-        //         files: [{
-        //             attachment: url,
-        //             name: 'meme.png'
-        //         }]
-        //     })
-        // }).catch(err => console.error(err));
-        receivedMessage.channel.send("This command is temporarily unavailable while changes are being made to it.")
     };
 
 };
