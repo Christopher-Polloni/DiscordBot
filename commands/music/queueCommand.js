@@ -33,7 +33,6 @@ module.exports = class queueCommand extends Commando.Command {
       for (let i = 0; i < 11; i++) {
         if (i < queue.length) {
           if (i == 0) {
-            console.log(queue[0])
             embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink}) \n${getSongDuration(queue[0].songLength)} | ${queue[0].author}`)
             if (queue.length >= 2) {
               embed.addField(`\u200b`, `**Up Next:**`)
@@ -42,7 +41,7 @@ module.exports = class queueCommand extends Commando.Command {
           else {
             embed.addField(`${i}.`, `[${queue[i].title}](${queue[i].videoLink}) \n${getSongDuration(queue[i].songLength)} | ${queue[i].author}`)
           }
-          embed.setFooter(`Showing ${i + 1}/${queue.length} Songs in Queue \nTotal Duration of Songs in Queue: ${getTotalDuration(receivedMessage)}`)
+          embed.setFooter(`Showing ${i}/${queue.length-1} Songs Up Next\nTotal Duration of Songs: ${getTotalDuration(receivedMessage)}`)
         }
         else {
           break
@@ -62,7 +61,8 @@ function getSongDuration(songLength) {
   let ss = date.getSeconds();
 
   if (seconds > 86399) {
-    console.log("Duration is longer than 24 hours")
+    let t = "Duration is longer than 24 hours"
+    return t;
   }
   else if (hh == "00") {
     if (ss < 10) {
@@ -79,7 +79,6 @@ function getSongDuration(songLength) {
       ss = "0" + ss;
     }
     let t = `${hh}:${mm}:${ss}`
-    console.log(t)
     return t;
   }
 }
@@ -88,7 +87,6 @@ function getTotalDuration(receivedMessage) {
   let seconds = 0;
   for (let i = 0; i < receivedMessage.guild.musicData.queue.length; i++) {
     seconds = seconds + Number(receivedMessage.guild.musicData.queue[i].songLength);
-    console.log(seconds)
   }
 
   let date = new Date(seconds * 1000);
@@ -97,7 +95,8 @@ function getTotalDuration(receivedMessage) {
   let ss = date.getSeconds();
 
   if (seconds > 86399) {
-    console.log("Duration is longer than 24 hours")
+    let t = "Duration is longer than 24 hours";
+    return t;
   }
   else if (hh == "00") {
     if (ss < 10) {
@@ -114,7 +113,6 @@ function getTotalDuration(receivedMessage) {
       ss = "0" + ss;
     }
     let t = `${hh}:${mm}:${ss}`
-    console.log(t)
     return t;
   }
 }
