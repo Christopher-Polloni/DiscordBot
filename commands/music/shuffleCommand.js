@@ -8,10 +8,9 @@ module.exports = class memeCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'shuffle',
-            group: 'miscellaneous',
+            group: 'music',
             memberName: 'shuffle',
             description: 'Shuffle the queue',
-            nsfw: true,
             examples: ['$shuffle'],
             guildOnly: false,
             argsType: 'multiple'
