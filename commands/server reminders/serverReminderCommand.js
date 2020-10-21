@@ -261,11 +261,15 @@ async function createnewMessage(newMessage, receivedMessage) {
         .setDescription(`${newMessage.date.toLocaleString()} EDT`)
         .addField('Message:', newMessage.message)
       const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
-      channel.send(embed);
-      // receivedMessage.say(embed)
-
-      deletion = await client2.db("DiscordBot").collection("Server Messages")
+      
+      try {
+        channel.send(embed);
+      } catch (e) {
+        console.error(e);
+      } finally {
+        deletion = await client2.db("DiscordBot").collection("Server Messages")
         .deleteOne({ _id: result.insertedId });
+      }
     });
 
   } catch (e) {
