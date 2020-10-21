@@ -52,13 +52,14 @@ async function getDate(receivedMessage) {
         const yearStart = '20';
         const year = yearStart.concat(yearEnd)
         if (year !== "2020" && year !== "2021") {
-          return receivedMessage.say('Currently messages can only be made through the end of 2021.');
+          receivedMessage.say('Currently messages can only be made through the end of 2021.');
+          return getDate(receivedMessage);
         }
         const month = dateInput[0] - 1;
         const day = dateInput[1];
 
         if (!moment([year, month, day]).isValid()) {
-          receivedMessage.reply('The date for this message is not valid.')
+          receivedMessage.say('The date for this message is not valid.')
           return getDate(receivedMessage);
         }
 
@@ -66,7 +67,7 @@ async function getDate(receivedMessage) {
 
         const difference = date - new Date();
         if (difference <= 0) {
-          receivedMessage.reply('The date for this message has already passed!');
+          receivedMessage.say('The date for this message has already passed!');
           return getDate(receivedMessage);
         }
 
@@ -143,14 +144,14 @@ async function getTime(receivedMessage, month, day, year) {
         }
 
         if (!moment([year, month, day, hours, minutes]).isValid()) {
-          receivedMessage.reply('The time for this reminder is not valid.')
+          receivedMessage.say('The time for this reminder is not valid.')
           return getTime(receivedMessage, month, day, year);
         }
 
         const date = new Date(year, month, day, hours, minutes, 00);
         const difference = date - new Date();
         if (difference <= 0) {
-          receivedMessage.reply('The date and time for this reminder has already passed!');
+          receivedMessage.say('The date and time for this reminder has already passed!');
           return getTime(receivedMessage, month, day, year);
         }
         else {
