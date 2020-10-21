@@ -177,9 +177,8 @@ async function getChannel(receivedMessage, date) {
 
         if (messages.first().mentions.channels.first()) {
           const channelID = messages.first().mentions.channels.first().id;
-          const channelName = messages.first().mentions.channels.first().name;
 
-          return getMessage(receivedMessage, date, channelID, channelName)
+          return getMessage(receivedMessage, date, channelID)
         }
         else {
           receivedMessage.say("You didn't properly mention a channel.")
@@ -196,7 +195,7 @@ async function getChannel(receivedMessage, date) {
 
 }
 
-async function getMessage(receivedMessage, date, channelID, channelName) {
+async function getMessage(receivedMessage, date, channelID) {
 
   console.log(date);
   receivedMessage.say("Please enter message for your reminder.").then((newmsg) => {
@@ -205,15 +204,29 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
     newmsg.channel.awaitMessages(filter, { time: 600000, max: 1, errors: ['time'] })
       .then(messages => {
 
+        let userMentions = messages.first().mentions.users
+        let userMentionsArray = userMentions.array()
+        let roleMentions = messages.first().mentions.roles
+        let roleMentionsArray = roleMentions.array()
+        let mentions = '';
+        for (let i = 0; i < userMentionsArray.length; i++) {
+          mentions = mentions.concat(` <@${userMentionsArray[i].id}>`)
+        }
+        for (let i = 0; i < roleMentionsArray.length; i++) {
+          mentions = mentions.concat(` <@&${roleMentionsArray[i].id}>`)
+        }
+
         const message = messages.first().content;
 
         return createnewMessage(
           {
             authorId: receivedMessage.author.id,
+            authorName: receivedMessage.author.username,
+            authorAvatarUrl: receivedMessage.author.displayAvatarURL(),
             date: date,
             channelID: channelID,
-            channelName: channelName,
             message: message,
+            mentions: mentions,
             command: 'schedulemessage'
           },
           receivedMessage
@@ -252,26 +265,44 @@ async function createnewMessage(newMessage, receivedMessage) {
 
     console.log('message_' + result.insertedId);
 
+    const embed2 = new Discord.MessageEmbed()
+      .setColor('#4cbb17')
+      .setTitle(`Scheduled Message`)
+      .setAuthor(newMessage.authorName, newMessage.authorAvatarUrl)
+      .setDescription(`${newMessage.date.toLocaleString()} EDT`)
+      .addField('Message:', newMessage.message)
+    const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
+    
+    const difference = newMessage.date - new Date();
 
-
-    schedule.scheduleJob('message_' + result.insertedId, newMessage.date, async function () {
-      const embed = new Discord.MessageEmbed()
-        .setColor('#4cbb17')
-        // .setTitle(`Message`)
-        .setDescription(`${newMessage.date.toLocaleString()} EDT`)
-        .addField('Message:', newMessage.message)
-      const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
-      
+    if (difference <= 0) {
       try {
-        channel.send(embed);
+        channel.send(embed2);
+        if (newMessage.mentions !== '') {
+          channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+        }
       } catch (e) {
         console.error(e);
       } finally {
         deletion = await client2.db("DiscordBot").collection("Server Messages")
-        .deleteOne({ _id: result.insertedId });
+          .deleteOne({ _id: result.insertedId });
       }
-    });
-
+    }
+    else {
+      schedule.scheduleJob('message_' + result.insertedId, newMessage.date, async function () {
+        try {
+          channel.send(embed2);
+          if (newMessage.mentions !== '') {
+            channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+          }
+        } catch (e) {
+          console.error(e);
+        } finally {
+          deletion = await client2.db("DiscordBot").collection("Server Messages")
+            .deleteOne({ _id: result.insertedId });
+        }
+      });
+    }
   } catch (e) {
     console.error(e);
     receivedMessage.reply('There was an error uploading your message. Please try again')
