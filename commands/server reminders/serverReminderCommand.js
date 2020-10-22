@@ -226,6 +226,7 @@ async function getMessage(receivedMessage, date, channelID) {
             authorAvatarUrl: receivedMessage.author.displayAvatarURL(),
             date: date,
             channelID: channelID,
+            guildID: receivedMessage.guild.id,
             message: message,
             mentions: mentions,
             command: 'schedulemessage'
