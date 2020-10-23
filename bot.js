@@ -24,7 +24,15 @@ Structures.extend('Guild', Guild => {
       };
     }
   }
-  return MusicGuild;
+  class TranslatorGuild extends Guild {
+    constructor(client, data) {
+      super(client, data);
+      this.translatorData = {
+        reactionTranslator: true
+      };
+    }
+  }
+  return MusicGuild, TranslatorGuild;
 });
 
 const client = new Commando.Client({
@@ -62,7 +70,7 @@ client.on('ready', () => {
   restartServerMessages();
 })
 
-client.on('messageReactionAdd', async (reaction, user) => {
+client.on('messageReactionAdd', async (reaction) => {
   if (reaction.partial) {
     try {
       await reaction.fetch();
@@ -72,7 +80,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }
   }
   const flags = ['🇺🇸', '🇪🇸', '🇧🇷', '🇮🇹'];
-  if (flags.includes(reaction.emoji.name)) {
+  if (flags.includes(reaction.emoji.name) && reaction.message.channel.guild.translatorData.reactionTranslator) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',
@@ -92,8 +100,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
       }],
       responseType: 'json'
     }).then(function (response) {
-      console.log(reaction.message.author.username)
-      console.log(reaction)
       const embed = new Discord.MessageEmbed()
         .setColor('#FFFF00')
         .setTitle('Message Translated')
@@ -101,7 +107,6 @@ client.on('messageReactionAdd', async (reaction, user) => {
         .addField(`Translated To ${config.languages[reaction.emoji.name].language}:`, response.data[0].translations[0].text)
         .setFooter(`${reaction.message.author.username} sent the original message`, reaction.message.author.displayAvatarURL())
       reaction.message.channel.send(embed)
-      // console.log(JSON.stringify(response.data[0].translations[0].text, null, 4));
     }).catch(function (error) {
       console.log(error);
     })
