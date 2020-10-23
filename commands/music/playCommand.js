@@ -226,7 +226,7 @@ module.exports = class playCommand extends Commando.Command {
           .on('finish', () => {
             // this event fires when the song has ended
             queue.shift()
-            if (queue.length >= 1) { // if there are more songs in queue
+            if (queue.length > 0) { // if there are more songs in queue
               return playSong(queue); // continue playing
             } else { // else if there are no more songs in queue
               receivedMessage.guild.musicData.isPlaying = false;
@@ -235,7 +235,8 @@ module.exports = class playCommand extends Commando.Command {
           })
           .on('error', e => {
             console.error(e);
-            if (queue.length >= 1) { // if there are more songs in queue
+            if (queue.length > 0) { // if there are more songs in queue
+              queue.shift();
               return playSong(queue); // continue playing
             } else { // else if there are no more songs in queue
               receivedMessage.guild.musicData.isPlaying = false;
