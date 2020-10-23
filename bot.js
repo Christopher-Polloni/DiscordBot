@@ -58,7 +58,8 @@ client.registry
 client.on('ready', () => {
   console.log("Connected as " + client.user.tag)
   client.user.setActivity(`${client.commandPrefix}` + "help all")
-  startup();
+  restartPersonalReminders();
+  restartServerMessages();
 })
 
 client.on('messageReactionAdd', async (reaction, user) => {
@@ -94,11 +95,11 @@ client.on('messageReactionAdd', async (reaction, user) => {
       console.log(reaction.message.author.username)
       console.log(reaction)
       const embed = new Discord.MessageEmbed()
-      .setColor('#FFFF00')
-      .setTitle('Message Translated')
-      .addField('Original Message:', reaction.message.content)
-      .addField(`Translated To ${config.languages[reaction.emoji.name].language}:`, response.data[0].translations[0].text)
-      .setFooter(`${reaction.message.author.username} sent the original message`, reaction.message.author.displayAvatarURL())
+        .setColor('#FFFF00')
+        .setTitle('Message Translated')
+        .addField('Original Message:', reaction.message.content)
+        .addField(`Translated To ${config.languages[reaction.emoji.name].language}:`, response.data[0].translations[0].text)
+        .setFooter(`${reaction.message.author.username} sent the original message`, reaction.message.author.displayAvatarURL())
       reaction.message.channel.send(embed)
       // console.log(JSON.stringify(response.data[0].translations[0].text, null, 4));
     }).catch(function (error) {
@@ -114,7 +115,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
 
 client.login(config.token);
 
-async function startup() {
+async function restartPersonalReminders() {
   try {
     await client2.connect();
     let results = await client2.db("DiscordBot").collection("Personal Reminders")
@@ -124,7 +125,7 @@ async function startup() {
     for (let i = 0; i < results.length; i++) {
       const reminderDate = results[i].date;
       const difference = reminderDate - new Date();
-      const user = await client.users.cache.get(results[i].authorId);
+      const user = client.users.cache.get(results[i].authorId);
       if (difference <= 0) {
         console.log(results[i]);
         console.log('The above has passed')
@@ -157,12 +158,59 @@ async function startup() {
             .deleteOne({ "_id": ObjectId(results[i]._id) });
           await client2.close();
         });
-        console.log(results[i]);
-        console.log('The above has been scheduled')
       }
 
     }
 
+  } catch (e) {
+    console.error(e);
+  } finally {
+    await client2.close();
+  }
+}
+
+async function restartServerMessages() {
+  try {
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Server Messages")
+      .find({ command: 'schedulemessage' })
+      .sort({ date: 1 })
+      .toArray()
+    for (let i = 0; i < results.length; i++) {
+      const reminderDate = results[i].date;
+      const difference = reminderDate - new Date();
+      const channel = client.channels.cache.get(results[i].channelID)
+      const user = client.users.cache.get(results[i].authorId)
+      if (difference <= 0) {
+        const embed = new Discord.MessageEmbed()
+          .setColor('#8B0000')
+          .setTitle("Missed Message!")
+          .setDescription(`Oops! It appears I was not online when I was supposed to send a message! I'm terribly sorry for this!\n\n
+          Date: ${results[i].date.toLocaleString()} EDT\nServer: ${results[i].guildName}\nChannel: #${results[i].channelName}\nMessage:\n${results[i].message}`)
+
+        user.send(embed);
+
+        deletion = await client2.db("DiscordBot").collection("Server Messages")
+          .deleteOne({ "_id": ObjectId(results[i]._id) });
+      }
+      else {
+        schedule.scheduleJob('message_' + results[i]._id, results[i].date, async function () {
+          const embed = new Discord.MessageEmbed()
+            .setColor('#4cbb17')
+            .setTitle(`Scheduled Message`)
+            .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
+            .setDescription(`${results[i].date.toLocaleString()} EDT`)
+            .addField('Message:', results[i].message)
+          channel.send(embed)
+
+          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+          await mongoClient.connect();
+          deletion = await mongoClient.db("DiscordBot").collection("Server Messages")
+            .deleteOne({ "_id": ObjectId(results[i]._id) });
+          await mongoClient.close();
+        });
+      }
+    }
   } catch (e) {
     console.error(e);
   } finally {

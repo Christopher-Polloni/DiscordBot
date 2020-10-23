@@ -178,8 +178,9 @@ async function getChannel(receivedMessage, date) {
 
         if (messages.first().mentions.channels.first()) {
           const channelID = messages.first().mentions.channels.first().id;
+          const channelName = messages.first().mentions.channels.first().name;
 
-          return getMessage(receivedMessage, date, channelID)
+          return getMessage(receivedMessage, date, channelID, channelName)
         }
         else {
           receivedMessage.say("You didn't properly mention a channel.")
@@ -196,7 +197,7 @@ async function getChannel(receivedMessage, date) {
 
 }
 
-async function getMessage(receivedMessage, date, channelID) {
+async function getMessage(receivedMessage, date, channelID, channelName) {
 
   console.log(date);
   receivedMessage.say("Please enter message for your reminder.").then((newmsg) => {
@@ -226,7 +227,9 @@ async function getMessage(receivedMessage, date, channelID) {
             authorAvatarUrl: receivedMessage.author.displayAvatarURL(),
             date: date,
             channelID: channelID,
+            channelName: channelName,
             guildID: receivedMessage.guild.id,
+            guildName: receivedMessage.guild.name,
             message: message,
             mentions: mentions,
             command: 'schedulemessage'
