@@ -56,7 +56,7 @@ client.registry
   .registerDefaultGroups()
   .registerDefaultCommands({
     unknownCommand: false,
-    prefix: false,
+    prefix: true,
     help: true,
     eval: false,
     ping: false,
@@ -66,7 +66,7 @@ client.registry
 
 client.on('ready', () => {
   console.log("Connected as " + client.user.tag)
-  client.user.setActivity(`${client.commandPrefix}` + "help all")
+  client.user.setActivity(`@boop help all`)
   restartPersonalReminders();
   restartServerMessages();
 })
