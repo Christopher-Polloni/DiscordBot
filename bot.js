@@ -48,7 +48,8 @@ client.registry
     ['music', 'Music Commands'],
     ['reddit', 'Reddit Image Commands'],
     ['reminders', 'Personal Reminder Commands'],
-    ['serverreminders', 'Server Reminder Commands']
+    ['serverreminders', 'Server Reminder Commands'],
+    ['translation', 'Translation Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
