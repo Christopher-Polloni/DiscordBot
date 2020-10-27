@@ -69,6 +69,7 @@ client.on('ready', () => {
   client.user.setActivity(`@boop help all`)
   restartPersonalReminders();
   restartServerMessages();
+  restartTranslationSettings();
 })
 
 client.on('messageReactionAdd', async (reaction) => {
@@ -221,5 +222,31 @@ async function restartServerMessages() {
     console.error(e);
   } finally {
     await client2.close();
+  }
+}
+
+async function restartTranslationSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Translator Settings")
+      .find({ reactionTranslator: false })
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    console.log(results)
+    console.log(guilds)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guildId)) {
+          let guild = client.guilds.cache.get(results[i].guildId);
+          guild.translatorData.reactionTranslator = false;
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
   }
 }
