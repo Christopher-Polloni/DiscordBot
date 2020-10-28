@@ -245,8 +245,8 @@ async function restartTranslationSettings() {
     console.log(guilds)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
-        if (guilds.includes(results[i].guildId)) {
-          let guild = client.guilds.cache.get(results[i].guildId);
+        if (guilds.includes(results[i].guild)) {
+          let guild = client.guilds.cache.get(results[i].guild);
           guild.translatorData.reactionTranslator = false;
         }
       }

@@ -9,7 +9,7 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
       group: 'translation',
       memberName: 'toggletranslation',
       description: 'Toggle whether translation occurs in a server when reacting to a message with specific country flags. Only server owners can use this command.',
-      examples: ['$toggletranslation on', '$toggletranslation off'],
+      examples: ['$toggletranslation', '$toggletranslation on', '$toggletranslation off'],
       guildOnly: true,
       argsType: 'single'
     })
@@ -54,7 +54,7 @@ async function upsertTranslatorSetting(guildId, updatedSetting) {
   const uri = config.mongoUri;
   const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   await client2.connect();
-  result = await client2.db("DiscordBot").collection("Translator Settings").updateOne({ guildId: guildId }, { $set: updatedSetting }, { upsert: true });
+  result = await client2.db("DiscordBot").collection("Translator Settings").updateOne({ guild: guildId }, { $set: updatedSetting }, { upsert: true });
   await client2.close();
   return
 }
