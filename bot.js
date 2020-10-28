@@ -78,6 +78,7 @@ client.setProvider(
 ).catch(console.error);
 
 client.on('messageReactionAdd', async (reaction) => {
+  
   if (reaction.partial) {
     try {
       await reaction.fetch();
@@ -87,7 +88,7 @@ client.on('messageReactionAdd', async (reaction) => {
     }
   }
   const flags = ['🇺🇸', '🇪🇸', '🇧🇷', '🇮🇹'];
-  if (flags.includes(reaction.emoji.name) && reaction.message.channel.guild.translatorData.reactionTranslator) {
+  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.translatorData.reactionTranslator)) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',

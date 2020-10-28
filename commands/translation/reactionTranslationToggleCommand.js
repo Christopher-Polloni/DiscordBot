@@ -16,20 +16,20 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
   }
   async run(receivedMessage, arg) {
     try {
-      if (arg == 'on' && receivedMessage.guild.translatorData.reactionTranslator == true) {
+      if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator == true) {
         return receivedMessage.say(`The ability to translate messages using reactions is already enabled!`);
       }
-      else if (arg == 'on' && receivedMessage.guild.translatorData.reactionTranslator == false) {
+      else if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator == false) {
         await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: true });
         receivedMessage.guild.translatorData.reactionTranslator = true;
         return receivedMessage.say(`The ability to translate messages using reactions is now enabled!`);
       }
-      else if (arg == 'off' && receivedMessage.guild.translatorData.reactionTranslator == true) {
+      else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator == true) {
         await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: false });
         receivedMessage.guild.translatorData.reactionTranslator = false;
         return receivedMessage.say(`The ability to translate messages using reactions is now disabled!`);
       }
-      else if (arg == 'off' && receivedMessage.guild.translatorData.reactionTranslator == false) {
+      else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator == false) {
         return receivedMessage.say(`The ability to translate messages using reactions is already disabled!`);
       }
       else {
