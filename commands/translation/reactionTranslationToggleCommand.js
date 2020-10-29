@@ -11,40 +11,46 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
       description: 'Toggle whether translation occurs in a server when reacting to a message with specific country flags. Only server owners can use this command.',
       examples: ['$toggletranslation', '$toggletranslation on', '$toggletranslation off'],
       guildOnly: true,
-      argsType: 'single'
+      argsType: 'single',
+      userPermissions: ['ADMINISTRATOR']
     })
   }
   async run(receivedMessage, arg) {
-    try {
-      if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator == true) {
-        return receivedMessage.say(`The ability to translate messages using reactions is already enabled!`);
-      }
-      else if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator == false) {
-        await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: true });
-        receivedMessage.guild.translatorData.reactionTranslator = true;
-        return receivedMessage.say(`The ability to translate messages using reactions is now enabled!`);
-      }
-      else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator == true) {
-        await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: false });
-        receivedMessage.guild.translatorData.reactionTranslator = false;
-        return receivedMessage.say(`The ability to translate messages using reactions is now disabled!`);
-      }
-      else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator == false) {
-        return receivedMessage.say(`The ability to translate messages using reactions is already disabled!`);
+    if (!arg) {
+      if (receivedMessage.guild.translatorData.reactionTranslator == true) {
+        return receivedMessage.say(`The ability to translate messages using reactions is currently enabled!`);
       }
       else {
-        if (receivedMessage.guild.translatorData.reactionTranslator == true) {
-          return receivedMessage.say(`The ability to translate messages using reactions is currently enabled!`);
+        return receivedMessage.say(`The ability to translate messages using reactions is currently disabled!`);
+      }
+    }
+    else if (arg.toLowerCase() !== 'on' && arg.toLowerCase() !== 'off') {
+      return receivedMessage.say(`To properly use this command, try \`toggletranslation\`, \`toggletranslation on\`, or \`toggletranslation off\``);
+    }
+    else {
+      try {
+        if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator) {
+          return receivedMessage.say(`The ability to translate messages using reactions is already enabled!`);
+        }
+        else if (arg.toLowerCase() == 'on' && !receivedMessage.guild.translatorData.reactionTranslator) {
+          await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: true });
+          receivedMessage.guild.translatorData.reactionTranslator = true;
+          return receivedMessage.say(`The ability to translate messages using reactions is now enabled!`);
+        }
+        else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator) {
+          await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: false });
+          receivedMessage.guild.translatorData.reactionTranslator = false;
+          return receivedMessage.say(`The ability to translate messages using reactions is now disabled!`);
         }
         else {
-          return receivedMessage.say(`The ability to translate messages using reactions is currently disabled!`);
+          return receivedMessage.say(`The ability to translate messages using reactions is already disabled!`);
         }
       }
-    } catch (e) {
-      console.error(e);
-      receivedMessage.say(`There was an error updating your server's translation settings. Please try again.`)
+      catch (e) {
+        console.error(e);
+        return receivedMessage.say(`There was an error updating your server's translation settings. Please try again.`)
+      }
     }
-
   }
 };
 
