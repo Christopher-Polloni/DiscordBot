@@ -17,7 +17,7 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
   }
   async run(receivedMessage, arg) {
     if (!arg) {
-      if (receivedMessage.guild.translatorData.reactionTranslator == true) {
+      if (receivedMessage.guild.guildSettings.reactionTranslator == true) {
         return receivedMessage.say(`The ability to translate messages using reactions is currently enabled!`);
       }
       else {
@@ -29,17 +29,17 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
     }
     else {
       try {
-        if (arg.toLowerCase() == 'on' && receivedMessage.guild.translatorData.reactionTranslator) {
+        if (arg.toLowerCase() == 'on' && receivedMessage.guild.guildSettings.reactionTranslator) {
           return receivedMessage.say(`The ability to translate messages using reactions is already enabled!`);
         }
-        else if (arg.toLowerCase() == 'on' && !receivedMessage.guild.translatorData.reactionTranslator) {
+        else if (arg.toLowerCase() == 'on' && !receivedMessage.guild.guildSettings.reactionTranslator) {
           await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: true });
-          receivedMessage.guild.translatorData.reactionTranslator = true;
+          receivedMessage.guild.guildSettings.reactionTranslator = true;
           return receivedMessage.say(`The ability to translate messages using reactions is now enabled!`);
         }
-        else if (arg.toLowerCase() == 'off' && receivedMessage.guild.translatorData.reactionTranslator) {
+        else if (arg.toLowerCase() == 'off' && receivedMessage.guild.guildSettings.reactionTranslator) {
           await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: false });
-          receivedMessage.guild.translatorData.reactionTranslator = false;
+          receivedMessage.guild.guildSettings.reactionTranslator = false;
           return receivedMessage.say(`The ability to translate messages using reactions is now disabled!`);
         }
         else {

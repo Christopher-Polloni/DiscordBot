@@ -27,15 +27,20 @@ Structures.extend('Guild', Guild => {
       };
     }
   }
-  class TranslatorGuild extends Guild {
+  class GuildSettings extends Guild {
     constructor(client, data) {
       super(client, data);
-      this.translatorData = {
-        reactionTranslator: true
+      this.guildSettings = {
+        reactionTranslator: true,
+        welcomeSettings : {
+          sendWelcome: false,
+          welcomeChannelId: null,
+          welcomeMessage: null
+        }
       };
     }
   }
-  return MusicGuild, TranslatorGuild;
+  return MusicGuild, GuildSettings;
 });
 
 const client = new Commando.Client({
@@ -52,7 +57,8 @@ client.registry
     ['reddit', 'Reddit Image Commands'],
     ['reminders', 'Personal Reminder Commands'],
     ['serverreminders', 'Server Reminder Commands'],
-    ['translation', 'Translation Commands']
+    ['translation', 'Translation Commands'],
+    ['moderation', 'Moderation Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
