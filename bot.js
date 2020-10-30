@@ -12,6 +12,8 @@ const client3 = new Discord.Client();
 const ObjectId = require('mongodb').ObjectID;
 const axios = require('axios').default;
 const uuidv4 = require('uuid');
+const Canvas = require('canvas');
+
 
 Structures.extend('Guild', Guild => {
   class MusicGuild extends Guild {
@@ -74,11 +76,55 @@ client.on('ready', () => {
 })
 
 client.setProvider(
-	MongoClient.connect(uri).then(client => new MongoDBProvider(client, 'DiscordBot'))
+  MongoClient.connect(uri).then(client => new MongoDBProvider(client, 'DiscordBot'))
 ).catch(console.error);
 
+const applyText = (canvas, text) => {
+  const ctx = canvas.getContext('2d');
+  let fontSize = 70;
+
+  do {
+    ctx.font = `${fontSize -= 10}px sans-serif`;
+  } while (ctx.measureText(text).width > canvas.width - 300);
+
+  return ctx.font;
+};
+
+client.on('guildMemberAdd', async (member) => {
+  const channel = member.guild.channels.cache.find(ch => ch.id === 'member-log');
+  if (!channel) return;
+
+  const canvas = Canvas.createCanvas(700, 250);
+  const ctx = canvas.getContext('2d');
+
+  const background = await Canvas.loadImage('./welcome-background.jpg');
+  ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
+
+  ctx.strokeStyle = '#74037b';
+  ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+  ctx.font = '40px sans-serif';
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText('Welcome to the server,', canvas.width / 2.5, canvas.height / 3.5);
+
+  ctx.font = applyText(canvas, `${member.displayName}!`);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillText(`${member.displayName}!`, canvas.width / 2.3, canvas.height / 1.5);
+
+  ctx.beginPath();
+  ctx.arc(125, 125, 100, 0, Math.PI * 2, true);
+  ctx.closePath();
+  ctx.clip();
+
+  const avatar = await Canvas.loadImage(member.user.displayAvatarURL({ format: 'jpg' }));
+  ctx.drawImage(avatar, 25, 25, 200, 200);
+
+  const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+
+  return channel.send(`Welcome to the server, ${member}!`, attachment);
+});
+
 client.on('messageReactionAdd', async (reaction) => {
-  
   if (reaction.partial) {
     try {
       await reaction.fetch();
@@ -242,8 +288,6 @@ async function restartTranslationSettings() {
       .toArray()
     await client2.close();
     let guilds = client.guilds.cache.map(guild => guild.id)
-    console.log(results)
-    console.log(guilds)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
         if (guilds.includes(results[i].guild)) {
