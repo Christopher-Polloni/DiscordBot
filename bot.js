@@ -33,7 +33,6 @@ Structures.extend('Guild', Guild => {
       this.guildSettings = {
         reactionTranslator: true,
         welcomeSettings : {
-          sendWelcome: false,
           welcomeChannelId: null,
           welcomeMessage: null
         }
@@ -97,7 +96,7 @@ const applyText = (canvas, text) => {
 };
 
 client.on('guildMemberAdd', async (member) => {
-  const channel = member.guild.channels.cache.find(ch => ch.id === 'member-log');
+  const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
   if (!channel) return;
 
   const canvas = Canvas.createCanvas(700, 250);
@@ -126,8 +125,10 @@ client.on('guildMemberAdd', async (member) => {
   ctx.drawImage(avatar, 25, 25, 200, 200);
 
   const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'welcome-image.png');
+  let message = member.guild.guildSettings.welcomeSettings.welcomeMessage;
+  message = message.replace(`---`, `<@${member.id}>`);
 
-  return channel.send(`Welcome to the server, ${member}!`, attachment);
+  return channel.send(message, attachment);
 });
 
 client.on('messageReactionAdd', async (reaction) => {
