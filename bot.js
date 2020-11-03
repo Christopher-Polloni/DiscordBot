@@ -78,6 +78,7 @@ client.on('ready', () => {
   restartPersonalReminders();
   restartServerMessages();
   restartTranslationSettings();
+  restartWelcomeSettings();
 })
 
 client.setProvider(
@@ -300,6 +301,31 @@ async function restartTranslationSettings() {
         if (guilds.includes(results[i].guild)) {
           let guild = client.guilds.cache.get(results[i].guild);
           guild.translatorData.reactionTranslator = false;
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartWelcomeSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Server Welcome Settings")
+      .find()
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guild)) {
+          let guild = client.guilds.cache.get(results[i].guild);
+          guild.guildSettings.welcomeSettings.welcomeChannelId = results[i].welcomeChannelId;
+          guild.guildSettings.welcomeSettings.welcomeMessage = results[i].welcomeMessage;
         }
       }
     }

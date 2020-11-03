@@ -17,7 +17,7 @@ module.exports = class welcomeCommand extends Commando.Command {
     }
     async run(receivedMessage, arg) {
         if (!arg) {
-            if (receivedMessage.guild.guildSettings.welcomeSettings.sendWelcome) {
+            if (receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId) {
                 let welcomeChannelId = receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId;
                 let welcomeMessage = receivedMessage.guild.guildSettings.welcomeSettings.welcomeMessage;
                 await receivedMessage.say(`${receivedMessage.guild.name} welcome messages are set to be sent in <#${welcomeChannelId}> with the following message:`)
