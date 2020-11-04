@@ -146,7 +146,7 @@ client.on('messageReactionAdd', async (reaction) => {
     }
   }
   const flags = ['🇺🇸', '🇪🇸', '🇧🇷', '🇮🇹'];
-  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.translatorData.reactionTranslator)) {
+  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.reactionTranslator)) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',
