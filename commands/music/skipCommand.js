@@ -1,6 +1,6 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
-const config = require(path.join(__dirname, '../../config', 'config.json'))
+const config = require('../../config.js');
 const Discord = require('discord.js');
 
 module.exports = class skipCommand extends Commando.Command{

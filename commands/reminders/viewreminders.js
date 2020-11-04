@@ -1,7 +1,7 @@
 const Commando = require('discord.js-commando');
 const Discord = require('discord.js');
 const path = require('path');
-const config = require(path.join(__dirname, '../../config', 'config.json'))
+const config = require('../../config.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const MongoClient = require('mongodb').MongoClient;

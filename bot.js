@@ -1,7 +1,7 @@
 const Commando = require('discord.js-commando');
 const { Structures } = require('discord.js');
 const path = require('path');
-const config = require(path.join(__dirname, 'config', 'config.json'));
+const config = require('./config.js');
 const schedule = require('node-schedule');
 const MongoClient = require('mongodb').MongoClient;
 const uri = config.mongoUri;

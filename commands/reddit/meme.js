@@ -1,6 +1,6 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
-const config = require(path.join(__dirname, '../../config', 'config.json'))
+const config = require('../../config.js');
 // const redditApi = require("imageapi.js");
 const fetch = require("node-fetch");
 const randomPuppy = require('random-puppy');

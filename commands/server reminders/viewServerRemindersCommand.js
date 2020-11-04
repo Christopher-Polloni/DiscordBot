@@ -1,7 +1,7 @@
 const Commando = require('discord.js-commando');
 const Discord = require('discord.js');
 const path = require('path');
-const config = require(path.join(__dirname, '../../config', 'config.json'))
+const config = require('../../config.js');
 const MongoClient = require('mongodb').MongoClient;
 const uri = config.mongoUri;
 const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
