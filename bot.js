@@ -27,6 +27,10 @@ Structures.extend('Guild', Guild => {
       };
     }
   }
+  return MusicGuild;
+});
+
+Structures.extend('Guild', Guild => {
   class GuildSettings extends Guild {
     constructor(client, data) {
       super(client, data);
@@ -39,7 +43,7 @@ Structures.extend('Guild', Guild => {
       };
     }
   }
-  return MusicGuild, GuildSettings;
+  return GuildSettings;
 });
 
 const client = new Commando.Client({
