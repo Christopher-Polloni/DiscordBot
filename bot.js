@@ -146,7 +146,7 @@ client.on('messageReactionAdd', async (reaction) => {
     }
   }
   const flags = ['🇺🇸', '🇪🇸', '🇧🇷', '🇮🇹'];
-  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.translatorData.reactionTranslator)) {
+  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.translatorData.reactionTranslator)) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',
@@ -304,7 +304,7 @@ async function restartTranslationSettings() {
       for (let i = 0; i < results.length; i++) {
         if (guilds.includes(results[i].guild)) {
           let guild = client.guilds.cache.get(results[i].guild);
-          guild.translatorData.reactionTranslator = false;
+          guild.guildSettings.translatorData.reactionTranslator = false;
         }
       }
     }
