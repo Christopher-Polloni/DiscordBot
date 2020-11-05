@@ -15,8 +15,8 @@ module.exports = class rockPaperScissorsCommand extends Commando.Command{
       })
     }
     async run (receivedMessage, arg) {
-      var rpsBotChoice = Math.random();
-      var botChoice = ""
+      const rpsBotChoice = Math.random();
+      let botChoice = ""
       if (rpsBotChoice <= .33) {
         let botChoice = "rock"
       }
@@ -28,35 +28,35 @@ module.exports = class rockPaperScissorsCommand extends Commando.Command{
       }
       if (arg == "rock"){
         if (botChoice == "rock"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": 👊\n" + config.botName + ": 👊\nWe tied! 😮")
+          receivedMessage.channel.send(`${receivedMessage.author}: 👊\n${receivedMessage.client.user}: 👊\nWe tied! 😮`)
         }
         else if (botChoice == "paper"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": 👊\n" + config.botName + ": ✋\nYou lose! 😜")
+          receivedMessage.channel.send(`${receivedMessage.author}: 👊\n${receivedMessage.client.user}: ✋\nYou lose! 😜`)
         }
         else {
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": 👊\n" + config.botName + ": ✌\nYou win! 😭")
+          receivedMessage.channel.send(`${receivedMessage.author}: 👊\n${receivedMessage.client.user}: ✌\nYou win! 😭`)
         }
       }
       else if (arg == "paper"){
         if (botChoice == "rock"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✋\n" + config.botName + ": 👊\nYou win! 😭")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✋\n${receivedMessage.client.user}: 👊\nYou win! 😭`)
         }
         else if (botChoice == "paper"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✋\n" + config.botName + ": ✋\nWe tied! 😮")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✋\n${receivedMessage.client.user}: ✋\nWe tied! 😮`)
         }
         else {
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✋\n" + config.botName + ": ✌\nYou lose! 😜")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✋\n${receivedMessage.client.user}: ✌\nYou lose! 😜`)
         }
       }
       else if (arg == "scissors"){
         if (botChoice == "rock"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✌\n" + config.botName + ": 👊\nYou lose! 😜")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✌\n${receivedMessage.client.user}: 👊\nYou lose! 😜`)
         }
         else if (botChoice == "paper"){
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✌\n" + config.botName + ": ✋\nYou win! 😭")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✌\n${receivedMessage.client.user}: ✋\nYou win! 😭`)
         }
         else {
-          receivedMessage.channel.send("<@" + receivedMessage.author.id + ">"+": ✌\n" + config.botName + ": ✌\nWe tied! 😮")
+          receivedMessage.channel.send(`${receivedMessage.author}: ✌\n${receivedMessage.client.user}: ✌\nWe tied! 😮`)
         }
       }
       else {
