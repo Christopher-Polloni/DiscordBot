@@ -2,7 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 
-module.exports = class welcomeCommand extends Commando.Command {
+module.exports = class kickCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'kick',
