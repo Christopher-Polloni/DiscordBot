@@ -16,15 +16,16 @@ module.exports = class rockPaperScissorsCommand extends Commando.Command{
     }
     async run (receivedMessage, arg) {
       const rpsBotChoice = Math.random();
-      let botChoice = ""
+      console.log(rpsBotChoice)
+      let botChoice = null;
       if (rpsBotChoice <= .33) {
-        let botChoice = "rock"
+        botChoice = "rock"
       }
       else if (rpsBotChoice > .33 && rpsBotChoice < .67) {
-        let botChoice = "paper"
+        botChoice = "paper"
       }
       else {
-        let botChoice = "scissors"
+        botChoice = "scissors"
       }
       if (arg == "rock"){
         if (botChoice == "rock"){
