@@ -9,7 +9,7 @@ module.exports = class welcomeCommand extends Commando.Command {
             group: 'moderation',
             memberName: 'welcome',
             description: 'View or update your welcome message for members joining your server',
-            examples: ['welcome', 'welcome update'],
+            examples: ['welcome', 'welcome update', 'welcome off'],
             guildOnly: true,
             argsType: 'single',
             userPermissions: ['ADMINISTRATOR']
@@ -20,9 +20,9 @@ module.exports = class welcomeCommand extends Commando.Command {
             if (receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId) {
                 let welcomeChannelId = receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId;
                 let welcomeMessage = receivedMessage.guild.guildSettings.welcomeSettings.welcomeMessage;
-                await receivedMessage.say(`${receivedMessage.guild.name} welcome messages are set to be sent in <#${welcomeChannelId}> with the following message:`)
-                await receivedMessage.say(`${welcomeMessage}`)
-                await receivedMessage.say(`To update these settings, use the command \`welcome update\``)
+                receivedMessage.say(`${receivedMessage.guild.name} welcome messages are set to be sent in <#${welcomeChannelId}> with the following message:`)
+                receivedMessage.say(`${welcomeMessage}`)
+                receivedMessage.say(`To update these settings, use the command \`welcome update\`\nTo turn off this setting, use the command \`welcome off\``)
             }
             else {
                 return receivedMessage.say(`Welcome message settings for ${receivedMessage.guild.name} are not set.`);
@@ -35,7 +35,7 @@ module.exports = class welcomeCommand extends Commando.Command {
             return deleteWelcomeSetting(receivedMessage);
         }
         else {
-            return receivedMessage.say(`To properly use this command, try \`welcome\` or \`welcome update\``);
+            return receivedMessage.say(`To properly use this command, try \`welcome\`, \`welcome update\` or \`welcome off\``);
         }
     }
 };
