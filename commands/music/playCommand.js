@@ -21,7 +21,7 @@ module.exports = class playCommand extends Commando.Command {
       group: 'music',
       memberName: 'play',
       description: 'Play a song in a voice channel',
-      examples: ['\'$play <Youtube link>\', \'$play <search term for song>\''],
+      examples: ['play <Youtube song link>', 'play <Youtube playlist link>', 'play <search terms for song>'],
       guildOnly: true,
       argsType: 'multiple'
     })

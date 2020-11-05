@@ -15,7 +15,7 @@ module.exports = class scheduleCommand extends Commando.Command {
       group: 'serverreminders',
       memberName: 'schedulemessage',
       description: 'Schedule a message for a channel in a server',
-      examples: ['$servermessage'],
+      examples: ['servermessage'],
       guildOnly: true,
       argsType: 'multiple'
     })

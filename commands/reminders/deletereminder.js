@@ -16,7 +16,7 @@ module.exports = class scheduleCommand extends Commando.Command {
       group: 'reminders',
       memberName: 'deletereminder',
       description: 'Delete one of your reminders',
-      examples: ['$deletereminder <reminderID>'],
+      examples: ['deletereminder <reminderID>'],
       guildOnly: false,
     })
   }

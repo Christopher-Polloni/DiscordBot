@@ -13,7 +13,7 @@ module.exports = class scheduleCommand extends Commando.Command {
             group: 'serverreminders',
             memberName: 'viewservermessages',
             description: 'View your scheduled messages for the server you run the command in.',
-            examples: ['$viewservermessages'],
+            examples: ['viewservermessages'],
             guildOnly: true,
         })
     }

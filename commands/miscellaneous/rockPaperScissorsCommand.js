@@ -9,7 +9,7 @@ module.exports = class rockPaperScissorsCommand extends Commando.Command{
         group : 'miscellaneous',
         memberName : 'rps',
         description : 'Play a simple game of rock, paper, scissors with the bot',
-        examples: ['$rps rock\n$rps paper\n$rps scissors'],
+        examples: ['rps rock', 'rps paper', 'rps scissors'],
         guildOnly: false,
         argsType: 'single'
       })

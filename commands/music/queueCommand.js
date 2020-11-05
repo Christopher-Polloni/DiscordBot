@@ -10,7 +10,7 @@ module.exports = class queueCommand extends Commando.Command {
       group: 'music',
       memberName: 'queue',
       description: 'View list of songs in the queue',
-      examples: ['\'$queue\''],
+      examples: ['queue'],
       guildOnly: true,
       argsType: 'multiple'
     })

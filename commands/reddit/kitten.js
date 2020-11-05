@@ -12,7 +12,7 @@ module.exports = class memeCommand extends Commando.Command {
             group: 'reddit',
             memberName: 'kitten',
             description: 'Retrieve an image from r/kittens',
-            examples: ['$kitten'],
+            examples: ['kitten'],
             guildOnly: false,
             argsType: 'multiple'
         })
