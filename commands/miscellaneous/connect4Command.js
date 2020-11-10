@@ -9,13 +9,15 @@ module.exports = class connect4Command extends Commando.Command {
             name: 'connect4',
             group: 'miscellaneous',
             memberName: 'connect4',
-            description: 'Play Connect 4 with a friend',
-            examples: ['connect4', 'connect4'],
+            description: 'Play Connect 4 with a user in same server',
+            examples: ['connect4 <user>'],
             guildOnly: true,
-            argsType: 'multiple'
         })
     }
-    async run(receivedMessage, args) {
+    async run(receivedMessage) {
+        if (receivedMessage.mentions.users.first() && receivedMessage.mentions.users.first().bot) {
+            return receivedMessage.say(`Oops! Looks like a mistake was made. Here are some possible fixes.\n1. You must play against another user, not a bot.\n2. This command must use your server's prefix. Use \`@boop#9207 prefix\` if you aren't sure what the prefix is.`)
+        }
         if (!receivedMessage.mentions.users.first()) {
             return receivedMessage.say(`You must mention the user you want to play with when using the \`connect4\` command.`)
         }
