@@ -43,7 +43,19 @@ module.exports = class connect4Command extends Commando.Command {
 };
 
 async function game(gameInfo) {
-    const embed = new Discord.MessageEmbed()
+
+    if (gameInfo.reactionFilter.length == 0){
+        const embed = new Discord.MessageEmbed()
+        .setColor('RED')
+        .setTitle('Connect 4')
+        .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
+        .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
+        .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
+        .addField(`THE WINNER IS`, `Nobody! It's a tie!`)
+        return gameInfo.receivedMessage.say(embed)
+    }
+    else {
+        const embed = new Discord.MessageEmbed()
         .setColor('RED')
         .setTitle('Connect 4')
         .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
@@ -79,31 +91,32 @@ async function game(gameInfo) {
             const reaction = collected.first();
 
             if (reaction.emoji.name == '1️⃣') {
-                editBoard(gameInfo, '0')
+                editBoard(gameInfo, '0' , '1️⃣')
             }
             else if (reaction.emoji.name == '2️⃣') {
-                editBoard(gameInfo, '1')
+                editBoard(gameInfo, '1', '2️⃣')
             }
             else if (reaction.emoji.name == '3️⃣') {
-                editBoard(gameInfo, '2')
+                editBoard(gameInfo, '2', '3️⃣')
             }
             else if (reaction.emoji.name == '4️⃣') {
-                editBoard(gameInfo, '3')
+                editBoard(gameInfo, '3', '4️⃣')
             }
             else if (reaction.emoji.name == '5️⃣') {
-                editBoard(gameInfo, '4')
+                editBoard(gameInfo, '4', '5️⃣')
             }
             else if (reaction.emoji.name == '6️⃣') {
-                editBoard(gameInfo, '5')
+                editBoard(gameInfo, '5', '6️⃣')
             }
             else {
-                editBoard(gameInfo, '6')
+                editBoard(gameInfo, '6', '7️⃣')
             }
         })
         .catch(collected => {
             gameInfo.receivedMessage.say('Two minutes passed without a selection, this game is now over!');
             console.log(collected)
         });
+    }    
 }
 
 function displayBoard(gameInfo) {
@@ -116,12 +129,13 @@ function displayBoard(gameInfo) {
     return boardDisplay
 }
 
-function editBoard(gameInfo, column) {
+function editBoard(gameInfo, column, emoji) {
     for (let i = 5; i >= 0; i--) {
         if (gameInfo.board[i][column] == '⚪') {
             gameInfo.board[i][column] = gameInfo.currentTurn
             if (i == 0) {
-                gameInfo.reactionFilter.splice(column, 1)
+                let indexOfColumn = gameInfo.reactionFilter.indexOf(emoji)
+                gameInfo.reactionFilter.splice(indexOfColumn, 1)
             }
             break
         }
