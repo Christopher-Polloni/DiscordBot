@@ -51,14 +51,18 @@ module.exports = class connect4Command extends Commando.Command {
 async function game(gameInfo) {
 
     if (gameInfo.reactionFilter.length == 0) {
-        const embed = new Discord.MessageEmbed()
-            .setColor('RED')
-            .setTitle('Connect 4')
-            .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
-            .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
-            .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
-            .addField(`THE WINNER IS`, `Nobody! It's a tie!`)
-        return gameInfo.receivedMessage.say(embed)
+        gameInfo.receivedMessage.channel.messages.fetch(gameInfo.messageId)
+            .then(previousMessage => {
+                const embed = new Discord.MessageEmbed()
+                    .setColor('RED')
+                    .setTitle('Connect 4')
+                    .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
+                    .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
+                    .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
+                    .addField(`THE WINNER IS`, `Nobody! It's a tie!`)
+                previousMessage.edit(embed)
+                previousMessage.reactions.removeAll()
+            })
     }
     else if (!gameInfo.messageId) {
         const embed = new Discord.MessageEmbed()
