@@ -16,6 +16,9 @@ module.exports = class connect4Command extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
+        if (!receivedMessage.mentions.users.first()){
+            return receivedMessage.say(`You must mention the user you want to play with when using the \`connect4\` command.`)
+        }
 
         let columnDisplay = `1️⃣2️⃣3️⃣4️⃣5️⃣6️⃣7️⃣`;
         let reactionFilter = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣'];
@@ -38,7 +41,7 @@ module.exports = class connect4Command extends Commando.Command {
                 user2: receivedMessage.mentions.users.first()
             }
         }
-        game(gameInfo)
+        return game(gameInfo)
     }
 };
 
