@@ -46,77 +46,77 @@ async function game(gameInfo) {
 
     if (gameInfo.reactionFilter.length == 0){
         const embed = new Discord.MessageEmbed()
-        .setColor('RED')
-        .setTitle('Connect 4')
-        .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
-        .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
-        .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
-        .addField(`THE WINNER IS`, `Nobody! It's a tie!`)
+            .setColor('RED')
+            .setTitle('Connect 4')
+            .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
+            .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
+            .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
+            .addField(`THE WINNER IS`, `Nobody! It's a tie!`)
         return gameInfo.receivedMessage.say(embed)
     }
     else {
         const embed = new Discord.MessageEmbed()
-        .setColor('RED')
-        .setTitle('Connect 4')
-        .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
-        .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
-        .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
-        .setFooter('Be sure to wait for all reactions to appear before selecting your choice.')
+            .setColor('RED')
+            .setTitle('Connect 4')
+            .setDescription(`${gameInfo.columnDisplay}\n` + displayBoard(gameInfo))
+            .addField('Player 1', `🔴 ${gameInfo.users.user1}`, true)
+            .addField('Player 2', `🟡 ${gameInfo.users.user2}`, true)
+            .setFooter('Be sure to wait for all reactions to appear before selecting your choice.')
 
-    if (gameInfo.currentTurn == '🔴') {
-        embed.addField('Your Turn:', `${gameInfo.users.user1}`)
-    }
-    else {
-        embed.addField('Your Turn:', `${gameInfo.users.user2}`)
-    }
-    let msg = await gameInfo.receivedMessage.say(embed)
-    for (let i = 0; i < gameInfo.reactionFilter.length; i++) {
-        await msg.react(gameInfo.reactionFilter[i]);
-    }
+        if (gameInfo.currentTurn == '🔴') {
+            embed.addField('Your Turn:', `${gameInfo.users.user1}`)
+        }
+        else {
+            embed.addField('Your Turn:', `${gameInfo.users.user2}`)
+        }
+        let msg = await gameInfo.receivedMessage.say(embed)
+        for (let i = 0; i < gameInfo.reactionFilter.length; i++) {
+            await msg.react(gameInfo.reactionFilter[i]);
+        }
 
-    let abc = '';
-    if (gameInfo.currentTurn == '🔴') {
-        abc = gameInfo.users.user1.id
+        let abc = '';
+        if (gameInfo.currentTurn == '🔴') {
+            abc = gameInfo.users.user1.id
+        }
+        else {
+            abc = gameInfo.users.user2.id
+        }
+
+        const filter = (reaction, user) => {
+            return gameInfo.reactionFilter.includes(reaction.emoji.name) && user.id === abc;
+        };
+
+        msg.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })
+            .then(collected => {
+                const reaction = collected.first();
+
+                if (reaction.emoji.name == '1️⃣') {
+                    editBoard(gameInfo, '0' , '1️⃣')
+                }
+                else if (reaction.emoji.name == '2️⃣') {
+                    editBoard(gameInfo, '1', '2️⃣')
+                }
+                else if (reaction.emoji.name == '3️⃣') {
+                    editBoard(gameInfo, '2', '3️⃣')
+                }
+                else if (reaction.emoji.name == '4️⃣') {
+                    editBoard(gameInfo, '3', '4️⃣')
+                }
+                else if (reaction.emoji.name == '5️⃣') {
+                    editBoard(gameInfo, '4', '5️⃣')
+                }
+                else if (reaction.emoji.name == '6️⃣') {
+                    editBoard(gameInfo, '5', '6️⃣')
+                }
+                else {
+                    editBoard(gameInfo, '6', '7️⃣')
+                }
+            })
+            .catch(collected => {
+                gameInfo.receivedMessage.say('Two minutes passed without a selection, this game is now over!');
+                console.log(collected)
+            });
     }
-    else {
-        abc = gameInfo.users.user2.id
-    }
-
-    const filter = (reaction, user) => {
-        return gameInfo.reactionFilter.includes(reaction.emoji.name) && user.id === abc;
-    };
-
-    msg.awaitReactions(filter, { max: 1, time: 120000, errors: ['time'] })
-        .then(collected => {
-            const reaction = collected.first();
-
-            if (reaction.emoji.name == '1️⃣') {
-                editBoard(gameInfo, '0' , '1️⃣')
-            }
-            else if (reaction.emoji.name == '2️⃣') {
-                editBoard(gameInfo, '1', '2️⃣')
-            }
-            else if (reaction.emoji.name == '3️⃣') {
-                editBoard(gameInfo, '2', '3️⃣')
-            }
-            else if (reaction.emoji.name == '4️⃣') {
-                editBoard(gameInfo, '3', '4️⃣')
-            }
-            else if (reaction.emoji.name == '5️⃣') {
-                editBoard(gameInfo, '4', '5️⃣')
-            }
-            else if (reaction.emoji.name == '6️⃣') {
-                editBoard(gameInfo, '5', '6️⃣')
-            }
-            else {
-                editBoard(gameInfo, '6', '7️⃣')
-            }
-        })
-        .catch(collected => {
-            gameInfo.receivedMessage.say('Two minutes passed without a selection, this game is now over!');
-            console.log(collected)
-        });
-    }    
 }
 
 function displayBoard(gameInfo) {
