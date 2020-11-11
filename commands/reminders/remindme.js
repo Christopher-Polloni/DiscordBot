@@ -200,7 +200,7 @@ async function createNewReminder(newReminder, receivedMessage) {
     const embed = new Discord.MessageEmbed()
       .setColor('#FFFF00')
       .setTitle('Reminder Set!')
-      .addField('Scheduled For:', `${newReminder.date.toLocaleString()} EDT`)
+      .addField('Scheduled For:', `${newReminder.date.toLocaleString()} ${config.timeZone}`)
       .addField('Reminder:', newReminder.reminder)
       .setFooter(`To delete this reminder: $deletereminder ${result.insertedId}`)
     receivedMessage.author.send(embed)
@@ -214,7 +214,7 @@ async function createNewReminder(newReminder, receivedMessage) {
       const embed = new Discord.MessageEmbed()
         .setColor('#4cbb17')
         .setTitle('🚨Reminder🚨')
-        .setDescription(`${newReminder.date.toLocaleString()} EDT`)
+        .setDescription(`${newReminder.date.toLocaleString()} ${config.timeZone}`)
         .addField('Reminder:', newReminder.reminder)
       receivedMessage.author.send(embed)
 

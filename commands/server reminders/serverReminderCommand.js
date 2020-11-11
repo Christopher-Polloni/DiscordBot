@@ -261,7 +261,7 @@ async function createnewMessage(newMessage, receivedMessage) {
     const embed = new Discord.MessageEmbed()
       .setColor('#FFFF00')
       .setTitle('Message Set!')
-      .addField('Scheduled For:', `${newMessage.date.toLocaleString()} EDT`)
+      .addField('Scheduled For:', `${newMessage.date.toLocaleString()} ${config.timeZone}`)
       .addField('Channel:', `<#${newMessage.channelID}>`)
       .addField('Message:', newMessage.message)
       .setFooter(`To delete this scheduled message: $deletemessage ${result.insertedId}`)
@@ -274,7 +274,7 @@ async function createnewMessage(newMessage, receivedMessage) {
       .setColor('#4cbb17')
       .setTitle(`Scheduled Message`)
       .setAuthor(newMessage.authorName, newMessage.authorAvatarUrl)
-      .setDescription(`${newMessage.date.toLocaleString()} EDT`)
+      .setDescription(`${newMessage.date.toLocaleString()} ${config.timeZone}`)
       .addField('Message:', newMessage.message)
     const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
     

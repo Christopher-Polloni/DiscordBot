@@ -55,7 +55,7 @@ async function viewReminders(receivedMessage, author) {
         let time = results[i].date;
         let id = results[i]._id;
         let reminder = results[i].reminder;
-        let info = `Date: ${time.toLocaleString()} EDT\nID: ${id}\nReminder: ${reminder}`
+        let info = `Date: ${time.toLocaleString()} ${config.timeZone}\nID: ${id}\nReminder: ${reminder}`
         embed.addField(title, info)
         embed.setFooter(`Showing ${title}/${results.length} Reminders`)
       }

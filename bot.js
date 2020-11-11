@@ -165,7 +165,7 @@ async function restartPersonalReminders() {
           .setColor('#8B0000')
           .setTitle("Missed Reminder!")
           .setDescription("Oops! It appears I was not online when I was supposed to remind you of something! I'm terribly sorry for this!")
-          .addField('Date', `${results[i].date.toLocaleString()} EDT`)
+          .addField('Date', `${results[i].date.toLocaleString()} ${config.timeZone}`)
           .addField('Reminder', results[i].reminder)
 
         user.send(embed);
@@ -178,7 +178,7 @@ async function restartPersonalReminders() {
           const embed = new Discord.MessageEmbed()
             .setColor('#4cbb17')
             .setTitle('🚨Reminder🚨')
-            .setDescription(`${results[i].date.toLocaleString()} EDT`)
+            .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
             .addField('Reminder:', results[i].reminder)
           user.send(embed)
 
@@ -218,7 +218,7 @@ async function restartServerMessages() {
           .setColor('#8B0000')
           .setTitle("Missed Message!")
           .setDescription(`Oops! It appears I was not online when I was supposed to send a message! I'm terribly sorry for this!\n\n
-          Date: ${results[i].date.toLocaleString()} EDT\nServer: ${results[i].guildName}\nChannel: #${results[i].channelName}\nMessage:\n${results[i].message}`)
+          Date: ${results[i].date.toLocaleString()} ${config.timeZone}\nServer: ${results[i].guildName}\nChannel: #${results[i].channelName}\nMessage:\n${results[i].message}`)
 
         user.send(embed);
 
@@ -231,7 +231,7 @@ async function restartServerMessages() {
             .setColor('#4cbb17')
             .setTitle(`Scheduled Message`)
             .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
-            .setDescription(`${results[i].date.toLocaleString()} EDT`)
+            .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
             .addField('Message:', results[i].message)
           channel.send(embed)
 

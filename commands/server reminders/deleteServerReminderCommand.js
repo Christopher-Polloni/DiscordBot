@@ -56,7 +56,7 @@ async function deleteServerMessage(receivedMessage, id) {
       const embed = new Discord.MessageEmbed()
         .setColor('#FF0000')
         .setTitle('Scheduled Message Deleted!')
-        .setDescription(`The following reminder has been deleted!\n\nDate: ${results[0].date.toLocaleString()} EDT\nChannel: <#${results[0].channelID}>\nMessage:\n${results[0].message}`)
+        .setDescription(`The following reminder has been deleted!\n\nDate: ${results[0].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[0].channelID}>\nMessage:\n${results[0].message}`)
       receivedMessage.say(embed)
 
       const thisJob = 'message_' + id;

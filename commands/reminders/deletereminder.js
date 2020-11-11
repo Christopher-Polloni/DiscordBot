@@ -60,7 +60,7 @@ async function deleteReminder(receivedMessage, id, author) {
         .setColor('#FF0000')
         .setTitle('Reminder Deleted!')
         .setDescription('The following reminder has been deleted!')
-        .addField('Scheduled For:', `${results[0].date.toLocaleString()} EDT`)
+        .addField('Scheduled For:', `${results[0].date.toLocaleString()} ${config.timeZone}`)
         .addField('Reminder:', results[0].reminder)
       receivedMessage.author.send(embed)
 

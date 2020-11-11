@@ -54,7 +54,7 @@ async function viewScheduledMessages(receivedMessage) {
                 .setColor('#0000FF')
                 .setTitle("Upcoming Server Message")
                 .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
-                .setDescription(`Date: ${results[i].date.toLocaleString()} EDT\nChannel: <#${results[i].channelID}>\nMessage:\n${results[i].message}`)
+                .setDescription(`Date: ${results[i].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[i].channelID}>\nMessage:\n${results[i].message}`)
                 .setFooter(`${i + 1}/${results.length} Messages | $deletemessage ${results[i]._id}`)
             receivedMessage.say(embed);
         }
