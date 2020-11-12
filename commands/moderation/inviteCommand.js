@@ -17,9 +17,12 @@ module.exports = class roleCommand extends Commando.Command {
     }
     async run(receivedMessage) {
         let guild = receivedMessage.guild;
-        let channel = guild.systemChannel;
+        let channel = receivedMessage.guild.channels.cache.find(channel => channel.id === guild.guildSettings.welcomeSettings.welcomeChannelId);
         if (!channel) {
-            channel = guild.channels.cache.last();
+            channel = guild.systemChannel;
+            if (!channel){
+                channel = guild.channels.cache.last();
+            }
         }
         return createLink(receivedMessage, channel, guild);
     }
