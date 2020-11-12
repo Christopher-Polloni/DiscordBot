@@ -25,7 +25,7 @@ module.exports = class kickCommand extends Commando.Command {
                         receivedMessage.say(`Successfully kicked ${user.tag}`);
                     })
                     .catch(err => {
-                        message.reply('I was unable to kick the member');
+                        receivedMessage.say('I was unable to kick the member');
                         console.error(err);
                     });
             }
