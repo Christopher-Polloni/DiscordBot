@@ -6,6 +6,7 @@ module.exports = {
   mongoUri: process.env.MONGO_URI,
   translationEndpoint: process.env.TRANSLATION_ENDPOINT,
   translationSubscriptionKey: process.env.TRANSLATION_SUBSCRIPTION_KEY,
+  openWeatherMapKey: process.env.OPEN_WEATHER_API_KEY,
   timeZone: "EST",
   languages: {
     "🇺🇸": {
