@@ -8,6 +8,7 @@ module.exports = {
   translationSubscriptionKey: process.env.TRANSLATION_SUBSCRIPTION_KEY,
   openWeatherMapKey: process.env.OPEN_WEATHER_API_KEY,
   timeZone: "EST",
+  bitlyApiKey: process.env.BITLY_KEY,
   languages: {
     "🇺🇸": {
       "language": "English",
