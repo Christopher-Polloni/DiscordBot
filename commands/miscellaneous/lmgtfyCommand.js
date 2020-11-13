@@ -17,7 +17,12 @@ module.exports = class weatherCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, arg) {
+        if (!arg) {
+            return receivedMessage.say(`http://lmgtfy.com`)
+        }
+        else {
             let query = encodeURIComponent(arg)
             return receivedMessage.say(`http://lmgtfy.com/?iie=1&q=${query}`)
+        }
     }
 };
