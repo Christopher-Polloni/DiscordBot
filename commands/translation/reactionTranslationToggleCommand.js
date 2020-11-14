@@ -12,7 +12,7 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
       examples: ['toggletranslation', 'toggletranslation on', 'toggletranslation off'],
       guildOnly: true,
       argsType: 'single',
-      userPermissions: ['ADMINISTRATOR']
+      userPermissions: ['MANAGE_GUILD']
     })
   }
   async run(receivedMessage, arg) {

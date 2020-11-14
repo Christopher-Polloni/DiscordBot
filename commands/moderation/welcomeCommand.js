@@ -12,7 +12,7 @@ module.exports = class welcomeCommand extends Commando.Command {
             examples: ['welcome', 'welcome update', 'welcome off'],
             guildOnly: true,
             argsType: 'single',
-            userPermissions: ['ADMINISTRATOR']
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage, arg) {
