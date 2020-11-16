@@ -61,7 +61,8 @@ client.registry
     ['reminders', 'Personal Reminder Commands'],
     ['serverreminders', 'Server Reminder Commands'],
     ['translation', 'Translation Commands'],
-    ['moderation', 'Moderation Commands']
+    ['moderation', 'Moderation Commands'],
+    ['games', 'Game Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()

@@ -7,7 +7,7 @@ module.exports = class tictactoeCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'tictactoe',
-            group: 'miscellaneous',
+            group: 'games',
             memberName: 'tictactoe',
             description: 'Play tictactoe with a user in same server',
             examples: ['tictactoe <user>'],

@@ -7,7 +7,7 @@ module.exports = class connect4Command extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'connect4',
-            group: 'miscellaneous',
+            group: 'games',
             memberName: 'connect4',
             description: 'Play Connect 4 with a user in same server',
             examples: ['connect4 <user>'],
