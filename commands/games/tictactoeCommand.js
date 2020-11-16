@@ -9,7 +9,7 @@ module.exports = class tictactoeCommand extends Commando.Command {
             name: 'tictactoe',
             group: 'games',
             memberName: 'tictactoe',
-            description: 'Play tictactoe with a user in same server',
+            description: 'Play tictactoe with a user in same server.',
             examples: ['tictactoe <user>'],
             guildOnly: true,
             aliases: ['ttt']

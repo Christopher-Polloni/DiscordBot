@@ -8,7 +8,7 @@ module.exports = class coinFlipCommand extends Commando.Command{
       name : 'flip',
       group : 'miscellaneous',
       memberName : 'flip',
-      description : 'Flip some coins',
+      description : 'Flip some coins.',
       examples: ['flip', 'flip <number>'],
       guildOnly: false,
       argsType: 'multiple'

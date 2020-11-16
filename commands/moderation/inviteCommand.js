@@ -8,7 +8,7 @@ module.exports = class roleCommand extends Commando.Command {
             name: 'invite',
             group: 'moderation',
             memberName: 'invite',
-            description: 'Generate an invite for this server',
+            description: 'Generate an invite for this server.',
             examples: [`invite`],
             guildOnly: true,
             argsType: 'single',

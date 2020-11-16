@@ -9,7 +9,7 @@ module.exports = class skipCommand extends Commando.Command{
       name : 'skip',
       group : 'music',
       memberName : 'skip',
-      description : 'Skip the current song playing',
+      description : 'Skip the song currently playing.',
       examples: ['skip'],
       guildOnly: true,
     })

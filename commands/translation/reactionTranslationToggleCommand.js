@@ -8,7 +8,7 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
       name: 'toggletranslation',
       group: 'translation',
       memberName: 'toggletranslation',
-      description: 'Toggle whether translation occurs in a server when reacting to a message with specific country flags. Only server owners can use this command.',
+      description: 'Toggle whether translation occurs in a server when reacting to a message with specific country flags.',
       examples: ['toggletranslation', 'toggletranslation on', 'toggletranslation off'],
       guildOnly: true,
       argsType: 'single',

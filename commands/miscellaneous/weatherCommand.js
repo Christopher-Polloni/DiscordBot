@@ -10,7 +10,7 @@ module.exports = class weatherCommand extends Commando.Command {
             name: 'weather',
             group: 'miscellaneous',
             memberName: 'weather',
-            description: 'Find out the weather',
+            description: 'Find out the current weather.',
             examples: ['weather <zipcode>'],
             guildOnly: false,
             argsType: 'multiple'

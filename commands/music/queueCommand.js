@@ -9,7 +9,7 @@ module.exports = class queueCommand extends Commando.Command {
       name: 'queue',
       group: 'music',
       memberName: 'queue',
-      description: 'View list of songs in the queue',
+      description: 'View list of songs in the queue.',
       examples: ['queue'],
       guildOnly: true,
       argsType: 'multiple'

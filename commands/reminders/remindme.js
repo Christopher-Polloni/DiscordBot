@@ -14,7 +14,7 @@ module.exports = class scheduleCommand extends Commando.Command {
       name: 'remindme',
       group: 'reminders',
       memberName: 'remindme',
-      description: 'Schedule a reminder',
+      description: 'Schedule a reminder.',
       examples: ['remindme'],
       guildOnly: false,
       argsType: 'multiple'

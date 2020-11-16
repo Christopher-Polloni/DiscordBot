@@ -8,7 +8,7 @@ module.exports = class welcomeCommand extends Commando.Command {
             name: 'welcome',
             group: 'moderation',
             memberName: 'welcome',
-            description: 'View or update your welcome message for members joining your server',
+            description: 'View or update your welcome message for members joining your server.',
             examples: ['welcome', 'welcome update', 'welcome off'],
             guildOnly: true,
             argsType: 'single',

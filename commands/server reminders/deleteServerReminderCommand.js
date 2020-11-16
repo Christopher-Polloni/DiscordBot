@@ -15,7 +15,7 @@ module.exports = class scheduleCommand extends Commando.Command {
       name: 'deleteservermessage',
       group: 'serverreminders',
       memberName: 'deleteservermessage',
-      description: 'Delete one of your scheduled server messages',
+      description: 'Delete one of your scheduled server messages.',
       examples: ['deleteservermessage <messageID>'],
       guildOnly: true,
     })

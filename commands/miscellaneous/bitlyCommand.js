@@ -11,7 +11,7 @@ module.exports = class bitlyCommand extends Commando.Command {
             aliases: ['bit-ly', 'bitly', 'shorten-url', 'short-url', 'url-shorten', 'url-short'],
             group: 'miscellaneous',
             memberName: 'bit.ly',
-            description: 'Shortens a URL using bit.ly',
+            description: 'Shortens a URL using bit.ly.',
             examples: ['bit.ly <URL>'],
             guildOnly: false,
             argsType: 'single'
