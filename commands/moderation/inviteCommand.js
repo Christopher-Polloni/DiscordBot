@@ -16,11 +16,15 @@ module.exports = class inviteCommand extends Commando.Command {
         })
     }
     async run(receivedMessage) {
+        if (receivedMessage.guild.vanityURLCode) {
+            receivedMessage.author.send(`${guild.name} | https://discord.gg/${receivedMessage.guild.vanityURLCode}`);
+            receivedMessage.say(`Invite was sent to your DM!`);
+        }
         let guild = receivedMessage.guild;
         let channel = receivedMessage.guild.channels.cache.find(channel => channel.id === guild.guildSettings.welcomeSettings.welcomeChannelId);
         if (!channel) {
             channel = guild.systemChannel;
-            if (!channel){
+            if (!channel) {
                 channel = guild.channels.cache.last();
             }
         }
