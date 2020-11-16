@@ -2,7 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 
-module.exports = class roleCommand extends Commando.Command {
+module.exports = class botInviteCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'botinvite',
