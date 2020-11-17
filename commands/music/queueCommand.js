@@ -16,38 +16,48 @@ module.exports = class queueCommand extends Commando.Command {
     })
   }
   run(receivedMessage, args) {
-    const voiceChannel = receivedMessage.member.voice.channel;
-    const queue = receivedMessage.guild.musicData.queue
-    if (!voiceChannel) {
-      return receivedMessage.reply('please join a voice channel first!');
-    }
-    else if (receivedMessage.guild.musicData.songDispatcher == null) {
-      return receivedMessage.reply('there is no song playing right now and the queue is empty!');
-    }
-    else if (args.length == 0) {
-      const embed = new Discord.MessageEmbed()
-        .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
-        .setTitle(`Queue for ${receivedMessage.guild.name}`)
-        .setColor('#ff1500')
-        .setTimestamp()
-      for (let i = 0; i < 11; i++) {
-        if (i < queue.length) {
-          if (i == 0) {
-            embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink}) \n${getSongDuration(queue[0].songLength)} | ${queue[0].author}`)
-            if (queue.length >= 2) {
-              embed.addField(`\u200b`, `**Up Next:**`)
-            }
-          }
-          else {
-            embed.addField(`${i}.`, `[${queue[i].title}](${queue[i].videoLink}) \n${getSongDuration(queue[i].songLength)} | ${queue[i].author}`)
-          }
-          embed.setFooter(`Showing ${i}/${queue.length-1} Songs Up Next\nTotal Duration of Songs: ${getTotalDuration(receivedMessage)}`)
+    try {
+      if (!receivedMessage.guild.musicData.isPlaying && receivedMessage.guild.musicData.queue.length == 0) {
+        return receivedMessage.say("There is no song playing right now and the queue is empty!")
+      }
+      const memberVoiceChannel = receivedMessage.member.voice.channel;
+      const botVoiceChannel = this.client.voice.connections.get(receivedMessage.guild.id).channel
+      if (botVoiceChannel == memberVoiceChannel) {
+        if (!receivedMessage.guild.musicData.isPlaying && receivedMessage.guild.musicData.queue.length == 0) {
+          return receivedMessage.say("There is no song playing right now and the queue is empty!")
         }
         else {
-          break
+          const queue = receivedMessage.guild.musicData.queue
+          const embed = new Discord.MessageEmbed()
+            .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+            .setTitle(`Queue for ${receivedMessage.guild.name}`)
+            .setColor('#ff1500')
+            .setTimestamp()
+          for (let i = 0; i < 11; i++) {
+            if (i < queue.length) {
+              if (i == 0) {
+                embed.addField(`**Now Playing:**`, `[${queue[0].title}](${queue[0].videoLink}) \n${getSongDuration(queue[0].songLength)} | ${queue[0].author}`)
+                if (queue.length >= 2) {
+                  embed.addField(`\u200b`, `**Up Next:**`)
+                }
+              }
+              else {
+                embed.addField(`${i}.`, `[${queue[i].title}](${queue[i].videoLink}) \n${getSongDuration(queue[i].songLength)} | ${queue[i].author}`)
+              }
+              embed.setFooter(`Showing ${i}/${queue.length - 1} Songs Up Next\nTotal Duration of Songs: ${getTotalDuration(receivedMessage)}`)
+            }
+            else {
+              break
+            }
+          }
+          return receivedMessage.say(embed);
         }
       }
-      return receivedMessage.say(embed);
+      else {
+        return receivedMessage.say('You must be in the same voice channel as the bot to use the `queue` command.');
+      }
+    } catch (error) {
+      return receivedMessage.say('You must be in the same voice channel as the bot to use the `queue` command.');
     }
   }
 };
