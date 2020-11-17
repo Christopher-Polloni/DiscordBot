@@ -18,16 +18,17 @@ module.exports = class memeCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-                
-        randomPuppy().then(async url => {
-            await receivedMessage.channel.send({
-                files: [{
-                    attachment: url,
-                    name: 'puppy.png'
-                }]
-            })
+        randomPuppy().then(url => {
+            const embed = new Discord.MessageEmbed()
+                .setTitle('r/puppy')
+                .setColor('RANDOM')
+                .setImage(url)
+                .setFooter(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+                .setTimestamp()
+            receivedMessage.say(embed)
+            receivedMessage.delete()
+                .then()
+                .catch(err => console.error(err));
         }).catch(err => console.error(err));
-
     };
-
 };
