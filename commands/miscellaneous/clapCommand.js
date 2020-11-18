@@ -2,7 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
-const { runInThisContext } = require('vm');
+
 
 module.exports = class clapCommand extends Commando.Command {
     constructor(client) {
