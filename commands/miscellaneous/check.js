@@ -2,7 +2,6 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
-const { runInThisContext } = require('vm');
 const request = require('request');
 const cheerio = require('cheerio')
 const schedule = require('node-schedule');
@@ -13,10 +12,11 @@ module.exports = class checkCommand extends Commando.Command {
             name: 'check',
             group: 'miscellaneous',
             memberName: 'check',
-            description: '',
+            description: 'IKEA availability checker',
             examples: ['check'],
             guildOnly: false,
-            ownerOnly: true
+            ownerOnly: true,
+            hidden: true
         })
     }
     async run(receivedMessage, arg) {    
