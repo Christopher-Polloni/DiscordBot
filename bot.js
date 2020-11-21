@@ -13,6 +13,7 @@ const ObjectId = require('mongodb').ObjectID;
 const axios = require('axios').default;
 const uuidv4 = require('uuid');
 const Canvas = require('canvas');
+const DBL = require("dblapi.js");
 
 
 Structures.extend('Guild', Guild => {
@@ -84,6 +85,8 @@ client.on('ready', () => {
   restartServerMessages();
   restartTranslationSettings();
   restartWelcomeSettings();
+  const dbl = new DBL(config.topggApiKEy, client);
+  dbl.postStats(client.guilds.cache.size)
 })
 
 client.setProvider(
