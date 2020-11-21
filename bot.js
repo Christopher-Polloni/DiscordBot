@@ -101,6 +101,18 @@ client.on('guildMemberAdd', async (member) => {
   return channel.send(message);
 });
 
+client.on('guildCreate', (guild) => {
+  console.log(`boop has joined: ${guild.name} - ${guild.id}`)
+  const dbl = new DBL(config.topggApiKEy, client);
+  return dbl.postStats(client.guilds.cache.size)
+});
+
+client.on('guildDelete', (guild) => {
+  console.log(`boop has been removed from: ${guild.name} - ${guild.id}`)
+  const dbl = new DBL(config.topggApiKEy, client);
+  return dbl.postStats(client.guilds.cache.size)
+});
+
 client.on('messageReactionAdd', async (reaction) => {
   if (reaction.partial) {
     try {
