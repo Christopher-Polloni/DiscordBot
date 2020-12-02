@@ -14,6 +14,8 @@ const axios = require('axios').default;
 const uuidv4 = require('uuid');
 const Canvas = require('canvas');
 const DBL = require("dblapi.js");
+const express = require('express');
+const http = require('http');
 
 
 Structures.extend('Guild', Guild => {
@@ -160,6 +162,29 @@ client.on('messageReactionAdd', async (reaction) => {
 
 });
 
+const app = express();
+const server = http.createServer(app);
+const dbl = new DBL(config.topggApiKEy, { webhookServer: server });
+
+dbl.webhook.on('ready', hook => {
+  console.log(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
+});
+dbl.webhook.on('vote', vote => {
+  const channel = client.channels.cache.get('781259759109799968');
+  if (vote.isWeekend){
+    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> 2x on top.gg!`);
+  }
+  else {
+    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> on top.gg!`);
+  }
+});
+
+app.get('/', (req, res) => {
+});
+
+server.listen(5000, () => {
+  console.log('Listening');
+});
 
 client.login(config.token);
 
