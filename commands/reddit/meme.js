@@ -32,29 +32,21 @@ module.exports = class memeCommand extends Commando.Command {
             .then(response => {
                 let i = Math.floor(Math.random() * response.data.children.length)
                 console.log(response.data.children[i].data.url)
-                if (response.data.children[i].data.url.endsWith('.jpg')){
-                    receivedMessage.channel.send({
-                        files: [{
-                            attachment: response.data.children[i].data.url,
-                            name: 'meme.jpg'
-                        }]
-                    })
-                }
-                else if (response.data.children[i].data.url.endsWith('.png')){
-                    receivedMessage.channel.send({
-                        files: [{
-                            attachment: response.data.children[i].data.url,
-                            name: 'meme.png'
-                        }]
-                    })
+                if ((response.data.children[i].data.url.endsWith('.jpg')) || (response.data.children[i].data.url.endsWith('.png'))) {
+                    const embed = new Discord.MessageEmbed()
+                        .setTitle(`r/${selectedSubreddit}`)
+                        .setColor('RANDOM')
+                        .setImage(response.data.children[i].data.url)
+                        .setFooter(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+                        .setTimestamp()
+                    receivedMessage.say(embed)
+                    receivedMessage.delete()
+                        .then()
+                        .catch(err => console.error(err));
                 }
                 else {
-                    receivedMessage.channel.send("Reddit didn't return an image. Please try again.")
+                    receivedMessage.say("Reddit didn't return an image. Please try again.")
                 }
-                
             });
-
-        
     };
-
 };
