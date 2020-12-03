@@ -87,7 +87,7 @@ client.on('ready', () => {
   restartServerMessages();
   restartTranslationSettings();
   restartWelcomeSettings();
-  const dbl = new DBL(config.topggApiKEy, client);
+  const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
 
@@ -105,13 +105,13 @@ client.on('guildMemberAdd', async (member) => {
 
 client.on('guildCreate', (guild) => {
   console.log(`boop has joined: ${guild.name} - ${guild.id}`)
-  const dbl = new DBL(config.topggApiKEy, client);
+  const dbl = new DBL(config.topggApiKey, client);
   return dbl.postStats(client.guilds.cache.size)
 });
 
 client.on('guildDelete', (guild) => {
   console.log(`boop has been removed from: ${guild.name} - ${guild.id}`)
-  const dbl = new DBL(config.topggApiKEy, client);
+  const dbl = new DBL(config.topggApiKey, client);
   return dbl.postStats(client.guilds.cache.size)
 });
 
@@ -164,7 +164,7 @@ client.on('messageReactionAdd', async (reaction) => {
 
 const app = express();
 const server = http.createServer(app);
-const dbl = new DBL(config.topggApiKEy, { webhookServer: server });
+const dbl = new DBL(config.topggApiKey, { webhookServer: server });
 
 dbl.webhook.on('ready', hook => {
   console.log(`Webhook running at http://${hook.hostname}:${hook.port}${hook.path}`);
