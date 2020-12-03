@@ -18,6 +18,7 @@ module.exports = class playCommand extends Commando.Command {
   constructor(client) {
     super(client, {
       name: 'play',
+      aliases: ['p'],
       group: 'music',
       memberName: 'play',
       description: 'Play a song in a voice channel.',

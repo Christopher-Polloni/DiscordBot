@@ -7,9 +7,10 @@ module.exports = class disconnectCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'disconnect',
+            aliases: ['dc'],
             group: 'music',
             memberName: 'disconnect',
-            description: 'Disconnect the bot from playing music.',
+            description: 'Clear the queue and have the bot disconnect from the voice channel.',
             examples: ['disconnect'],
             guildOnly: true,
             argsType: 'single'
