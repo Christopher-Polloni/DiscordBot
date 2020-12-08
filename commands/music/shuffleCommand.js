@@ -12,7 +12,7 @@ module.exports = class memeCommand extends Commando.Command {
             memberName: 'shuffle',
             description: 'Shuffle the queue.',
             examples: ['shuffle'],
-            guildOnly: false,
+            guildOnly: true,
             argsType: 'multiple'
         })
     }
