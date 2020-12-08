@@ -39,9 +39,13 @@ Structures.extend('Guild', Guild => {
       super(client, data);
       this.guildSettings = {
         reactionTranslator: true,
-        welcomeSettings : {
+        welcomeSettings: {
           welcomeChannelId: null,
           welcomeMessage: null
+        },
+        cleverbotSettings: {
+          enabled: false,
+          cleverbotChannelId: null
         }
       };
     }
@@ -65,7 +69,8 @@ client.registry
     ['serverreminders', 'Server Reminder Commands'],
     ['translation', 'Translation Commands'],
     ['moderation', 'Moderation Commands'],
-    ['games', 'Game Commands']
+    ['games', 'Game Commands'],
+    ['cleverbot', 'Cleverbot Commands'],
   ])
   // .registerDefaults()
   .registerDefaultTypes()
@@ -87,13 +92,31 @@ client.on('ready', () => {
   restartServerMessages();
   restartTranslationSettings();
   restartWelcomeSettings();
-  const dbl = new DBL(config.topggApiKey, client);
-  dbl.postStats(client.guilds.cache.size)
+  restartCleverbotSettings();
+  // const dbl = new DBL(config.topggApiKey, client);
+  // dbl.postStats(client.guilds.cache.size)
 })
 
 client.setProvider(
   MongoClient.connect(uri).then(client => new MongoDBProvider(client, 'DiscordBot'))
 ).catch(console.error);
+
+client.on('message', async (message) => {
+  if (!message.guild.guildSettings.cleverbotSettings.enabled){
+    return
+  }
+  let cleverbotChannel = message.guild.guildSettings.cleverbotSettings.cleverbotChannelId;
+  if (!message.isCommand && !message.author.bot && cleverbotChannel == message.channel.id) {
+    const url = `http://www.cleverbot.com/getreply?key=${config.cleverBotApiKey}&input=${message.content}`
+    axios.get(url)
+      .then(function (response) {
+        return message.channel.send(response.data.output)
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+  }
+});
 
 client.on('guildMemberAdd', async (member) => {
   const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
@@ -171,7 +194,7 @@ dbl.webhook.on('ready', hook => {
 });
 dbl.webhook.on('vote', vote => {
   const channel = client.channels.cache.get('781259759109799968');
-  if (vote.isWeekend){
+  if (vote.isWeekend) {
     return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> 2x on top.gg!`);
   }
   else {
@@ -332,6 +355,31 @@ async function restartWelcomeSettings() {
           let guild = client.guilds.cache.get(results[i].guild);
           guild.guildSettings.welcomeSettings.welcomeChannelId = results[i].welcomeChannelId;
           guild.guildSettings.welcomeSettings.welcomeMessage = results[i].welcomeMessage;
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartCleverbotSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Cleverbot Settings")
+      .find()
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guild)) {
+          let guild = client.guilds.cache.get(results[i].guild);
+          guild.guildSettings.cleverbotSettings.enabled = true;
+          guild.guildSettings.cleverbotSettings.channelId = results[i].channelId;
         }
       }
     }
