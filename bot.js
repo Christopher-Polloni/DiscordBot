@@ -379,7 +379,7 @@ async function restartCleverbotSettings() {
         if (guilds.includes(results[i].guild)) {
           let guild = client.guilds.cache.get(results[i].guild);
           guild.guildSettings.cleverbotSettings.enabled = true;
-          guild.guildSettings.cleverbotSettings.channelId = results[i].channelId;
+          guild.guildSettings.cleverbotSettings.cleverbotChannelId = results[i].channelId;
         }
       }
     }
