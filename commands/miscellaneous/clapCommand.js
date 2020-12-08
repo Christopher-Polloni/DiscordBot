@@ -10,15 +10,21 @@ module.exports = class clapCommand extends Commando.Command {
             name: 'clap',
             group: 'miscellaneous',
             memberName: 'clap',
-            description: 'Send 👏 messages 👏 like 👏 this.',
+            description: '👏 Send 👏 messages 👏 like 👏 this 👏',
             examples: ['clap <message>'],
             guildOnly: false,
             argsType: 'single'
         })
     }
     async run(receivedMessage, arg) {
+        if (!arg){
+            return receivedMessage.say('You must include the message after saying `clap`.')
+        }
         let regex = /\s/g
-        let text = arg.replace(regex, ' 👏 ');
+        let newArgs = arg.replace(regex, ' 👏 ');
+        let prefix = '👏 ';
+        let suffix = ' 👏';
+        let text = prefix.concat(newArgs, suffix)
         if (text.length < 2049) {
             receivedMessage.delete()
                 .then(() => {
