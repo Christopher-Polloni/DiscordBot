@@ -48,10 +48,10 @@ module.exports = class playCommand extends Commando.Command {
             "authorProfilePicture": receivedMessage.author.displayAvatarURL()
           }
           receivedMessage.guild.musicData.queue.push(song)
-          if (receivedMessage.guild.musicData.isPlaying == false) { // if nothing is playing
+          if (receivedMessage.guild.musicData.isPlaying == false) {
             receivedMessage.guild.musicData.isPlaying = true;
-            return playSong(receivedMessage.guild.musicData.queue); // play the playlist
-          } else if (receivedMessage.guild.musicData.isPlaying == true) { // if something is already playing
+            return playSong(receivedMessage.guild.musicData.queue);
+          } else if (receivedMessage.guild.musicData.isPlaying == true) {
             return receivedMessage.say(
               `Playlist - :musical_note:  Your link :musical_note: has been added to queue`
             );
@@ -61,10 +61,10 @@ module.exports = class playCommand extends Commando.Command {
           const results = await ytpl(args[0]);
           let errorAddingToQueue = 0;
           const videoEmbed = new Discord.MessageEmbed()
-          .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
-          .setTitle(`:musical_note: Adding songs to the queue from the playlist ${results.title} :musical_note:`)
-          .setColor('#fffb19')
-          .setTimestamp()
+            .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+            .setTitle(`:musical_note: Adding songs to the queue from the playlist ${results.title} :musical_note:`)
+            .setColor('#fffb19')
+            .setTimestamp()
           receivedMessage.say(videoEmbed)
           for (let i = 0; i < results.items.length; i++) {
             try {
@@ -77,21 +77,21 @@ module.exports = class playCommand extends Commando.Command {
                 "authorProfilePicture": receivedMessage.author.displayAvatarURL()
               }
               receivedMessage.guild.musicData.queue.push(song)
-              if (receivedMessage.guild.musicData.isPlaying == false) { // if nothing is playing
+              if (receivedMessage.guild.musicData.isPlaying == false) {
                 receivedMessage.guild.musicData.isPlaying = true;
-                playSong(receivedMessage.guild.musicData.queue); // play the playlist
+                playSong(receivedMessage.guild.musicData.queue);
               }
             }
-            catch (err){
+            catch (err) {
               console.error(err)
               errorAddingToQueue++;
-            } 
+            }
           }
           const videoEmbed2 = new Discord.MessageEmbed()
-          .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
-          .setTitle(`:musical_note: Successfully added ${results.items.length-errorAddingToQueue}/${results.items.length} songs to the queue from the playlist ${results.title} :musical_note:`)
-          .setColor('#fffb19')
-          .setTimestamp()
+            .setAuthor(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+            .setTitle(`:musical_note: Successfully added ${results.items.length - errorAddingToQueue}/${results.items.length} songs to the queue from the playlist ${results.title} :musical_note:`)
+            .setColor('#fffb19')
+            .setTimestamp()
           receivedMessage.say(videoEmbed2)
         }
       } catch (err) {
@@ -104,7 +104,6 @@ module.exports = class playCommand extends Commando.Command {
       var searchThis = args.join(' ');
       search(searchThis, opts, function (err, results) {
         if (err) return console.log(err);
-        console.log(results)
         var userAvatarUrl = receivedMessage.author.displayAvatarURL();
         sendEmbed(results, userAvatarUrl)
       });
@@ -113,7 +112,6 @@ module.exports = class playCommand extends Commando.Command {
       const embed = new Discord.MessageEmbed()
         .setColor('#ff1500')
         .setTitle("Select a Song!")
-        // .setURL(results[0].link)
         .setAuthor(receivedMessage.author.username, userAvatarUrl)
         .addFields(
           { name: 'Option 1', value: `**Title: ${results[0].title}**\nChannel: ${results[0].channelTitle}` },
@@ -122,7 +120,6 @@ module.exports = class playCommand extends Commando.Command {
           { name: 'Option 4', value: `**Title: ${results[3].title}**\nChannel: ${results[3].channelTitle}` },
           { name: 'Option 5', value: `**Title: ${results[4].title}**\nChannel: ${results[4].channelTitle}` }
         )
-        // .setImage(results[0].thumbnails.default.url)
         .setTimestamp()
       let confirm = await receivedMessage.channel.send(embed)
       await confirm.react('1️⃣');
@@ -167,7 +164,7 @@ module.exports = class playCommand extends Commando.Command {
     };
 
     async function playSelection(url) {
-      console.log(url)
+      // console.log(url)
       var info = await ytdl.getInfo(url, { filter: 'audioonly' })
       const song = {
         "videoLink": url,
@@ -177,11 +174,11 @@ module.exports = class playCommand extends Commando.Command {
         "authorProfilePicture": receivedMessage.author.displayAvatarURL()
       }
       receivedMessage.guild.musicData.queue.push(song)
-      if (receivedMessage.guild.musicData.isPlaying == false) { // if nothing is playing
+      if (receivedMessage.guild.musicData.isPlaying == false) {
         receivedMessage.guild.musicData.isPlaying = true;
-        return playSong(receivedMessage.guild.musicData.queue); // play the playlist
-      } 
-      else if (receivedMessage.guild.musicData.isPlaying == true) { // if something is already playing
+        return playSong(receivedMessage.guild.musicData.queue);
+      }
+      else if (receivedMessage.guild.musicData.isPlaying == true) {
         const videoEmbed = new Discord.MessageEmbed(song)
           .setAuthor(song.author, song.authorProfilePicture)
           .setTitle(`:musical_note: ${song.title} :musical_note: has been added to queue`)
@@ -192,56 +189,46 @@ module.exports = class playCommand extends Commando.Command {
     };
 
     async function playSong(queue) {
-      // console.log(queue)
-      // console.log(queue[0])
-      console.log(queue[0].videoLink)
       voiceChannel.join().then(connection => {
         const dispatcher = connection
           .play(
-            ytdl(queue[0].videoLink, { // pass the url to .ytdl()
+            ytdl(queue[0].videoLink, {
               quality: 'highestaudio',
-              // download part of the song before playing it
-              // helps reduces stuttering
               highWaterMark: 1024 * 1024 * 10
             })
           )
           .on('start', () => {
-            // the following line is essential to other commands like skip
             receivedMessage.guild.musicData.songDispatcher = dispatcher;
             dispatcher.setVolume(receivedMessage.guild.musicData.volume);
-            // voiceChannel = queue[0].voiceChannel;
-            // display the current playing song as a nice little embed
             const videoEmbed = new Discord.MessageEmbed()
               .setAuthor(queue[0].author, queue[0].authorProfilePicture)
-              .setThumbnail(queue[0].thumbnail) // song thumbnail
+              .setThumbnail(queue[0].thumbnail)
               .setColor('#2c7a26')
               .addField('Now Playing:', queue[0].title)
               .setURL(queue[0].link)
               .addField('Duration:', getSongDuration(queue[0].songLength))
               .setTimestamp()
-            // also display next song title, if there is one in queue
             if (queue[1]) videoEmbed.addField('Next Song:', queue[1].title);
-            // receivedMessage.say(videoEmbed); // send the embed to chat
             return receivedMessage.say(videoEmbed);
           })
           .on('finish', () => {
             // this event fires when the song has ended
             queue.shift()
-            if (queue.length > 0) { // if there are more songs in queue
-              return playSong(queue); // continue playing
-            } else { // else if there are no more songs in queue
+            if (queue.length > 0) {
+              return playSong(queue);
+            } else {
               receivedMessage.guild.musicData.isPlaying = false;
-              return voiceChannel.leave(); // leave the voice channel
+              return voiceChannel.leave();
             }
           })
           .on('error', e => {
             console.error(e);
-            if (queue.length > 0) { // if there are more songs in queue
+            if (queue.length > 0) {
               queue.shift();
-              return playSong(queue); // continue playing
-            } else { // else if there are no more songs in queue
+              return playSong(queue);
+            } else {
               receivedMessage.guild.musicData.isPlaying = false;
-              return voiceChannel.leave(); // leave the voice channel
+              return voiceChannel.leave();
             }
           });
       })

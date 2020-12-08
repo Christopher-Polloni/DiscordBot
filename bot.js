@@ -93,8 +93,8 @@ client.on('ready', () => {
   restartTranslationSettings();
   restartWelcomeSettings();
   restartCleverbotSettings();
-  // const dbl = new DBL(config.topggApiKey, client);
-  // dbl.postStats(client.guilds.cache.size)
+  const dbl = new DBL(config.topggApiKey, client);
+  dbl.postStats(client.guilds.cache.size)
 })
 
 client.setProvider(
