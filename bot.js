@@ -102,6 +102,9 @@ client.setProvider(
 ).catch(console.error);
 
 client.on('message', async (message) => {
+  if (message.channel.type == 'dm'){
+    return
+  }
   if (!message.guild.guildSettings.cleverbotSettings.enabled){
     return
   }

@@ -20,33 +20,39 @@ module.exports = class memeCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-
-        const sortByTimeOptions = ["hour", "day", "week", "month", "year", "all"];
-        const sortByTime = sortByTimeOptions[Math.floor(Math.random() * sortByTimeOptions.length)];
-
-        const subredditOptions = ["meme", "memes", "TrippinThroughTime", "funny"];
-        const selectedSubreddit = subredditOptions[Math.floor(Math.random() * subredditOptions.length)];
-
-        fetch(`https://api.reddit.com/r/${selectedSubreddit}/top.json?sort=top&t=${sortByTime}&limit=100`)
-            .then(response => response.json())
-            .then(response => {
-                let i = Math.floor(Math.random() * response.data.children.length)
-                console.log(response.data.children[i].data.url)
-                if ((response.data.children[i].data.url.endsWith('.jpg')) || (response.data.children[i].data.url.endsWith('.png'))) {
-                    const embed = new Discord.MessageEmbed()
-                        .setTitle(`r/${selectedSubreddit}`)
-                        .setColor('RANDOM')
-                        .setImage(response.data.children[i].data.url)
-                        .setFooter(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
-                        .setTimestamp()
-                    receivedMessage.say(embed)
-                    receivedMessage.delete()
-                        .then()
-                        .catch(err => console.error(err));
-                }
-                else {
-                    receivedMessage.say("Reddit didn't return an image. Please try again.")
-                }
-            });
+        return getMeme(receivedMessage);
     };
 };
+
+async function getMeme(receivedMessage) {
+
+    const sortByTimeOptions = ["hour", "day", "week", "month", "year", "all"];
+    const sortByTime = sortByTimeOptions[Math.floor(Math.random() * sortByTimeOptions.length)];
+
+    const subredditOptions = ["meme", "memes", "TrippinThroughTime", "funny"];
+    const selectedSubreddit = subredditOptions[Math.floor(Math.random() * subredditOptions.length)];
+    const url = `https://api.reddit.com/r/${selectedSubreddit}/top.json?sort=top&t=${sortByTime}&limit=100`
+
+    fetch(url)
+        .then(response => response.json())
+        .then(response => {
+            let i = Math.floor(Math.random() * response.data.children.length)
+            console.log(response.data.children[i].data.url)
+            if ((response.data.children[i].data.url.endsWith('.jpg')) || (response.data.children[i].data.url.endsWith('.png'))) {
+                const embed = new Discord.MessageEmbed()
+                    .setTitle(`r/${selectedSubreddit}`)
+                    .setColor('RANDOM')
+                    .setImage(response.data.children[i].data.url)
+                    .setFooter(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
+                    .setTimestamp()
+                receivedMessage.say(embed)
+                receivedMessage.delete()
+                    .then()
+                    .catch(err => console.error(err));
+            }
+            else {
+                return getMeme(receivedMessage)
+            }
+        });
+
+}
