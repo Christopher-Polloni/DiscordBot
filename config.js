@@ -3,6 +3,7 @@ dotenv.config();
 module.exports = {
   token: process.env.TOKEN,
   youtubeAPI: process.env.YOUTUBE_API,
+  youtubeCookie: process.env.YOUTUBE_COOKIE,
   mongoUri: process.env.MONGO_URI,
   translationEndpoint: process.env.TRANSLATION_ENDPOINT,
   translationSubscriptionKey: process.env.TRANSLATION_SUBSCRIPTION_KEY,

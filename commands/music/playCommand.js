@@ -194,7 +194,12 @@ module.exports = class playCommand extends Commando.Command {
           .play(
             ytdl(queue[0].videoLink, {
               quality: 'highestaudio',
-              highWaterMark: 1024 * 1024 * 10
+              highWaterMark: 1024 * 1024 * 10,
+              requestOptions: {
+                headers: {
+                  cookie: config.youtubeCookie,
+                },
+              }
             })
           )
           .on('start', () => {
