@@ -102,10 +102,10 @@ client.setProvider(
 ).catch(console.error);
 
 client.on('message', async (message) => {
-  if (message.channel.type == 'dm'){
+  if (message.channel.type == 'dm') {
     return
   }
-  if (!message.guild.guildSettings.cleverbotSettings.enabled){
+  if (!message.guild.guildSettings.cleverbotSettings.enabled) {
     return
   }
   let cleverbotChannel = message.guild.guildSettings.cleverbotSettings.cleverbotChannelId;
@@ -130,15 +130,38 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 client.on('guildCreate', (guild) => {
-  console.log(`boop has joined: ${guild.name} - ${guild.id}`)
   const dbl = new DBL(config.topggApiKey, client);
-  return dbl.postStats(client.guilds.cache.size)
+  dbl.postStats(client.guilds.cache.size)
+  const channel = client.channels.cache.get('787920254969315328');
+  const totalMemberCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const embed = new Discord.MessageEmbed()
+    .setColor('GREEN')
+    .setThumbnail(guild.iconURL({ format: 'png' }))
+    .setTitle(`Joined: ${guild.name}`)
+    .addField('Members', (guild.memberCount))
+    .addField('Owner', guild.owner.user.tag)
+    .addField('Server ID', guild.id)
+    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalMemberCount}`)
+    .setTimestamp()
+  return channel.send(embed);
 });
 
 client.on('guildDelete', (guild) => {
   console.log(`boop has been removed from: ${guild.name} - ${guild.id}`)
   const dbl = new DBL(config.topggApiKey, client);
-  return dbl.postStats(client.guilds.cache.size)
+  dbl.postStats(client.guilds.cache.size)
+  const channel = client.channels.cache.get('787920254969315328');
+  const totalMemberCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const embed = new Discord.MessageEmbed()
+    .setColor('RED')
+    .setThumbnail(guild.iconURL({ format: 'png' }))
+    .setTitle(`Left: ${guild.name}`)
+    .addField('Members', (guild.memberCount))
+    .addField('Owner', guild.owner.user.tag)
+    .addField('Server ID', guild.id)
+    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalMemberCount}`)
+    .setTimestamp()
+  return channel.send(embed);
 });
 
 client.on('messageReactionAdd', async (reaction) => {
