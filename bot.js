@@ -130,36 +130,39 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 client.on('guildCreate', (guild) => {
+  const serverMemberCount = client.guilds.cache.get(guild.id).members.cache.filter(member => !member.user.bot).size
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
   const channel = client.channels.cache.get('787920254969315328');
-  const totalMemberCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalMemberCount = client.guilds.cache.map((guild) => guild.members.cache.filter(member => !member.user.bot).size).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalBotCount = client.guilds.cache.map((guild) => guild.members.cache.filter(member => member.user.bot).size).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
   const embed = new Discord.MessageEmbed()
     .setColor('GREEN')
     .setThumbnail(guild.iconURL({ format: 'png' }))
     .setTitle(`Joined: ${guild.name}`)
-    .addField('Members', (guild.memberCount))
+    .addField('Members', serverMemberCount)
     .addField('Owner', guild.owner.user.tag)
     .addField('Server ID', guild.id)
-    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalMemberCount}`)
+    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalCount}\nTotal Humans: ${totalMemberCount}\nTotal Bots: ${totalBotCount}`)
     .setTimestamp()
   return channel.send(embed);
 });
 
 client.on('guildDelete', (guild) => {
-  console.log(`boop has been removed from: ${guild.name} - ${guild.id}`)
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
   const channel = client.channels.cache.get('787920254969315328');
-  const totalMemberCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalMemberCount = client.guilds.cache.map((guild) => guild.members.cache.filter(member => !member.user.bot).size).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalBotCount = client.guilds.cache.map((guild) => guild.members.cache.filter(member => member.user.bot).size).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
   const embed = new Discord.MessageEmbed()
     .setColor('RED')
     .setThumbnail(guild.iconURL({ format: 'png' }))
     .setTitle(`Left: ${guild.name}`)
-    .addField('Members', (guild.memberCount))
     .addField('Owner', guild.owner.user.tag)
     .addField('Server ID', guild.id)
-    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalMemberCount}`)
+    .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalCount}\nTotal Humans: ${totalMemberCount}\nTotal Bots: ${totalBotCount}`)
     .setTimestamp()
   return channel.send(embed);
 });
