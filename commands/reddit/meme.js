@@ -1,9 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
-// const redditApi = require("imageapi.js");
 const fetch = require("node-fetch");
-const randomPuppy = require('random-puppy');
 const Discord = require('discord.js');
 
 module.exports = class memeCommand extends Commando.Command {
