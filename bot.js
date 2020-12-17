@@ -327,6 +327,9 @@ async function restartServerMessages() {
             .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
             .addField('Message:', results[i].message)
           channel.send(embed)
+          if (results[i].mentions !== '') {
+            channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+          }
 
           const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
           await mongoClient.connect();
