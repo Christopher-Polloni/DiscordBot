@@ -264,7 +264,7 @@ async function createnewMessage(newMessage, receivedMessage) {
       .addField('Scheduled For:', `${newMessage.date.toLocaleString()} ${config.timeZone}`)
       .addField('Channel:', `<#${newMessage.channelID}>`)
       .addField('Message:', newMessage.message)
-      .setFooter(`To delete this scheduled message: $deletemessage ${result.insertedId}`)
+      .setFooter(`To delete this scheduled message: $deleteservermessage ${result.insertedId}`)
     receivedMessage.say(embed)
     receivedMessage.react('✅');
 
