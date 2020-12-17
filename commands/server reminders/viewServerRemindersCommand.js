@@ -55,12 +55,12 @@ async function viewScheduledMessages(receivedMessage) {
                 .setTitle("Upcoming Server Message")
                 .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
                 .setDescription(`Date: ${results[i].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[i].channelID}>\nMessage:\n${results[i].message}`)
-                .setFooter(`${i + 1}/${results.length} Messages | $deletemessage ${results[i]._id}`)
+                .setFooter(`${i + 1}/${results.length} Messages | $deleteservermessage ${results[i]._id}`)
             receivedMessage.say(embed);
         }
     } catch (e) {
         console.error(e);
-        receivedMessage.reply('There was an error uploading your reminder. Please try again')
+        receivedMessage.reply('There was an error showing your reminders. Please try again')
     } finally {
         await client2.close();
     }
