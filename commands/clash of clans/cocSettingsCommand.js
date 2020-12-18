@@ -47,7 +47,12 @@ module.exports = class cocSettingsCommand extends Commando.Command {
             return getClanTag(receivedMessage);
         }
         else if (arg.toLowerCase() == 'off') {
-            return deleteClashOfClansSettings(receivedMessage);
+            if (!receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag) {
+                return receivedMessage.say(`Clash of Clans reminder settings for ${receivedMessage.guild.name} are not set.`)
+            }
+            else {
+                return deleteClashOfClansSettings(receivedMessage);
+            }
         }
         else {
             return receivedMessage.say(`To properly use this command, try \`coc-settings\`, \`coc-settings update\` or \`coc-settings off\``);
@@ -124,7 +129,7 @@ async function getPreparationMessage(receivedMessage, clanTag, clanName, channel
                     preparationMentions = preparationMentions.concat(` <@&${roleMentionsArray[i].id}>`)
                 }
                 let preparationMessage = messages.first().content;
-                
+
                 return getWarMessage(receivedMessage, clanTag, clanName, channelId, preparationMessage, preparationMentions);
             })
             .catch((e) => {
@@ -152,7 +157,7 @@ async function getWarMessage(receivedMessage, clanTag, clanName, channelId, prep
                     warMentions = warMentions.concat(` <@&${roleMentionsArray[i].id}>`)
                 }
                 const warMessage = messages.first().content;
-                
+
                 const updatedSetting = {
                     guild: receivedMessage.guild.id,
                     clanTag: clanTag,
@@ -195,5 +200,23 @@ async function upsertClashOfClansSettings(receivedMessage, updatedSetting) {
 }
 
 async function deleteClashOfClansSettings(receivedMessage) {
-    
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client2.connect();
+        result = await client2.db("DiscordBot").collection("Clash of Clans Settings").deleteOne({ guild: receivedMessage.guild.id });
+        await client2.close();
+        receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.clanName = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarning = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning = null;
+        receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarningMentions = null;
+        return receivedMessage.say(`Clash of Clans reminder settings are now turned off`);
+    } catch (e) {
+        console.error(e);
+        return receivedMessage.say("There was an error deleting the settings. You can restart the process with `coc-settings off`")
+    }
 }
