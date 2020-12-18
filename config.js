@@ -11,6 +11,7 @@ module.exports = {
   bitlyApiKey: process.env.BITLY_KEY,
   topggApiKey: process.env.TOP_GG_API_KEY,
   cleverBotApiKey: process.env.CLEVER_BOT_API_KEY,
+  clashOfClansApiKey: process.env.CLASH_OF_CLANS_API_KEY,
   languages: {
     "🇺🇸": {
       "language": "English",

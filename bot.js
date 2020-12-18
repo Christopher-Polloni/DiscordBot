@@ -46,6 +46,15 @@ Structures.extend('Guild', Guild => {
         cleverbotSettings: {
           enabled: false,
           cleverbotChannelId: null
+        },
+        clashOfClansSettings: {
+          clanTag: null,
+          clanName: null,
+          cocReminderChannelId: null,
+          preparationEndWarning: null,
+          preparationEndWarningMentions: null,
+          warEndWarning: null,
+          warEndWarningMentions: null
         }
       };
     }
@@ -71,6 +80,7 @@ client.registry
     ['moderation', 'Moderation Commands'],
     ['games', 'Game Commands'],
     ['cleverbot', 'Cleverbot Commands'],
+    ['coc', 'Clash Of Clans Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
