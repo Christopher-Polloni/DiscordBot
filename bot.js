@@ -339,7 +339,7 @@ async function restartServerMessages() {
             .addField('Message:', results[i].message)
           channel.send(embed)
           if (results[i].mentions !== '') {
-            channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+            channel.send(`The following were mentioned above: ${results[i].mentions}`);
           }
 
           const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
