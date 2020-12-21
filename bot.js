@@ -103,6 +103,7 @@ client.on('ready', () => {
   restartTranslationSettings();
   restartWelcomeSettings();
   restartCleverbotSettings();
+  restartClashOfClansSettings();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -422,6 +423,36 @@ async function restartCleverbotSettings() {
           let guild = client.guilds.cache.get(results[i].guild);
           guild.guildSettings.cleverbotSettings.enabled = true;
           guild.guildSettings.cleverbotSettings.cleverbotChannelId = results[i].channelId;
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartClashOfClansSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Clash of Clans Settings")
+      .find()
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guild)) {
+          let guild = client.guilds.cache.get(results[i].guild);
+          guild.guildSettings.clashOfClansSettings.clanTag = results[i].clanTag;
+          guild.guildSettings.clashOfClansSettings.clanName = results[i].clanName;
+          guild.guildSettings.clashOfClansSettings.cocReminderChannelId = results[i].cocReminderChannelId;
+          guild.guildSettings.clashOfClansSettings.preparationEndWarning = results[i].preparationEndWarning;
+          guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions = results[i].preparationEndWarningMentions;
+          guild.guildSettings.clashOfClansSettings.warEndWarning = results[i].warEndWarning;
+          guild.guildSettings.clashOfClansSettings.warEndWarningMentions = results[i].warEndWarningMentions;
         }
       }
     }
