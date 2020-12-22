@@ -460,3 +460,51 @@ async function restartClashOfClansSettings() {
     console.error(e)
   }
 }
+
+async function restartClashOfClansReminders() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+      .find()
+      .toArray()
+    await client2.close();
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        const channel = client.channels.cache.get(results[i].cocReminderChannelId)
+        const embed = new Discord.MessageEmbed()
+          .setColor("RED")
+          .setTitle("Clash of Clans Reminder")
+          .addField('Clan Name', results[i].clanName, true)
+          .addField('Clan Tag', results[i].clanTag, true)
+          .setTimestamp()
+        if (results[i].type == 'preparation') {
+          embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
+        }
+        if (results[i].type == 'war') {
+          embed.addField('War Ends in 30 Minutes', warReminder.warEndWarning)
+        }
+
+        schedule.scheduleJob('cocReminder_' + results[i]._id, results[i].messageTime, async function () {
+          channel.send(embed)
+          if (results[i].mentions !== '' && results[i].type == 'preparation') {
+            channel.send(`The following were mentioned above: ${results[i].preparationEndWarningMentions}`);
+          }
+          if (results[i].mentions !== '' && results[i].type == 'war') {
+            channel.send(`The following were mentioned above: ${results[i].warEndWarningMentions}`);
+          }
+
+          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+          await mongoClient.connect();
+          deletion = await mongoClient.db("DiscordBot").collection("Clash of Clans Reminders")
+            .deleteOne({ "_id": ObjectId(results[i]._id) });
+          await mongoClient.close();
+        });
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
