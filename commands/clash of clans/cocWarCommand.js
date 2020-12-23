@@ -86,6 +86,7 @@ async function setReminders(receivedMessage, data) {
         const preparationReminder = {
             type: "preparation",
             guild: receivedMessage.guild.id,
+            opponent: data.opponent.name,
             endingTime: new Date(new Date(moment(data.startTime).format())),
             messageTime: new Date(new Date(moment(data.startTime).format()) - 1800000),
             clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
@@ -98,6 +99,7 @@ async function setReminders(receivedMessage, data) {
         const warReminder = {
             type: "war",
             guild: receivedMessage.guild.id,
+            opponent: data.opponent.name,
             endingTime: new Date(new Date(moment(data.endTime).format())),
             messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
             clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
@@ -115,17 +117,13 @@ async function setReminders(receivedMessage, data) {
     
             const preparationEndEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
-                .setTitle("Clash of Clans Reminder")
-                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
-                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${preparationReminder.opponent}`)
                 .addField('Preparation Ends in 30 Minutes', preparationReminder.preparationEndWarning)
                 .setTimestamp()
     
             const warEndEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
-                .setTitle("Clash of Clans Reminder")
-                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
-                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${warReminder.opponent}`)
                 .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
                 .setTimestamp()
     
@@ -167,6 +165,7 @@ async function setReminders(receivedMessage, data) {
         const warReminder = {
             type: "war",
             guild: receivedMessage.guild.id,
+            opponent: data.opponent.name,
             endingTime: new Date(new Date(moment(data.endTime).format())),
             messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
             clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
@@ -183,9 +182,7 @@ async function setReminders(receivedMessage, data) {
     
             const warEndEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
-                .setTitle("Clash of Clans Reminder")
-                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
-                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${warReminder.opponent}`)
                 .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
                 .setTimestamp()
     

@@ -477,9 +477,7 @@ async function restartClashOfClansReminders() {
       const channel = client.channels.cache.get(results[i].cocReminderChannelId)
       const embed = new Discord.MessageEmbed()
         .setColor("RED")
-        .setTitle("Clash of Clans Reminder")
-        .addField('Clan Name', results[i].clanName, true)
-        .addField('Clan Tag', results[i].clanTag, true)
+        .setTitle(`Clash of Clans Reminder\n${results[i].clanName} vs ${results[i].opponent}`)
         .setTimestamp()
       if (results[i].type == 'preparation') {
         embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
