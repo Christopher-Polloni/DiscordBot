@@ -16,8 +16,7 @@ module.exports = class cocWarCommand extends Commando.Command {
             description: 'Run this command when you are in preparation day and messages will automatically be sent 30 minutes prior to prep day and war day ending if properly configured using the coc-settings command.',
             examples: ['coc-war'],
             guildOnly: true,
-            ownerOnly: true,
-            hidden: true
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage) {

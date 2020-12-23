@@ -16,9 +16,8 @@ module.exports = class cocSettingsCommand extends Commando.Command {
             description: 'Update your settings for Clash Of Clans war reminders.',
             examples: ['coc-settings'],
             guildOnly: true,
-            ownerOnly: true,
-            hidden: true,
-            argsType: 'single'
+            argsType: 'single',
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage, arg) {
