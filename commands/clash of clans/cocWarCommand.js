@@ -21,6 +21,9 @@ module.exports = class cocWarCommand extends Commando.Command {
         })
     }
     async run(receivedMessage) {
+        if (!receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag){
+            return receivedMessage.say(`Clash of Clans settings are not setup for this server. Use the command \`coc-settings update\` in order to begin the process`)
+        }
         axios({
             baseURL: 'https://api.clashofclans.com/v1/',
             url: `clans/${encodeURIComponent(receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag)}/currentwar`,

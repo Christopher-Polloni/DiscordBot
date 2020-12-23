@@ -206,7 +206,21 @@ async function deleteClashOfClansSettings(receivedMessage) {
     try {
         await client2.connect();
         result = await client2.db("DiscordBot").collection("Clash of Clans Settings").deleteOne({ guild: receivedMessage.guild.id });
+
+        let results = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+            .find({ "guild": receivedMessage.guild.id })
+            .toArray()
+
+        if (results) {
+            for (let i = 0; i < results.length; i++) {
+                const thisJob = 'cocReminder_' + results[i]._id;
+                schedule.cancelJob(thisJob);
+            }
+            deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+                .deleteMany({ "guild": receivedMessage.guild.id });
+        }
         await client2.close();
+
         receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag = null;
         receivedMessage.guild.guildSettings.clashOfClansSettings.clanName = null;
         receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId = null;
@@ -219,4 +233,6 @@ async function deleteClashOfClansSettings(receivedMessage) {
         console.error(e);
         return receivedMessage.say("There was an error deleting the settings. You can restart the process with `coc-settings off`")
     }
+
+
 }
