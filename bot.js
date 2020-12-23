@@ -16,6 +16,7 @@ const Canvas = require('canvas');
 const DBL = require("dblapi.js");
 const express = require('express');
 const http = require('http');
+const moment = require('moment')
 
 
 Structures.extend('Guild', Guild => {
@@ -104,6 +105,7 @@ client.on('ready', () => {
   restartWelcomeSettings();
   restartCleverbotSettings();
   restartClashOfClansSettings();
+  restartClashOfClansReminders();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -471,38 +473,35 @@ async function restartClashOfClansReminders() {
       .find()
       .toArray()
     await client2.close();
-    if (results.length !== 0) {
-      for (let i = 0; i < results.length; i++) {
-        const channel = client.channels.cache.get(results[i].cocReminderChannelId)
-        const embed = new Discord.MessageEmbed()
-          .setColor("RED")
-          .setTitle("Clash of Clans Reminder")
-          .addField('Clan Name', results[i].clanName, true)
-          .addField('Clan Tag', results[i].clanTag, true)
-          .setTimestamp()
-        if (results[i].type == 'preparation') {
-          embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
-        }
-        if (results[i].type == 'war') {
-          embed.addField('War Ends in 30 Minutes', warReminder.warEndWarning)
-        }
-
-        schedule.scheduleJob('cocReminder_' + results[i]._id, results[i].messageTime, async function () {
-          channel.send(embed)
-          if (results[i].mentions !== '' && results[i].type == 'preparation') {
-            channel.send(`The following were mentioned above: ${results[i].preparationEndWarningMentions}`);
-          }
-          if (results[i].mentions !== '' && results[i].type == 'war') {
-            channel.send(`The following were mentioned above: ${results[i].warEndWarningMentions}`);
-          }
-
-          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-          await mongoClient.connect();
-          deletion = await mongoClient.db("DiscordBot").collection("Clash of Clans Reminders")
-            .deleteOne({ "_id": ObjectId(results[i]._id) });
-          await mongoClient.close();
-        });
+    for (let i = 0; i < results.length; i++) {
+      const channel = client.channels.cache.get(results[i].cocReminderChannelId)
+      const embed = new Discord.MessageEmbed()
+        .setColor("RED")
+        .setTitle("Clash of Clans Reminder")
+        .addField('Clan Name', results[i].clanName, true)
+        .addField('Clan Tag', results[i].clanTag, true)
+        .setTimestamp()
+      if (results[i].type == 'preparation') {
+        embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
       }
+      if (results[i].type == 'war') {
+        embed.addField('War Ends in 30 Minutes', results[i].warEndWarning)
+      }
+      schedule.scheduleJob('cocReminder_' + results[i]._id, results[i].messageTime, async function () {
+        channel.send(embed)
+        if (results[i].preparationEndWarningMentions !== '' && results[i].type == 'preparation') {
+          channel.send(`The following were mentioned above: ${results[i].preparationEndWarningMentions}`);
+        }
+        if (results[i].warEndWarningMentions !== '' && results[i].type == 'war') {
+          channel.send(`The following were mentioned above: ${results[i].warEndWarningMentions}`);
+        }
+
+        const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoClient.connect();
+        deletion = await mongoClient.db("DiscordBot").collection("Clash of Clans Reminders")
+          .deleteOne({ "_id": ObjectId(results[i]._id) });
+        await mongoClient.close();
+      });
     }
   } catch (e) {
     console.error(e)

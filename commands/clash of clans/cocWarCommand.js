@@ -77,7 +77,7 @@ async function setReminders(receivedMessage, data) {
     const preparationReminder = {
         type: "preparation",
         guild: receivedMessage.guild.id,
-        endingTime: new Date(moment(data.startTime).format()),
+        endingTime: new Date(new Date(moment(data.startTime).format())),
         messageTime: new Date(new Date(moment(data.startTime).format()) - 1800000),
         clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
         clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
@@ -89,7 +89,7 @@ async function setReminders(receivedMessage, data) {
     const warReminder = {
         type: "war",
         guild: receivedMessage.guild.id,
-        endingTime: new Date(moment(data.endTime).format()),
+        endingTime: new Date(new Date(moment(data.endTime).format())),
         messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
         clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
         clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
