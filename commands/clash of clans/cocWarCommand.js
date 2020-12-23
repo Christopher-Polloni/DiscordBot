@@ -183,7 +183,7 @@ async function setReminders(receivedMessage, data) {
     
             const warEndEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
-                .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${warReminder.opponent}`)
+                .setTitle(`Clash of Clans Reminder\n${warReminder.clanName} vs ${warReminder.opponent}`)
                 .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
                 .setTimestamp()
     
@@ -202,7 +202,7 @@ async function setReminders(receivedMessage, data) {
             });
             
             return receivedMessage.say(`Reminders have been set for ${data.clan.name} vs ${data.opponent.name}`)
-            
+
         } catch (e) {
             console.error(e);
             return receivedMessage.say("There was an error. You can restart the process with `coc-war`")
