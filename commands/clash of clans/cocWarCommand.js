@@ -154,6 +154,8 @@ async function setReminders(receivedMessage, data) {
                         .deleteOne({ _id: result2.insertedId });
                 }
             });
+
+            return receivedMessage.say(`Reminders have been set for ${data.clan.name} vs ${data.opponent.name}`)
     
         } catch (e) {
             console.error(e);
@@ -198,7 +200,9 @@ async function setReminders(receivedMessage, data) {
                         .deleteOne({ _id: result2.insertedId });
                 }
             });
-    
+            
+            return receivedMessage.say(`Reminders have been set for ${data.clan.name} vs ${data.opponent.name}`)
+            
         } catch (e) {
             console.error(e);
             return receivedMessage.say("There was an error. You can restart the process with `coc-war`")
