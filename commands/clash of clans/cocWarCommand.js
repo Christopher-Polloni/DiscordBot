@@ -30,11 +30,11 @@ module.exports = class cocWarCommand extends Commando.Command {
             },
             responseType: 'application/json'
         }).then(function (response) {
-            if (response.data.state == "preparation") {
+            if (response.data.state == "preparation" || response.data.state == 'inWar') {
                 return checkStatusOfReminders(receivedMessage, response.data)
             }
             else {
-                return receivedMessage.say(`${response.data.clan.name} (${response.data.clan.tag}) is not currently in Preparation Day.`)
+                return receivedMessage.say(`${response.data.clan.name} (${response.data.clan.tag}) is not currently in Preparation or War Day.`)
             }
         }).catch(function (error) {
             console.log(error);
@@ -58,7 +58,9 @@ async function checkStatusOfReminders(receivedMessage, data) {
             .toArray()
         await client2.close();
 
-        if (result.length > 0) {
+        const dateEnds = new Date(new Date(moment(data.endTime).format()) - 1800000)
+        const difference = dateEnds - new Date()
+        if (result.length > 0 || difference <= 0) {
             return receivedMessage.say(`The \`coc-war\` command has already been run for the war you are currently in (${data.clan.name} vs ${data.opponent.name})`)
         }
         else {
@@ -74,87 +76,133 @@ async function setReminders(receivedMessage, data) {
     const MongoClient = require('mongodb').MongoClient;
     const uri = config.mongoUri;
     const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    const preparationReminder = {
-        type: "preparation",
-        guild: receivedMessage.guild.id,
-        endingTime: new Date(new Date(moment(data.startTime).format())),
-        messageTime: new Date(new Date(moment(data.startTime).format()) - 1800000),
-        clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
-        clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
-        cocReminderChannelId: receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId,
-        preparationEndWarning: receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarning,
-        preparationEndWarningMentions: receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions,
-    }
 
-    const warReminder = {
-        type: "war",
-        guild: receivedMessage.guild.id,
-        endingTime: new Date(new Date(moment(data.endTime).format())),
-        messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
-        clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
-        clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
-        cocReminderChannelId: receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId,
-        warEndWarning: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning,
-        warEndWarningMentions: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarningMentions
-    }
-    try {
-        await client2.connect();
-        let result1 = await client2.db("DiscordBot").collection("Clash of Clans Reminders").insertOne(preparationReminder);
-        let result2 = await client2.db("DiscordBot").collection("Clash of Clans Reminders").insertOne(warReminder);
-
-        const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === warReminder.cocReminderChannelId);
-
-        const preparationEndEmbed = new Discord.MessageEmbed()
-            .setColor("RED")
-            .setTitle("Clash of Clans Reminder")
-            .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
-            .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
-            .addField('Preparation Ends in 30 Minutes', preparationReminder.preparationEndWarning)
-            .setTimestamp()
-
-        const warEndEmbed = new Discord.MessageEmbed()
-            .setColor("RED")
-            .setTitle("Clash of Clans Reminder")
-            .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
-            .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
-            .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
-            .setTimestamp()
-
-
-        schedule.scheduleJob('cocReminder_' + result1.insertedId, preparationReminder.messageTime, async function () {
-            try {
-                channel.send(preparationEndEmbed);
-                if (preparationReminder.preparationEndWarningMentions !== '') {
-                    channel.send(`The following were mentioned above: ${preparationReminder.preparationEndWarningMentions}`);
+    const dateEnds = new Date(new Date(moment(data.startTime).format()) - 1800000)
+    const difference = dateEnds - new Date()
+    if (difference > 0){
+        const preparationReminder = {
+            type: "preparation",
+            guild: receivedMessage.guild.id,
+            endingTime: new Date(new Date(moment(data.startTime).format())),
+            messageTime: new Date(new Date(moment(data.startTime).format()) - 1800000),
+            clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
+            clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
+            cocReminderChannelId: receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId,
+            preparationEndWarning: receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarning,
+            preparationEndWarningMentions: receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions,
+        }
+    
+        const warReminder = {
+            type: "war",
+            guild: receivedMessage.guild.id,
+            endingTime: new Date(new Date(moment(data.endTime).format())),
+            messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
+            clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
+            clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
+            cocReminderChannelId: receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId,
+            warEndWarning: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning,
+            warEndWarningMentions: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarningMentions
+        }
+        try {
+            await client2.connect();
+            let result1 = await client2.db("DiscordBot").collection("Clash of Clans Reminders").insertOne(preparationReminder);
+            let result2 = await client2.db("DiscordBot").collection("Clash of Clans Reminders").insertOne(warReminder);
+    
+            const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === warReminder.cocReminderChannelId);
+    
+            const preparationEndEmbed = new Discord.MessageEmbed()
+                .setColor("RED")
+                .setTitle("Clash of Clans Reminder")
+                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
+                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .addField('Preparation Ends in 30 Minutes', preparationReminder.preparationEndWarning)
+                .setTimestamp()
+    
+            const warEndEmbed = new Discord.MessageEmbed()
+                .setColor("RED")
+                .setTitle("Clash of Clans Reminder")
+                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
+                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
+                .setTimestamp()
+    
+    
+            schedule.scheduleJob('cocReminder_' + result1.insertedId, preparationReminder.messageTime, async function () {
+                try {
+                    channel.send(preparationEndEmbed);
+                    if (preparationReminder.preparationEndWarningMentions !== '') {
+                        channel.send(`The following were mentioned above: ${preparationReminder.preparationEndWarningMentions}`);
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+                        .deleteOne({ _id: result1.insertedId });
                 }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
-                    .deleteOne({ _id: result1.insertedId });
-            }
-        });
-
-        schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
-            try {
-                channel.send(warEndEmbed);
-                if (preparationReminder.warEndWarningMentions !== '') {
-                    channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);
+            });
+    
+            schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
+                try {
+                    channel.send(warEndEmbed);
+                    if (preparationReminder.warEndWarningMentions !== '') {
+                        channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+                        .deleteOne({ _id: result2.insertedId });
                 }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
-                    .deleteOne({ _id: result2.insertedId });
-            }
-        });
-
-    } catch (e) {
-        console.error(e);
-        return receivedMessage.say("There was an error. You can restart the process with `coc-war`")
+            });
+    
+        } catch (e) {
+            console.error(e);
+            return receivedMessage.say("There was an error. You can restart the process with `coc-war`")
+        }        
     }
-
-
+    else {
+        const warReminder = {
+            type: "war",
+            guild: receivedMessage.guild.id,
+            endingTime: new Date(new Date(moment(data.endTime).format())),
+            messageTime: new Date(new Date(moment(data.endTime).format()) - 1800000),
+            clanTag: receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag,
+            clanName: receivedMessage.guild.guildSettings.clashOfClansSettings.clanName,
+            cocReminderChannelId: receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId,
+            warEndWarning: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning,
+            warEndWarningMentions: receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarningMentions
+        }
+        try {
+            await client2.connect();
+            let result2 = await client2.db("DiscordBot").collection("Clash of Clans Reminders").insertOne(warReminder);
+    
+            const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === warReminder.cocReminderChannelId);
+    
+            const warEndEmbed = new Discord.MessageEmbed()
+                .setColor("RED")
+                .setTitle("Clash of Clans Reminder")
+                .addField('Clan Name', receivedMessage.guild.guildSettings.clashOfClansSettings.clanName, true)
+                .addField('Clan Tag', receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag, true)
+                .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
+                .setTimestamp()
+    
+            schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
+                try {
+                    channel.send(warEndEmbed);
+                    if (preparationReminder.warEndWarningMentions !== '') {
+                        channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);
+                    }
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+                        .deleteOne({ _id: result2.insertedId });
+                }
+            });
+    
+        } catch (e) {
+            console.error(e);
+            return receivedMessage.say("There was an error. You can restart the process with `coc-war`")
+        }
+    }
 }
-
-
