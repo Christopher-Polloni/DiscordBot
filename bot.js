@@ -475,7 +475,6 @@ async function restartClashOfClansReminders() {
       const embed = new Discord.MessageEmbed()
         .setColor("RED")
         .setTitle(`Clash of Clans Reminder\n${results[i].clanName} vs ${results[i].opponent}`)
-        .setTimestamp()
       if (results[i].type == 'preparation') {
         embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
       }
@@ -483,6 +482,7 @@ async function restartClashOfClansReminders() {
         embed.addField('War Ends in 30 Minutes', results[i].warEndWarning)
       }
       schedule.scheduleJob('cocReminder_' + results[i]._id, results[i].messageTime, async function () {
+        embed.setTimestamp()
         channel.send(embed)
         if (results[i].preparationEndWarningMentions !== '' && results[i].type == 'preparation') {
           channel.send(`The following were mentioned above: ${results[i].preparationEndWarningMentions}`);

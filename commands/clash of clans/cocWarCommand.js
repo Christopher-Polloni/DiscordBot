@@ -118,17 +118,15 @@ async function setReminders(receivedMessage, data) {
                 .setColor("RED")
                 .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${preparationReminder.opponent}`)
                 .addField('Preparation Ends in 30 Minutes', preparationReminder.preparationEndWarning)
-                .setTimestamp()
     
             const warEndEmbed = new Discord.MessageEmbed()
                 .setColor("RED")
                 .setTitle(`Clash of Clans Reminder\n${preparationReminder.clanName} vs ${warReminder.opponent}`)
-                .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
-                .setTimestamp()
-    
+                .addField('War Ends in 30 Minutes', warReminder.warEndWarning)    
     
             schedule.scheduleJob('cocReminder_' + result1.insertedId, preparationReminder.messageTime, async function () {
                 try {
+                    embed.setTimestamp()
                     channel.send(preparationEndEmbed);
                     if (preparationReminder.preparationEndWarningMentions !== '') {
                         channel.send(`The following were mentioned above: ${preparationReminder.preparationEndWarningMentions}`);
@@ -143,8 +141,9 @@ async function setReminders(receivedMessage, data) {
     
             schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
                 try {
+                    embed.setTimestamp()
                     channel.send(warEndEmbed);
-                    if (preparationReminder.warEndWarningMentions !== '') {
+                    if (warReminder.warEndWarningMentions !== '') {
                         channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);
                     }
                 } catch (e) {
@@ -185,12 +184,12 @@ async function setReminders(receivedMessage, data) {
                 .setColor("RED")
                 .setTitle(`Clash of Clans Reminder\n${warReminder.clanName} vs ${warReminder.opponent}`)
                 .addField('War Ends in 30 Minutes', warReminder.warEndWarning)
-                .setTimestamp()
     
             schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
                 try {
+                    warEndEmbed.setTimestamp()
                     channel.send(warEndEmbed);
-                    if (preparationReminder.warEndWarningMentions !== '') {
+                    if (warReminder.warEndWarningMentions !== '') {
                         channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);
                     }
                 } catch (e) {
