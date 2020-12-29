@@ -183,7 +183,6 @@ async function upsertClashOfClansSettings(receivedMessage, updatedSetting) {
     try {
         await client2.connect();
         result = await client2.db("DiscordBot").collection("Clash of Clans Settings").updateOne({ guild: updatedSetting.guild }, { $set: updatedSetting }, { upsert: true });
-        await client2.close();
         receivedMessage.guild.guildSettings.clashOfClansSettings.clanTag = updatedSetting.clanTag;
         receivedMessage.guild.guildSettings.clashOfClansSettings.clanName = updatedSetting.clanName;
         receivedMessage.guild.guildSettings.clashOfClansSettings.cocReminderChannelId = updatedSetting.cocReminderChannelId;
@@ -191,7 +190,23 @@ async function upsertClashOfClansSettings(receivedMessage, updatedSetting) {
         receivedMessage.guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions = updatedSetting.preparationEndWarningMentions;
         receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning = updatedSetting.warEndWarning;
         receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarningMentions = updatedSetting.warEndWarningMentions;
-        return receivedMessage.say(`Clash of Clans reminder settings were updated`);
+
+        reminders = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+            .find({ "guild": receivedMessage.guild.id })
+            .toArray()
+
+        if (reminders) {
+            for (let i = 0; i < reminders.length; i++) {
+                const thisJob = 'cocReminder_' + reminders[i]._id;
+                schedule.cancelJob(thisJob);
+            }
+
+            deletion = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
+                .deleteMany({ "guild": receivedMessage.guild.id });
+        }
+        await client2.close();
+
+        return receivedMessage.say(`Clash of Clans reminder settings were updated. All previously scheduled reminders were cancelled. Run the \`coc-war\` command again to restart the reminders.`);
     } catch (e) {
         console.error(e);
         return receivedMessage.say("There was an error updating the settings. You can restart the process with `coc-settings update`")
