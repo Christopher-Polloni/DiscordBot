@@ -128,7 +128,7 @@ async function setReminders(receivedMessage, data) {
     
             schedule.scheduleJob('cocReminder_' + result1.insertedId, preparationReminder.messageTime, async function () {
                 try {
-                    embed.setTimestamp()
+                    preparationEndEmbed.setTimestamp()
                     channel.send(preparationEndEmbed);
                     if (preparationReminder.preparationEndWarningMentions !== '') {
                         channel.send(`The following were mentioned above: ${preparationReminder.preparationEndWarningMentions}`);
@@ -143,7 +143,7 @@ async function setReminders(receivedMessage, data) {
     
             schedule.scheduleJob('cocReminder_' + result2.insertedId, warReminder.messageTime, async function () {
                 try {
-                    embed.setTimestamp()
+                    warEndEmbed.setTimestamp()
                     channel.send(warEndEmbed);
                     if (warReminder.warEndWarningMentions !== '') {
                         channel.send(`The following were mentioned above: ${warReminder.warEndWarningMentions}`);

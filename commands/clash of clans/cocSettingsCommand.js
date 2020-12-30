@@ -30,6 +30,7 @@ module.exports = class cocSettingsCommand extends Commando.Command {
                 let warEndWarning = receivedMessage.guild.guildSettings.clashOfClansSettings.warEndWarning;
                 const embed = new Discord.MessageEmbed()
                     .setTitle("Clash of Clans Reminder Settings")
+                    .setThumbnail('https://uca6a8b4e166fe6da02590290c06.previews.dropboxusercontent.com/p/thumb/ABCCbDXUsRdvudTOzoK25_BEr1MK8YjFBujoYaWH3QJG4sIXYM9ZkHwQUMDRxtZvG-XAd6_OA-rU8nJmd8QGHGwPLAOfs_iXlu73rSa4LzOZpiA0ekLpuN8EOpTgU1O_pIMuPvtNgaOZbXvfrLfLLkTnnUl9hvT_lO16pWw7mdOuadv2TaHGXVncUTxkv5x2SRHmJNikOrpicQkR_alIkAlf1PIOk8NOa8BZQVvRjUkiKL03RKCtR3XAiLtfyCgzWjbhrXwt40UM9NhUkR_5TKDYJcXEwElEOHp5NMVR8wnVdDV_jb-yaaOt3awi8Z7eP8ftF8YHYhF8qXdMjC3fh4PyJ_Ji0NAjf2GlBT4lNvRzKA/p.jpeg?fv_content=true&size_mode=5')
                     .addField('Clan Name', clanName, true)
                     .addField('Clan Tag', clanTag, true)
                     .addField('Channel', `<#${cocReminderChannelId}>`)
