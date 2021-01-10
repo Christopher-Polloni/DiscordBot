@@ -44,6 +44,9 @@ Structures.extend('Guild', Guild => {
           welcomeChannelId: null,
           welcomeMessage: null
         },
+        moderationLogs: {
+          memberLeaveLogChannelId: null
+        },
         cleverbotSettings: {
           enabled: false,
           cleverbotChannelId: null
@@ -79,6 +82,7 @@ client.registry
     ['serverreminders', 'Server Reminder Commands'],
     ['translation', 'Translation Commands'],
     ['moderation', 'Moderation Commands'],
+    ['moderation logs', 'Moderation Log Commands'],
     ['games', 'Game Commands'],
     ['cleverbot', 'Cleverbot Commands'],
     ['coc', 'Clash Of Clans Commands']
@@ -106,6 +110,7 @@ client.on('ready', () => {
   restartCleverbotSettings();
   restartClashOfClansSettings();
   restartClashOfClansReminders();
+  restartModerationLogSettings();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -141,6 +146,20 @@ client.on('guildMemberAdd', async (member) => {
   message = message.replace(`---`, `<@${member.id}>`);
   return channel.send(message);
 });
+
+client.on('guildMemberRemove', async (member) => {
+  const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
+  if (!channel) return;
+  const embed = new Discord.MessageEmbed()
+    .setColor('RED')
+    .setThumbnail(member.user.displayAvatarURL())
+    .setTitle(`Member Left`)
+    .setDescription(`${member} ${member.user.tag}`)
+    .setFooter(`ID: ${member.id}`)
+    .setTimestamp()
+  return channel.send(embed);
+});
+
 
 client.on('guildCreate', async (guild) => {
   const dbl = new DBL(config.topggApiKey, client);
@@ -498,6 +517,32 @@ async function restartClashOfClansReminders() {
           .deleteOne({ "_id": ObjectId(results[i]._id) });
         await mongoClient.close();
       });
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartModerationLogSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Moderation Log Settings")
+      .find()
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guildId)) {
+          let guild = client.guilds.cache.get(results[i].guildId);
+          if (results[i].memberLeaveLogChannelId) {
+            guild.guildSettings.moderationLogs.memberLeaveLogChannelId = results[i].memberLeaveLogChannelId;
+          }
+        }
+      }
     }
   } catch (e) {
     console.error(e)
