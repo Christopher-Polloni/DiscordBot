@@ -112,8 +112,8 @@ client.on('ready', () => {
   restartClashOfClansSettings();
   restartClashOfClansReminders();
   restartModerationLogSettings();
-  // const dbl = new DBL(config.topggApiKey, client);
-  // dbl.postStats(client.guilds.cache.size)
+  const dbl = new DBL(config.topggApiKey, client);
+  dbl.postStats(client.guilds.cache.size)
 })
 
 client.setProvider(
@@ -162,7 +162,7 @@ client.on('guildMemberAdd', async (member) => {
 });
 
 client.on('guildMemberRemove', async (member) => {
-  const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
+  const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.moderationLogs.memberLeaveLogChannelId);
   if (!channel) return;
   const embed = new Discord.MessageEmbed()
     .setColor('RED')

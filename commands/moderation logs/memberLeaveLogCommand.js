@@ -6,6 +6,7 @@ module.exports = class memberLeaveLogCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'leave-log',
+            aliases: ['leavelog'],
             group: 'moderation logs',
             memberName: 'leave-log',
             description: 'Set a channel for a message to be sent in when a user leaves the server.',
