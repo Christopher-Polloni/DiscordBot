@@ -45,7 +45,8 @@ Structures.extend('Guild', Guild => {
           welcomeMessage: null
         },
         moderationLogs: {
-          memberLeaveLogChannelId: null
+          memberLeaveLogChannelId: null,
+          memberJoinLogChannelId: null
         },
         cleverbotSettings: {
           enabled: false,
@@ -111,8 +112,8 @@ client.on('ready', () => {
   restartClashOfClansSettings();
   restartClashOfClansReminders();
   restartModerationLogSettings();
-  const dbl = new DBL(config.topggApiKey, client);
-  dbl.postStats(client.guilds.cache.size)
+  // const dbl = new DBL(config.topggApiKey, client);
+  // dbl.postStats(client.guilds.cache.size)
 })
 
 client.setProvider(
@@ -140,11 +141,24 @@ client.on('message', async (message) => {
 });
 
 client.on('guildMemberAdd', async (member) => {
-  const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
-  if (!channel) return;
-  let message = member.guild.guildSettings.welcomeSettings.welcomeMessage;
-  message = message.replace(`---`, `<@${member.id}>`);
-  return channel.send(message);
+  const welcomeChannel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.welcomeSettings.welcomeChannelId);
+  const joinLogChannel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.moderationLogs.memberJoinLogChannelId);
+  if (!welcomeChannel && !joinLogChannel) return;
+  if (welcomeChannel) {
+    let message = member.guild.guildSettings.welcomeSettings.welcomeMessage;
+    message = message.replace(`---`, `<@${member.id}>`);
+    welcomeChannel.send(message);
+  }
+  if (joinLogChannel) {
+    const embed = new Discord.MessageEmbed()
+      .setColor('GREEN')
+      .setThumbnail(member.user.displayAvatarURL())
+      .setTitle(`Member Joined`)
+      .setDescription(`${member} ${member.user.tag}`)
+      .setFooter(`ID: ${member.id}`)
+      .setTimestamp()
+    joinLogChannel.send(embed);
+  }
 });
 
 client.on('guildMemberRemove', async (member) => {
@@ -540,6 +554,9 @@ async function restartModerationLogSettings() {
           let guild = client.guilds.cache.get(results[i].guildId);
           if (results[i].memberLeaveLogChannelId) {
             guild.guildSettings.moderationLogs.memberLeaveLogChannelId = results[i].memberLeaveLogChannelId;
+          }
+          if (results[i].memberJoinLogChannelId) {
+            guild.guildSettings.moderationLogs.memberJoinLogChannelId = results[i].memberJoinLogChannelId;
           }
         }
       }
