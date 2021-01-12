@@ -46,7 +46,8 @@ Structures.extend('Guild', Guild => {
         },
         moderationLogs: {
           memberLeaveLogChannelId: null,
-          memberJoinLogChannelId: null
+          memberJoinLogChannelId: null,
+          memberNicknameChangeLogChannelId: null
         },
         cleverbotSettings: {
           enabled: false,
@@ -174,6 +175,22 @@ client.on('guildMemberRemove', async (member) => {
   return channel.send(embed);
 });
 
+client.on('guildMemberUpdate', async (oldMember, newMember) => {
+  const nicknameLogChannel = newMember.guild.channels.cache.find(ch => ch.id === newMember.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId);
+  if (!nicknameLogChannel) return;
+  if (nicknameLogChannel && (oldMember.displayName !== newMember.displayName)) {
+    const embed = new Discord.MessageEmbed()
+      .setColor('BLUE')
+      .setThumbnail(newMember.user.displayAvatarURL())
+      .setTitle(`Member Nickname Change`)
+      .setDescription(`${newMember}`)
+      .addField(`Old Nickname`, `${oldMember.displayName}`)
+      .addField(`New Nickname`, `${newMember.displayName}`)
+      .setFooter(`ID: ${newMember.id}`)
+      .setTimestamp()
+    nicknameLogChannel.send(embed);
+  }
+});
 
 client.on('guildCreate', async (guild) => {
   const dbl = new DBL(config.topggApiKey, client);
@@ -557,6 +574,9 @@ async function restartModerationLogSettings() {
           }
           if (results[i].memberJoinLogChannelId) {
             guild.guildSettings.moderationLogs.memberJoinLogChannelId = results[i].memberJoinLogChannelId;
+          }
+          if (results[i].memberNicknameChangeLogChannelId) {
+            guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = results[i].memberNicknameChangeLogChannelId;
           }
         }
       }
