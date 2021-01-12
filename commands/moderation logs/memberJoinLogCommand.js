@@ -20,7 +20,7 @@ module.exports = class memberJoinLogCommand extends Commando.Command {
         if (!arg) {
             if (receivedMessage.guild.guildSettings.moderationLogs.memberJoinLogChannelId) {
                 let memberJoinLogChannelId = receivedMessage.guild.guildSettings.moderationLogs.memberJoinLogChannelId;
-                receivedMessage.say(`${receivedMessage.guild.name} member join log messages are set to be sent in <#${memberJoinLogChannelId}> with the following message:`)
+                receivedMessage.say(`${receivedMessage.guild.name} member join log messages are set to be sent in <#${memberJoinLogChannelId}>`)
                 receivedMessage.say(`To update these settings, use the command \`join-log update\`\nTo turn off this setting, use the command \`join-log off\``)
             }
             else {

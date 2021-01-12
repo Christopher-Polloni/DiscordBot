@@ -20,7 +20,7 @@ module.exports = class memberLeaveLogCommand extends Commando.Command {
         if (!arg) {
             if (receivedMessage.guild.guildSettings.moderationLogs.memberLeaveLogChannelId) {
                 let memberLeaveLogChannelId = receivedMessage.guild.guildSettings.moderationLogs.memberLeaveLogChannelId;
-                receivedMessage.say(`${receivedMessage.guild.name} member leave log messages are set to be sent in <#${memberLeaveLogChannelId}> with the following message:`)
+                receivedMessage.say(`${receivedMessage.guild.name} member leave log messages are set to be sent in <#${memberLeaveLogChannelId}>`)
                 receivedMessage.say(`To update these settings, use the command \`leave-log update\`\nTo turn off this setting, use the command \`leave-log off\``)
             }
             else {
