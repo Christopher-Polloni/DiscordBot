@@ -47,7 +47,8 @@ Structures.extend('Guild', Guild => {
         moderationLogs: {
           memberLeaveLogChannelId: null,
           memberJoinLogChannelId: null,
-          memberNicknameChangeLogChannelId: null
+          memberNicknameChangeLogChannelId: null,
+          banLogChannelId: null
         },
         cleverbotSettings: {
           enabled: false,
@@ -165,14 +166,22 @@ client.on('guildMemberAdd', async (member) => {
 client.on('guildMemberRemove', async (member) => {
   const channel = member.guild.channels.cache.find(ch => ch.id === member.guild.guildSettings.moderationLogs.memberLeaveLogChannelId);
   if (!channel) return;
-  const embed = new Discord.MessageEmbed()
-    .setColor('RED')
-    .setThumbnail(member.user.displayAvatarURL())
-    .setTitle(`Member Left`)
-    .setDescription(`${member} ${member.user.tag}`)
-    .setFooter(`ID: ${member.id}`)
-    .setTimestamp()
-  return channel.send(embed);
+  try {
+    const banList = await member.guild.fetchBans();
+    const bannedUser = banList.find(user => user.user.id == member.id);
+    if (!bannedUser) {
+      const embed = new Discord.MessageEmbed()
+        .setColor('RED')
+        .setThumbnail(member.user.displayAvatarURL())
+        .setTitle(`Member Left`)
+        .setDescription(`${member} ${member.user.tag}`)
+        .setFooter(`ID: ${member.id}`)
+        .setTimestamp()
+      return channel.send(embed);
+    }
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 client.on('guildMemberUpdate', async (oldMember, newMember) => {
@@ -190,6 +199,36 @@ client.on('guildMemberUpdate', async (oldMember, newMember) => {
       .setTimestamp()
     nicknameLogChannel.send(embed);
   }
+});
+
+client.on('guildBanAdd', async (guild, user) => {
+  const banLogChannel = guild.channels.cache.find(ch => ch.id === guild.guildSettings.moderationLogs.banLogChannelId);
+  if (!banLogChannel) return;
+  const banInfo = await guild.fetchBan(user);
+  const embed = new Discord.MessageEmbed()
+    .setColor('RED')
+    .setThumbnail(user.displayAvatarURL())
+    .setTitle(`Member Banned`)
+    .setDescription(`${user} ${user.tag}`)
+    .setFooter(`ID: ${user.id}`)
+    .setTimestamp()
+  if (banInfo.reason){
+    embed.addField('Reason:', banInfo.reason)
+  }
+  banLogChannel.send(embed);
+});
+
+client.on('guildBanRemove', async (guild, user) => {
+  const banLogChannel = guild.channels.cache.find(ch => ch.id === guild.guildSettings.moderationLogs.banLogChannelId);
+  if (!banLogChannel) return;
+  const embed = new Discord.MessageEmbed()
+    .setColor('YELLOW')
+    .setThumbnail(user.displayAvatarURL())
+    .setTitle(`Member Unbanned`)
+    .setDescription(`${user} ${user.tag}`)
+    .setFooter(`ID: ${user.id}`)
+    .setTimestamp()
+  banLogChannel.send(embed);
 });
 
 client.on('guildCreate', async (guild) => {
@@ -577,6 +616,9 @@ async function restartModerationLogSettings() {
           }
           if (results[i].memberNicknameChangeLogChannelId) {
             guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = results[i].memberNicknameChangeLogChannelId;
+          }
+          if (results[i].banLogChannelId) {
+            guild.guildSettings.moderationLogs.banLogChannelId = results[i].banLogChannelId;
           }
         }
       }
