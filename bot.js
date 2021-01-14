@@ -48,7 +48,8 @@ Structures.extend('Guild', Guild => {
           memberLeaveLogChannelId: null,
           memberJoinLogChannelId: null,
           memberNicknameChangeLogChannelId: null,
-          banLogChannelId: null
+          banLogChannelId: null,
+          messageEditLogChannelId: null
         },
         cleverbotSettings: {
           enabled: false,
@@ -264,6 +265,45 @@ client.on('guildDelete', async (guild) => {
     .setFooter(`Total Servers: ${client.guilds.cache.size}\nTotal Members: ${totalCount}`)
     .setTimestamp()
   return channel.send(embed);
+});
+
+client.on('messageUpdate', async (oldMessage, newMessage) => {
+  if (oldMessage.partial) {
+    try {
+      oldMessage = await oldMessage.fetch();
+    } catch (error) {
+      console.error('Something went wrong when fetching the message: ', error);
+      return;
+    }
+  }
+  if(!oldMessage.guild) return;
+  const messageEditLogChannel = newMessage.guild.channels.cache.find(ch => ch.id === newMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId);
+  if (!messageEditLogChannel) return;
+  if (!oldMessage.author.bot && oldMessage.guild && (oldMessage.content !== newMessage.content)) {
+    const embed = new Discord.MessageEmbed()
+      .setColor('YELLOW')
+      .setAuthor(oldMessage.author.tag, oldMessage.author.displayAvatarURL())
+      .setTitle(`Message Edited`)
+      .addField(`Author:`, `${oldMessage.author}`, true)
+      .addField('Message Location:', `${newMessage.channel} [Jump to Message](${newMessage.url})`, true)
+      .setFooter(`User ID: ${newMessage.author.id}`)
+      .setTimestamp()
+    if (oldMessage.content.length > 1024){
+      let reducedOldMessage = oldMessage.content.slice(0, 1021).concat('...')
+      embed.addField(`Original:`, `${reducedOldMessage}`)
+    }
+    else {
+      embed.addField(`Original:`, `${oldMessage.content}`)
+    }
+    if (newMessage.content.length > 1024){
+      let reducedNewMessage = newMessage.content.slice(0, 1021).concat('...')
+      embed.addField(`After Edit:`, `${reducedNewMessage}`)
+    }
+    else {
+      embed.addField(`After Edit:`, `${newMessage.content}`)
+    }
+    messageEditLogChannel.send(embed);
+  }
 });
 
 client.on('messageReactionAdd', async (reaction) => {
@@ -619,6 +659,9 @@ async function restartModerationLogSettings() {
           }
           if (results[i].banLogChannelId) {
             guild.guildSettings.moderationLogs.banLogChannelId = results[i].banLogChannelId;
+          }
+          if (results[i].messageEditLogChannelId) {
+            guild.guildSettings.moderationLogs.messageEditLogChannelId = results[i].messageEditLogChannelId;
           }
         }
       }
