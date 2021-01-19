@@ -356,7 +356,7 @@ client.on('messageDelete', async (message) => {
   }
 });
 
-client.on('messageReactionAdd', async (reaction) => {
+client.on('messageReactionAdd', async (reaction, user) => {
   if (reaction.partial) {
     try {
       await reaction.fetch();
@@ -365,8 +365,7 @@ client.on('messageReactionAdd', async (reaction) => {
       return;
     }
   }
-  const flags = ['🇺🇸', '🇪🇸', '🇧🇷', '🇮🇹'];
-  if (flags.includes(reaction.emoji.name) && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.reactionTranslator)) {
+  if (config.languages[reaction.emoji.name] && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.reactionTranslator)) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',
@@ -387,11 +386,11 @@ client.on('messageReactionAdd', async (reaction) => {
       responseType: 'json'
     }).then(function (response) {
       const embed = new Discord.MessageEmbed()
-        .setColor('#FFFF00')
-        .setTitle('Message Translated')
-        .addField('Original Message:', reaction.message.content)
-        .addField(`Translated To ${config.languages[reaction.emoji.name].language}:`, response.data[0].translations[0].text)
-        .setFooter(`${reaction.message.author.username} sent the original message`, reaction.message.author.displayAvatarURL())
+        .setColor('BLUE')
+        .setTitle(`Message Translated`)
+        .setDescription(`[Original Message](${reaction.message.url})`)
+        .addField(`Translated to ${config.languages[reaction.emoji.name].language}:`, response.data[0].translations[0].text)
+        .setFooter(`Translation Requested by ${user.username}`, user.displayAvatarURL())
       reaction.message.channel.send(embed)
     }).catch(function (error) {
       console.log(error);

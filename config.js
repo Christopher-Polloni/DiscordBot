@@ -13,21 +13,16 @@ module.exports = {
   cleverBotApiKey: process.env.CLEVER_BOT_API_KEY,
   clashOfClansApiKey: process.env.CLASH_OF_CLANS_API_KEY,
   languages: {
-    "🇺🇸": {
-      "language": "English",
-      "abbreviation": "en"
-    },
-    "🇪🇸": {
-      "language": "Spanish",
-      "abbreviation": "es"
-    },
-    "🇧🇷": {
-      "language": "Portuguese",
-      "abbreviation": "pt"
-    },
-    "🇮🇹": {
-      "language": "Italian",
-      "abbreviation": "it"
-    }
+    "🇺🇸": { "language": "English", "abbreviation": "en" },
+    "🇫🇷": { "language": "French",  "abbreviation": "fr" },
+    "🇩🇪": { "language": "German",  "abbreviation": "de" },
+    "🇬🇷": { "language": "Greek",   "abbreviation": "el" },
+    "🇮🇹": { "language": "Italian", "abbreviation": "it" },
+    "🇯🇵": { "language": "Japanese", "abbreviation": "ja" },
+    "🇰🇷": { "language": "Korean", "abbreviation": "ko" },
+    "🇵🇱": { "language": "Polish", "abbreviation": "pl" },
+    "🇧🇷": { "language": "Portuguese", "abbreviation": "pt" },
+    "🇷🇺": { "language": "Russian", "abbreviation": "ru" },
+    "🇪🇸": { "language": "Spanish", "abbreviation": "es" }
   }
 }
