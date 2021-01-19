@@ -49,7 +49,10 @@ Structures.extend('Guild', Guild => {
           memberJoinLogChannelId: null,
           memberNicknameChangeLogChannelId: null,
           banLogChannelId: null,
-          messageEditLogChannelId: null
+          messageEditLogChannelId: null,
+          messageDeleteLogChannelId: null,
+          messageDeleteLogIgnoreStartsWith: [],
+          messageDeleteLogIgnoreIncludes: []
         },
         cleverbotSettings: {
           enabled: false,
@@ -213,7 +216,7 @@ client.on('guildBanAdd', async (guild, user) => {
     .setDescription(`${user} ${user.tag}`)
     .setFooter(`ID: ${user.id}`)
     .setTimestamp()
-  if (banInfo.reason){
+  if (banInfo.reason) {
     embed.addField('Reason:', banInfo.reason)
   }
   banLogChannel.send(embed);
@@ -276,7 +279,7 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       return;
     }
   }
-  if(!oldMessage.guild) return;
+  if (!oldMessage.guild) return;
   const messageEditLogChannel = newMessage.guild.channels.cache.find(ch => ch.id === newMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId);
   if (!messageEditLogChannel) return;
   if (!oldMessage.author.bot && oldMessage.guild && (oldMessage.content !== newMessage.content)) {
@@ -288,14 +291,14 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       .addField('Message Location:', `${newMessage.channel} [Jump to Message](${newMessage.url})`, true)
       .setFooter(`User ID: ${newMessage.author.id}`)
       .setTimestamp()
-    if (oldMessage.content.length > 1024){
+    if (oldMessage.content.length > 1024) {
       let reducedOldMessage = oldMessage.content.slice(0, 1021).concat('...')
       embed.addField(`Original:`, `${reducedOldMessage}`)
     }
     else {
       embed.addField(`Original:`, `${oldMessage.content}`)
     }
-    if (newMessage.content.length > 1024){
+    if (newMessage.content.length > 1024) {
       let reducedNewMessage = newMessage.content.slice(0, 1021).concat('...')
       embed.addField(`After Edit:`, `${reducedNewMessage}`)
     }
@@ -303,6 +306,53 @@ client.on('messageUpdate', async (oldMessage, newMessage) => {
       embed.addField(`After Edit:`, `${newMessage.content}`)
     }
     messageEditLogChannel.send(embed);
+  }
+});
+
+client.on('messageDelete', async (message) => {
+  if (!message.guild) return;
+  const messageDeleteLogChannel = message.guild.channels.cache.find(ch => ch.id === message.guild.guildSettings.moderationLogs.messageDeleteLogChannelId);
+  if (!messageDeleteLogChannel) return;
+  if (message.partial) {
+    const embed = new Discord.MessageEmbed()
+      .setColor('RED')
+      .setTitle(`Message Deleted`)
+      .setDescription(`A message that was sent prior to <@575416249400426506> coming online has been deleted. As a result, the message content and author are unavailable.`)
+      .addField('Message Location:', `${message.channel}`, true)
+      .setTimestamp()
+    return messageDeleteLogChannel.send(embed);
+  }
+
+  const ignoreStartsWith = message.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith
+  const ignoreIncludes = message.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes
+
+  const startsWith = (element) => message.content.startsWith(element);
+  const includes = (element) => message.content.includes(element);
+
+  if (message.isCommand || message.author.bot){
+    return
+  }
+
+  if (ignoreStartsWith.length !==0 && ignoreStartsWith.some(startsWith)) {
+    return
+  }
+
+  if (ignoreIncludes.length !==0 && ignoreIncludes.some(includes)){
+    return
+  }
+
+
+  if (!message.author.bot) {
+    const embed = new Discord.MessageEmbed()
+      .setColor('RED')
+      .setAuthor(message.author.tag, message.author.displayAvatarURL())
+      .setTitle(`Message Deleted`)
+      .setDescription(`**Message Content:**\n${message.content}`)
+      .addField(`Author:`, `${message.author}`, true)
+      .addField('Message Location:', `${message.channel}`, true)
+      .setFooter(`User ID: ${message.author.id}`)
+      .setTimestamp()
+    messageDeleteLogChannel.send(embed);
   }
 });
 
@@ -662,6 +712,15 @@ async function restartModerationLogSettings() {
           }
           if (results[i].messageEditLogChannelId) {
             guild.guildSettings.moderationLogs.messageEditLogChannelId = results[i].messageEditLogChannelId;
+          }
+          if (results[i].messageDeleteLogChannelId) {
+            guild.guildSettings.moderationLogs.messageDeleteLogChannelId = results[i].messageDeleteLogChannelId;
+          }
+          if (results[i].messageDeleteLogIgnoreStartsWith) {
+            guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith = results[i].messageDeleteLogIgnoreStartsWith;
+          }
+          if (results[i].messageDeleteLogIgnoreIncludes) {
+            guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = results[i].messageDeleteLogIgnoreIncludes;
           }
         }
       }
