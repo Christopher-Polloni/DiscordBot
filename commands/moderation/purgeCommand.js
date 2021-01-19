@@ -14,7 +14,7 @@ module.exports = class inviteCommand extends Commando.Command {
             examples: [`purge <# of messages>`],
             guildOnly: true,
             argsType: 'single',
-            userPermissions: ['MANAGE_MESSAGES']
+            userPermissions: ['ADMINISTRATOR']
         })
     }
     async run(receivedMessage, arg) {
@@ -38,6 +38,9 @@ module.exports = class inviteCommand extends Commando.Command {
                     console.error(err);
                     return receivedMessage.say(`There was an error deleting some or all of the messages.`);
                 });
+        }
+        else {
+            return receivedMessage.say(`You must enter a valid number between 1 and 100 in order to delete previous messages in this channel. For example: \`purge 10\``)
         }
     }
 };
