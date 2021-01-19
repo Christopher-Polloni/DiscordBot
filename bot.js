@@ -239,7 +239,7 @@ client.on('guildCreate', async (guild) => {
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
   const channel = client.channels.cache.get('787920254969315328');
-  const totalCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalCount = client.guilds.cache.map((g) => g.memberCount || 0).reduce((accumulator, currentValue) => accumulator + currentValue)
   const owner = await client.users.fetch(guild.ownerID)
   const embed = new Discord.MessageEmbed()
     .setColor('GREEN')
@@ -257,7 +257,7 @@ client.on('guildDelete', async (guild) => {
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
   const channel = client.channels.cache.get('787920254969315328');
-  const totalCount = client.guilds.cache.map((g) => g.memberCount).reduce((accumulator, currentValue) => accumulator + currentValue)
+  const totalCount = client.guilds.cache.map((g) => g.memberCount || 0).reduce((accumulator, currentValue) => accumulator + currentValue)
   const owner = await client.users.fetch(guild.ownerID)
   const embed = new Discord.MessageEmbed()
     .setColor('RED')
