@@ -1,6 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
+const Discord = require('discord.js')
 
 module.exports = class banLogCommand extends Commando.Command {
     constructor(client) {
@@ -19,9 +20,12 @@ module.exports = class banLogCommand extends Commando.Command {
     async run(receivedMessage, arg) {
         if (!arg) {
             if (receivedMessage.guild.guildSettings.moderationLogs.banLogChannelId) {
-                let banLogChannelId = receivedMessage.guild.guildSettings.moderationLogs.banLogChannelId;
-                receivedMessage.say(`${receivedMessage.guild.name} user ban log messages are set to be sent in <#${banLogChannelId}>`)
-                receivedMessage.say(`To update these settings, use the command \`ban-log update\`\nTo turn off this setting, use the command \`ban-log off\``)
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Moderation Log Settings - User Banned/Unbanned')
+                    .setColor('BLUE')
+                    .addField('Log Channel:', `<#${receivedMessage.guild.guildSettings.moderationLogs.banLogChannelId}>`)
+                    .setFooter(`To update these settings, use the command \`ban-log update\`\nTo turn off this setting, use the command \`ban-log off\``)
+                return receivedMessage.say(embed)
             }
             else {
                 return receivedMessage.say(`A channel for a message to be sent in when a user is banned or unbanned from ${receivedMessage.guild.name} is not set.\nTo update these settings, use the command \`ban-log update\``);

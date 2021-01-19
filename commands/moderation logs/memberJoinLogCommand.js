@@ -1,6 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
+const Discord = require('discord.js')
 
 module.exports = class memberJoinLogCommand extends Commando.Command {
     constructor(client) {
@@ -19,9 +20,12 @@ module.exports = class memberJoinLogCommand extends Commando.Command {
     async run(receivedMessage, arg) {
         if (!arg) {
             if (receivedMessage.guild.guildSettings.moderationLogs.memberJoinLogChannelId) {
-                let memberJoinLogChannelId = receivedMessage.guild.guildSettings.moderationLogs.memberJoinLogChannelId;
-                receivedMessage.say(`${receivedMessage.guild.name} member join log messages are set to be sent in <#${memberJoinLogChannelId}>`)
-                receivedMessage.say(`To update these settings, use the command \`join-log update\`\nTo turn off this setting, use the command \`join-log off\``)
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Moderation Log Settings - Member Join')
+                    .setColor('BLUE')
+                    .addField('Log Channel:', `<#${receivedMessage.guild.guildSettings.moderationLogs.memberJoinLogChannelId}>`)
+                    .setFooter(`To update these settings, use the command \`join-log update\`\nTo turn off this setting, use the command \`join-log off\``)
+                return receivedMessage.say(embed)
             }
             else {
                 return receivedMessage.say(`A channel for a message to be sent in when a member joins ${receivedMessage.guild.name} is not set.\nTo update these settings, use the command \`join-log update\``);

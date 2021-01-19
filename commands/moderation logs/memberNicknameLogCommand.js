@@ -1,6 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
+const Discord = require('discord.js')
 
 module.exports = class memberNicknameChangeLogCommand extends Commando.Command {
     constructor(client) {
@@ -19,12 +20,15 @@ module.exports = class memberNicknameChangeLogCommand extends Commando.Command {
     async run(receivedMessage, arg) {
         if (!arg) {
             if (receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId) {
-                let memberNicknameChangeLogChannelId = receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId;
-                receivedMessage.say(`${receivedMessage.guild.name} member nickname change log messages are set to be sent in <#${memberNicknameChangeLogChannelId}>`)
-                receivedMessage.say(`To update these settings, use the command \`nickname-log update\`\nTo turn off this setting, use the command \`nickname-log off\``)
+                const embed = new Discord.MessageEmbed()
+                    .setTitle('Moderation Log Settings - Nickname Change')
+                    .setColor('BLUE')
+                    .addField('Log Channel:', `<#${receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId}>`)
+                    .setFooter(`To update these settings, use the command \`nickname-log update\`\nTo turn off this setting, use the command \`nickname-log off\``)
+                return receivedMessage.say(embed)
             }
             else {
-                return receivedMessage.say(`A channel for a message to be sent in when a member changes their nickname in  ${receivedMessage.guild.name} is not set.\nTo update these settings, use the command \`nickname-log update\``);
+                return receivedMessage.say(`A channel for a message to be sent in when a member changes their nickname in ${receivedMessage.guild.name} is not set.\nTo update these settings, use the command \`nickname-log update\``);
             }
         }
         else if (arg.toLowerCase() == 'update') {
