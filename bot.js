@@ -514,6 +514,15 @@ async function restartServerMessages() {
             .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
             .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
             .addField('Message:', results[i].message)
+            if (results[i].message !== ''){
+              embed.addField('Message:', results[i].message)
+            }
+            else {
+              embed.addField('Message:', '\u200B')
+            }
+            if (results[i].gif){
+              embed.setImage(results[i].gif)
+            }
           channel.send(embed)
           if (results[i].mentions !== '') {
             channel.send(`The following were mentioned above: ${results[i].mentions}`);

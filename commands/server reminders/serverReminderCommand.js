@@ -5,6 +5,7 @@ const config = require('../../config.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
 const MongoClient = require('mongodb').MongoClient;
+const { indexOf } = require('ffmpeg-static');
 const uri = config.mongoUri;
 const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
@@ -218,7 +219,23 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
           mentions = mentions.concat(` <@&${roleMentionsArray[i].id}>`)
         }
 
-        const message = messages.first().content;
+        const messageArgs = messages.first().content.split(" ");
+        const regex = /((http:\/\/(giphy\.com\/gifs\/.*|gph\.is\/.*|media\.giphy\.com\/media\/.*|tenor\.co\/.*|tenor\.com\/.*))|(https:\/\/(giphy\.com\/gifs\/.*|gph\.is\/.*|media\.giphy\.com\/media\/.*|tenor\.co\/.*|tenor\.com\/.*)))/i
+        let index = null
+        let gif = null
+        messageArgs.forEach(element => {
+          if (regex.test(element)){
+            index = messageArgs.indexOf(element)
+          }
+        });
+        if (index){
+          gif = messageArgs[index]
+        }
+        else {
+          gif = null
+        }
+        messageArgs.splice(index, 1)
+        const message = messageArgs.join(" ")
 
         return createnewMessage(
           {
@@ -231,6 +248,7 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
             guildID: receivedMessage.guild.id,
             guildName: receivedMessage.guild.name,
             message: message,
+            gif: gif,
             mentions: mentions,
             command: 'schedulemessage'
           },
@@ -263,8 +281,16 @@ async function createnewMessage(newMessage, receivedMessage) {
       .setTitle('Message Set!')
       .addField('Scheduled For:', `${newMessage.date.toLocaleString()} ${config.timeZone}`)
       .addField('Channel:', `<#${newMessage.channelID}>`)
-      .addField('Message:', newMessage.message)
       .setFooter(`To delete this scheduled message: $deleteservermessage ${result.insertedId}`)
+      if (newMessage.message !== ''){
+        embed.addField('Message:', newMessage.message)
+      }
+      else {
+        embed.addField('Message:', '\u200B')
+      }
+      if (newMessage.gif){
+        embed.setImage(newMessage.gif)
+      }
     receivedMessage.say(embed)
     receivedMessage.react('✅');
 
@@ -275,7 +301,15 @@ async function createnewMessage(newMessage, receivedMessage) {
       .setTitle(`Scheduled Message`)
       .setAuthor(newMessage.authorName, newMessage.authorAvatarUrl)
       .setDescription(`${newMessage.date.toLocaleString()} ${config.timeZone}`)
-      .addField('Message:', newMessage.message)
+      if (newMessage.message !== ''){
+        embed2.addField('Message:', newMessage.message)
+      }
+      else {
+        embed2.addField('Message:', '\u200B')
+      }
+      if (newMessage.gif){
+        embed2.setImage(newMessage.gif)
+      }
     const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
     
     const difference = newMessage.date - new Date();
