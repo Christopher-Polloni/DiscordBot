@@ -10,7 +10,7 @@ module.exports = class pollCommand extends Commando.Command {
             group: 'miscellaneous',
             memberName: 'poll',
             description: 'Set up a poll in a channel.',
-            examples: [`poll <channel>\n<question>\n<option 1>\n<option 2>\n<option 3>`],
+            examples: [`poll <#channel>\n<question>\n<option 1>\n<option 2>\n<option 3>`],
             guildOnly: true,
             argsType: 'single',
             userPermissions: ['MANAGE_GUILD']
@@ -19,7 +19,7 @@ module.exports = class pollCommand extends Commando.Command {
     async run(receivedMessage, args) {
         const reactions = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
         if (!args) {
-            return receivedMessage.say('To properly use this command, use the following format, ensuring that the question and each option are on a new line within the original message. A number emoji will automatically be added to each option\n```poll <channel>\n<question>\n<option 1>\n<option 2>\n<option 3>```')
+            return receivedMessage.say('To properly use this command, use the following format, ensuring that the question and each option are on a new line within the original message. A number emoji will automatically be added to each option\n```poll <#channel>\n<question>\n<option 1>\n<option 2>\n<option 3>```')
         }
         if (receivedMessage.mentions.channels.first()) {
             const channelId = receivedMessage.mentions.channels.first().id;
