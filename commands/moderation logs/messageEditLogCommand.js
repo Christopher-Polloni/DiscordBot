@@ -83,7 +83,7 @@ async function upsertModerationLogSetting(receivedMessage, channelId) {
 
 async function deleteBanLogSetting(receivedMessage) {
     if (!receivedMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId) {
-        return receivedMessage.say(`Moderation Log Setting for users being banned or unbanned was already turned off`);
+        return receivedMessage.say(`Moderation Log Setting for messages being edited was already turned off`);
     }
     const MongoClient = require('mongodb').MongoClient;
     const uri = config.mongoUri;
