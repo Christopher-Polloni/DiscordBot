@@ -40,6 +40,7 @@ Structures.extend('Guild', Guild => {
       super(client, data);
       this.guildSettings = {
         reactionTranslator: true,
+        reactionRoles: [],
         welcomeSettings: {
           welcomeChannelId: null,
           welcomeMessage: null
@@ -89,6 +90,7 @@ client.registry
     ['serverreminders', 'Server Reminder Commands'],
     ['translation', 'Translation Commands'],
     ['moderation', 'Moderation Commands'],
+    ['reaction roles', 'Reaction Role Commands'],
     ['moderation logs', 'Moderation Log Commands'],
     ['games', 'Game Commands'],
     ['cleverbot', 'Cleverbot Commands'],
@@ -118,6 +120,7 @@ client.on('ready', () => {
   restartClashOfClansSettings();
   restartClashOfClansReminders();
   restartModerationLogSettings();
+  restartReactionRoles();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -329,15 +332,15 @@ client.on('messageDelete', async (message) => {
   const startsWith = (element) => message.content.startsWith(element);
   const includes = (element) => message.content.includes(element);
 
-  if (message.isCommand || message.author.bot){
+  if (message.isCommand || message.author.bot) {
     return
   }
 
-  if (ignoreStartsWith.length !==0 && ignoreStartsWith.some(startsWith)) {
+  if (ignoreStartsWith.length !== 0 && ignoreStartsWith.some(startsWith)) {
     return
   }
 
-  if (ignoreIncludes.length !==0 && ignoreIncludes.some(includes)){
+  if (ignoreIncludes.length !== 0 && ignoreIncludes.some(includes)) {
     return
   }
 
@@ -364,6 +367,9 @@ client.on('messageReactionAdd', async (reaction, user) => {
       console.error('Something went wrong when fetching the message: ', error);
       return;
     }
+  }
+  if (user.bot) {
+    return
   }
   if (config.languages[reaction.emoji.name] && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.reactionTranslator)) {
     axios({
@@ -395,6 +401,41 @@ client.on('messageReactionAdd', async (reaction, user) => {
     }).catch(function (error) {
       console.log(error);
     })
+  }
+  else if (reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
+    const reactionRoleMessage = reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)
+    if (reactionRoleMessage.emoji.includes(reaction.emoji.id || reaction.emoji.name)) {
+      if (reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name) !== -1) {
+        const member = await reaction.message.guild.members.fetch(user.id)
+        const role = await reaction.message.guild.roles.fetch(reactionRoleMessage.roles[reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name)])
+        member.roles.add(role)
+      }
+    }
+  }
+  else {
+    return
+  }
+
+});
+
+client.on('messageReactionRemove', async (reaction, user) => {
+  if (reaction.partial) {
+    try {
+      await reaction.fetch();
+    } catch (error) {
+      console.error('Something went wrong when fetching the message: ', error);
+      return;
+    }
+  }
+  if (reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
+    const reactionRoleMessage = reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)
+    if (reactionRoleMessage.emoji.includes(reaction.emoji.id || reaction.emoji.name)) {
+      if (reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name) !== -1) {
+        const member = await reaction.message.guild.members.fetch(user.id)
+        const role = await reaction.message.guild.roles.fetch(reactionRoleMessage.roles[reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name)])
+        member.roles.remove(role)
+      }
+    }
   }
   else {
     return
@@ -514,15 +555,15 @@ async function restartServerMessages() {
             .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
             .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
             .addField('Message:', results[i].message)
-            if (results[i].message !== ''){
-              embed.addField('Message:', results[i].message)
-            }
-            else {
-              embed.addField('Message:', '\u200B')
-            }
-            if (results[i].gif){
-              embed.setImage(results[i].gif)
-            }
+          if (results[i].message !== '') {
+            embed.addField('Message:', results[i].message)
+          }
+          else {
+            embed.addField('Message:', '\u200B')
+          }
+          if (results[i].gif) {
+            embed.setImage(results[i].gif)
+          }
           channel.send(embed)
           if (results[i].mentions !== '') {
             channel.send(`The following were mentioned above: ${results[i].mentions}`);
@@ -730,6 +771,30 @@ async function restartModerationLogSettings() {
           if (results[i].messageDeleteLogIgnoreIncludes) {
             guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = results[i].messageDeleteLogIgnoreIncludes;
           }
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartReactionRoles() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Reaction Roles")
+      .find()
+      .toArray()
+    await client2.close();
+    let guilds = client.guilds.cache.map(guild => guild.id)
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        if (guilds.includes(results[i].guildId)) {
+          let guild = client.guilds.cache.get(results[i].guildId);
+          guild.guildSettings.reactionRoles.push(results[i])
         }
       }
     }
