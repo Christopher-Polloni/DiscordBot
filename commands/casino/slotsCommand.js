@@ -2,7 +2,6 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
-const { NONAME } = require('dns');
 
 module.exports = class slotsCommand extends Commando.Command {
     constructor(client) {
