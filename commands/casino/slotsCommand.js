@@ -124,12 +124,3 @@ function getDuplicate(array) {
         return array[1]
     }
 }
-
-function populateSlotArrays(index1, index2, index3) {
-    if (array[0] === array[1] || array[0] === array[2]) {
-        return array[0]
-    }
-    else {
-        return array[1]
-    }
-}
