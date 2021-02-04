@@ -13,7 +13,7 @@ module.exports = class slotsCommand extends Commando.Command {
             memberName: 'slot',
             description: 'Play slots',
             examples: ['slot <bet>'],
-            guildOnly: true,
+            guildOnly: false,
             argsType: 'single'
         })
     }
