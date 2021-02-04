@@ -74,6 +74,19 @@ Structures.extend('Guild', Guild => {
   return GuildSettings;
 });
 
+Structures.extend('User', User => {
+  class Casino extends User {
+    constructor(client, data) {
+      super(client, data);
+      this.casino = {
+        setup: false,
+        balance: null
+      };
+    }
+  }
+  return Casino;
+});
+
 const client = new Commando.Client({
   owner: '231961695420022785',
   commandPrefix: '$',
@@ -94,7 +107,8 @@ client.registry
     ['moderation logs', 'Moderation Log Commands'],
     ['games', 'Game Commands'],
     ['cleverbot', 'Cleverbot Commands'],
-    ['coc', 'Clash Of Clans Commands']
+    ['coc', 'Clash Of Clans Commands'],
+    ['casino', 'Casino Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
