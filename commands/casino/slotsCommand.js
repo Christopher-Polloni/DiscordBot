@@ -28,7 +28,7 @@ module.exports = class slotsCommand extends Commando.Command {
                 .setFooter('Usage: slot <bet>')
             return receivedMessage.say(embed)
         }
-        else if (!Number.isInteger(Number(args)) || (args > receivedMessage.author.casino.balance)) {
+        else if (!Number.isInteger(Number(args)) || (args > receivedMessage.author.casino.balance) || (args < 0)) {
             return receivedMessage.say('The amount you bet must be a valid integer below or equal to your current balance. To view your balance use the `credits` command.')
         }
         else {
