@@ -80,7 +80,8 @@ Structures.extend('User', User => {
       super(client, data);
       this.casino = {
         setup: false,
-        balance: null
+        balance: null,
+        dailyCooldown: null
       };
     }
   }
