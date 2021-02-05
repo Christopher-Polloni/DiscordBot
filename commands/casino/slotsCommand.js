@@ -22,6 +22,7 @@ module.exports = class slotsCommand extends Commando.Command {
         }
         if (!args) {
             const embed = new Discord.MessageEmbed()
+                .setColor('RED')
                 .setTitle('Slot Machine Payouts')
                 .setDescription('🍌🍌🍌 - 0.5x\n🍇🍇❓ - 1.5x\n🍇🍇🍇 - 2x\n🍊🍊❓ - 2x\n🍒🍒❓ - 2.5x\n🍊🍊🍊 - 3x\n🍒🍒🍒 - 3.5x\n💎💎❓ - 4x\n💰💰❓ - 10x\n💎💎💎 - 7x\n💰💰💰 - 15x')
                 .setFooter('Usage: slot <bet>')
@@ -73,6 +74,7 @@ module.exports = class slotsCommand extends Commando.Command {
             if (jackpot(slotsWinningRow)) {
                 if ((slotsWinningRow[0] == "🍌") && args == 1) {
                     const embed = new Discord.MessageEmbed()
+                        .setColor('RED')
                         .setDescription(slotMachine)
                         .addField('Profit', `**0** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
@@ -82,6 +84,7 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[slotsWinningRow[0]].jackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
+                        .setColor('RED')
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
                         .addField('Profit', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
@@ -94,6 +97,7 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[getDuplicate(slotsWinningRow)].semiJackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
+                        .setColor('RED')
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
                         .addField('Profit', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
@@ -102,6 +106,7 @@ module.exports = class slotsCommand extends Commando.Command {
                 else {
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args
                     const embed = new Discord.MessageEmbed()
+                        .setColor('RED')
                         .setDescription(slotMachine + '\n**-- YOU LOST --**')
                         .addField('Profit', `**-${args}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)

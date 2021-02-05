@@ -22,7 +22,7 @@ module.exports = class casinoSetupCommand extends Commando.Command {
     }
     async run(receivedMessage, args) {
         if (receivedMessage.author.casino.setup) {
-            return receivedMessage.say('You already initialized your casino account. This command only needed to be run once.')
+            return receivedMessage.say('You already initialized your casino account. This command only needs to be run once.')
         }
         else {
             return initializeUserCasino(receivedMessage)
@@ -37,14 +37,20 @@ async function initializeUserCasino(receivedMessage) {
     const uri = config.mongoUri;
     const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
+        receivedMessage.channel.startTyping(5)
         await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: receivedMessage.author.id }, { $set: {userId: receivedMessage.author.id, balance: 10000} }, { upsert: true });
+        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: receivedMessage.author.id }, { $set: { userId: receivedMessage.author.id, balance: 10000 } }, { upsert: true });
         await client2.close();
         receivedMessage.author.casino.setup = true
         receivedMessage.author.casino.balance = 10000
-        return receivedMessage.say('Your account has been created and given 10,000 credits!')
+        receivedMessage.channel.stopTyping(true)
+        const embed = new Discord.MessageEmbed()
+            .setColor('GREEN')
+            .setDescription('**Your account has been created and given 10,000 credits!**')
+            .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+        return receivedMessage.say(embed)
     } catch (e) {
         console.error(e);
         receivedMessage.say("An error occurred. Please run the command again.")
     }
-  }
+}

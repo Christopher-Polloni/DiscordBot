@@ -21,7 +21,11 @@ module.exports = class creditsCommand extends Commando.Command {
             return receivedMessage.say('You must first set up your casino account before using any casino commands. To do this, simply run the `casino-setup` command.')
         }
         else {
-            return receivedMessage.say(`You currently have ${receivedMessage.author.casino.balance.toLocaleString()} credits.`)
+            const embed = new Discord.MessageEmbed()
+                .setColor('BLUE')
+                .addField('Your Total Credits', `${receivedMessage.author.casino.balance.toLocaleString()} credits`)
+                .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+            return receivedMessage.say(embed)
         }
 
     }
