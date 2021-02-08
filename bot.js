@@ -81,7 +81,8 @@ Structures.extend('User', User => {
       this.casino = {
         setup: false,
         balance: null,
-        dailyCooldown: null
+        dailyCooldown: null,
+        voteCooldown: null
       };
     }
   }
