@@ -78,7 +78,8 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine)
                         .addField('Profit', `**0** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
-                    receivedMessage.say(embed)
+                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    return receivedMessage.say(embed)
                 }
                 else {
                     const winnings = Math.ceil(args * payout[slotsWinningRow[0]].jackpot)
@@ -88,7 +89,8 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
                         .addField('Profit', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
-                    receivedMessage.say(embed)
+                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    return receivedMessage.say(embed)
                 }
             }
             else {
@@ -101,7 +103,8 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
                         .addField('Profit', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
-                    receivedMessage.say(embed)
+                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    return receivedMessage.say(embed)
                 }
                 else {
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args
@@ -110,7 +113,8 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + '\n**-- YOU LOST --**')
                         .addField('Profit', `**-${args}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
-                    receivedMessage.say(embed)
+                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    return receivedMessage.say(embed)
                 }
             }
         }
@@ -126,5 +130,18 @@ function getDuplicate(array) {
     }
     else {
         return array[1]
+    }
+}
+
+async function updateBalanceDB(userId, balance) {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client2.connect();
+        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance } }, { upsert: true });
+        await client2.close();
+    } catch (e) {
+        console.error(`Slot update error. User: ${userId} Balance: ${balance}\n`, e)
     }
 }
