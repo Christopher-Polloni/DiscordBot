@@ -24,9 +24,11 @@ module.exports = class dailyCommand extends Commando.Command {
             receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
             const embed = new Discord.MessageEmbed()
                 .setColor('GREEN')
+                .setTitle('Daily Credits Claimed!')
                 .addField('Credits Added', '2,500', true)
                 .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                 .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+            updateDailyCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.dailyCooldown)
             return receivedMessage.say(embed)
         }
         else {
@@ -38,17 +40,19 @@ module.exports = class dailyCommand extends Commando.Command {
                 receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
                 const embed = new Discord.MessageEmbed()
                     .setColor('GREEN')
+                    .setTitle('Daily Credits Claimed!')
                     .addField('Credits Added', '2,500', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+                updateDailyCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, now)
                 return receivedMessage.say(embed)
             }
             else {
-
                 const timeDiff = new Date(receivedMessage.author.casino.dailyCooldown) - new Date(now + oneDay)
                 const humanTime = new Date(timeDiff).toISOString().substring(11, 19);
                 const embed = new Discord.MessageEmbed()
                     .setColor('RED')
+                    .setTitle('Daily Credits Already Claimed!')
                     .setDescription('You already collected your free credits today.')
                     .addField('Time Until Next Available Claim', humanTime, true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
@@ -58,3 +62,16 @@ module.exports = class dailyCommand extends Commando.Command {
 
     }
 };
+
+async function updateDailyCooldownDB(userId, balance, dailyCooldown) {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client2.connect();
+        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance, dailyCooldown: dailyCooldown } }, { upsert: true });
+        await client2.close();
+    } catch (e) {
+        console.error(`Daily Cooldown update error. User: ${userId} Balance: ${balance} Daily Cooldown: ${dailyCooldown}\n`, e)
+    }
+}
