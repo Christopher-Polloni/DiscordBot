@@ -23,6 +23,7 @@ module.exports = class creditsCommand extends Commando.Command {
         else {
             const embed = new Discord.MessageEmbed()
                 .setColor('BLUE')
+                .setTitle('Casino Credits')
                 .addField('Your Total Credits', `${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                 .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
             return receivedMessage.say(embed)

@@ -91,6 +91,7 @@ module.exports = class voteCommand extends Commando.Command {
                 const humanTime = new Date(timeDiff).toISOString().substring(11, 19);
                 const embed = new Discord.MessageEmbed()
                     .setColor('RED')
+                    .setTitle('Vote Credits Already Claimed!')
                     .setDescription('You already collected your free credits for voting within the past 12 hours.')
                     .addField('Time Until Next Available Claim', humanTime, true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
