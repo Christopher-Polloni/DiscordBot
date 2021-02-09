@@ -110,6 +110,6 @@ async function updateVoteCooldownDB(userId, balance, voteCooldown) {
         result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance, voteCooldown: voteCooldown } }, { upsert: true });
         await client2.close();
     } catch (e) {
-        console.error(`Vote Cooldown update error. User: ${userId} Vote Cooldown: ${voteCooldown}\n`, e)
+        console.error(`Vote Cooldown update error. User: ${userId} Balance: ${balance} Vote Cooldown: ${voteCooldown}\n`, e)
     }
 }
