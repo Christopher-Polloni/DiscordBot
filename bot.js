@@ -137,6 +137,7 @@ client.on('ready', () => {
   restartClashOfClansReminders();
   restartModerationLogSettings();
   restartReactionRoles();
+  restartCasinoSettings();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -811,6 +812,33 @@ async function restartReactionRoles() {
         if (guilds.includes(results[i].guildId)) {
           let guild = client.guilds.cache.get(results[i].guildId);
           guild.guildSettings.reactionRoles.push(results[i])
+        }
+      }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartCasinoSettings() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Casino")
+      .find()
+      .toArray()
+    await client2.close();
+    if (results.length !== 0) {
+      for (let i = 0; i < results.length; i++) {
+        const user = await client.users.fetch(results[i].userId)
+        console.log(user)
+        if (user) {
+          user.casino.setup = true
+          user.casino.balance = results[i].balance || 0
+          user.casino.dailyCooldown = results[i].dailyCooldown || null
+          user.casino.voteCooldown = results[i].voteCooldown || null
         }
       }
     }
