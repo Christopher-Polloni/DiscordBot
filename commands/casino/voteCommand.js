@@ -41,7 +41,7 @@ module.exports = class voteCommand extends Commando.Command {
                     .addField('Credits Added', '5,000', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
+                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
                 return receivedMessage.say(embed)
             }
             else {
@@ -52,7 +52,7 @@ module.exports = class voteCommand extends Commando.Command {
                     .addField('Credits Added', '2,500', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
+                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
                 return receivedMessage.say(embed)
             }
 
@@ -70,7 +70,7 @@ module.exports = class voteCommand extends Commando.Command {
                         .addField('Credits Added', '5,000', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
+                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
                     return receivedMessage.say(embed)
                 }
                 else {
@@ -82,7 +82,7 @@ module.exports = class voteCommand extends Commando.Command {
                         .addField('Credits Added', '2,500', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
+                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
                     return receivedMessage.say(embed)
                 }
             }
@@ -101,13 +101,13 @@ module.exports = class voteCommand extends Commando.Command {
     }
 };
 
-async function updateVoteCooldownDB(userId, voteCooldown) {
+async function updateVoteCooldownDB(userId, balance, voteCooldown) {
     const MongoClient = require('mongodb').MongoClient;
     const uri = config.mongoUri;
     const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
         await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { voteCooldown: voteCooldown } }, { upsert: true });
+        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance, voteCooldown: voteCooldown } }, { upsert: true });
         await client2.close();
     } catch (e) {
         console.error(`Vote Cooldown update error. User: ${userId} Vote Cooldown: ${voteCooldown}\n`, e)
