@@ -4,7 +4,7 @@ const config = require('../../config.js');
 const Discord = require('discord.js');
 const DBL = require("dblapi.js");
 
-module.exports = class dailyCommand extends Commando.Command {
+module.exports = class voteCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'vote',
@@ -41,6 +41,7 @@ module.exports = class dailyCommand extends Commando.Command {
                     .addField('Credits Added', '5,000', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
                 return receivedMessage.say(embed)
             }
             else {
@@ -51,6 +52,7 @@ module.exports = class dailyCommand extends Commando.Command {
                     .addField('Credits Added', '2,500', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+                updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
                 return receivedMessage.say(embed)
             }
 
@@ -58,8 +60,8 @@ module.exports = class dailyCommand extends Commando.Command {
         else {
             const now = new Date()
             const halfDay = 1000 * 60 * 60 * 12;
-            const dayHasPassed = (now - receivedMessage.author.casino.dailyCooldown) > halfDay;
-            if (dayHasPassed) {
+            const halfDayHasPassed = (now - receivedMessage.author.casino.voteCooldown) > halfDay;
+            if (halfDayHasPassed) {
                 if (isWeekend) {
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
                     const embed = new Discord.MessageEmbed()
@@ -68,25 +70,28 @@ module.exports = class dailyCommand extends Commando.Command {
                         .addField('Credits Added', '5,000', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
                     return receivedMessage.say(embed)
                 }
                 else {
-                    receivedMessage.author.casino.dailyCooldown = now
+                    receivedMessage.author.casino.voteCooldown = now
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
                     const embed = new Discord.MessageEmbed()
                         .setColor('GREEN')
+                        .setTitle('Thanks for voting!')
                         .addField('Credits Added', '2,500', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
+                    updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.voteCooldown)
                     return receivedMessage.say(embed)
                 }
             }
             else {
-                const timeDiff = new Date(receivedMessage.author.casino.dailyCooldown) - new Date(now + halfDay)
+                const timeDiff = new Date(halfDay) - (new Date(now) - new Date(receivedMessage.author.casino.voteCooldown))
                 const humanTime = new Date(timeDiff).toISOString().substring(11, 19);
                 const embed = new Discord.MessageEmbed()
                     .setColor('RED')
-                    .setDescription('You already collected your free credits today.')
+                    .setDescription('You already collected your free credits for voting within the past 12 hours.')
                     .addField('Time Until Next Available Claim', humanTime, true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                 return receivedMessage.say(embed)
@@ -95,3 +100,16 @@ module.exports = class dailyCommand extends Commando.Command {
 
     }
 };
+
+async function updateVoteCooldownDB(userId, voteCooldown) {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    try {
+        await client2.connect();
+        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { voteCooldown: voteCooldown } }, { upsert: true });
+        await client2.close();
+    } catch (e) {
+        console.error(`Vote Cooldown update error. User: ${userId} Vote Cooldown: ${voteCooldown}\n`, e)
+    }
+}
