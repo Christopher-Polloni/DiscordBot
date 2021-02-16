@@ -10,7 +10,7 @@ module.exports = class voteCommand extends Commando.Command {
             name: 'vote',
             group: 'casino',
             memberName: 'vote',
-            description: 'Receive 2,500 credits after voting, double on the weekend!',
+            description: 'Receive 5,000 credits after voting, double on the weekend!',
             examples: ['vote'],
             guildOnly: false,
             argsType: 'single',
@@ -34,22 +34,22 @@ module.exports = class voteCommand extends Commando.Command {
         else if (!receivedMessage.author.casino.voteCooldown) {
             receivedMessage.author.casino.voteCooldown = new Date()
             if (isWeekend) {
-                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
+                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 10000
                 const embed = new Discord.MessageEmbed()
                     .setColor('GREEN')
                     .setTitle('Thanks for voting!')
-                    .addField('Credits Added', '5,000', true)
+                    .addField('Credits Added', '10,000', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                 updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
                 return receivedMessage.say(embed)
             }
             else {
-                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
+                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
                 const embed = new Discord.MessageEmbed()
                     .setColor('GREEN')
                     .setTitle('Thanks for voting!')
-                    .addField('Credits Added', '2,500', true)
+                    .addField('Credits Added', '5,000', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                 updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
@@ -63,11 +63,11 @@ module.exports = class voteCommand extends Commando.Command {
             const halfDayHasPassed = (now - receivedMessage.author.casino.voteCooldown) > halfDay;
             if (halfDayHasPassed) {
                 if (isWeekend) {
-                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
+                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 10000
                     const embed = new Discord.MessageEmbed()
                         .setColor('GREEN')
                         .setTitle('Thanks for voting!')
-                        .addField('Credits Added', '5,000', true)
+                        .addField('Credits Added', '10,000', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                     updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)
@@ -75,11 +75,11 @@ module.exports = class voteCommand extends Commando.Command {
                 }
                 else {
                     receivedMessage.author.casino.voteCooldown = now
-                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
+                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
                     const embed = new Discord.MessageEmbed()
                         .setColor('GREEN')
                         .setTitle('Thanks for voting!')
-                        .addField('Credits Added', '2,500', true)
+                        .addField('Credits Added', '5,000', true)
                         .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                     updateVoteCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.voteCooldown)

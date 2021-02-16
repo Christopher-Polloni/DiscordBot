@@ -9,7 +9,7 @@ module.exports = class dailyCommand extends Commando.Command {
             name: 'daily',
             group: 'casino',
             memberName: 'daily',
-            description: 'Receive 2,500 credits for free every day.',
+            description: 'Receive 5,000 credits for free every day.',
             examples: ['daily'],
             guildOnly: false,
             argsType: 'single',
@@ -21,11 +21,11 @@ module.exports = class dailyCommand extends Commando.Command {
         }
         else if (!receivedMessage.author.casino.dailyCooldown) {
             receivedMessage.author.casino.dailyCooldown = new Date()
-            receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
+            receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
             const embed = new Discord.MessageEmbed()
                 .setColor('GREEN')
                 .setTitle('Daily Credits Claimed!')
-                .addField('Credits Added', '2,500', true)
+                .addField('Credits Added', '5,000', true)
                 .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                 .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
             updateDailyCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, receivedMessage.author.casino.dailyCooldown)
@@ -37,11 +37,11 @@ module.exports = class dailyCommand extends Commando.Command {
             const dayHasPassed = (now - receivedMessage.author.casino.dailyCooldown) > oneDay;
             if (dayHasPassed) {
                 receivedMessage.author.casino.dailyCooldown = now
-                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 2500
+                receivedMessage.author.casino.balance = receivedMessage.author.casino.balance + 5000
                 const embed = new Discord.MessageEmbed()
                     .setColor('GREEN')
                     .setTitle('Daily Credits Claimed!')
-                    .addField('Credits Added', '2,500', true)
+                    .addField('Credits Added', '5,000', true)
                     .addField('New Balance', receivedMessage.author.casino.balance.toLocaleString(), true)
                     .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                 updateDailyCooldownDB(receivedMessage.author.id, receivedMessage.author.casino.balance, now)
