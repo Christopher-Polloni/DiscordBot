@@ -7,7 +7,7 @@ module.exports = class highLowCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'high-low',
-            aliases: ['hl'],
+            aliases: ['hl', 'h-l'],
             group: 'casino',
             memberName: 'high-low',
             description: 'Guess if the number generated is high or low (Low = 1 - 5, High = 6 - 10)',

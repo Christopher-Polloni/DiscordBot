@@ -7,7 +7,6 @@ module.exports = class casinoSetupCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'casino-setup',
-            aliases: ['casinosetup'],
             group: 'casino',
             memberName: 'casino-setup',
             description: 'Setup your casino account so you can use any casino command',

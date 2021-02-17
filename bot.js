@@ -833,7 +833,6 @@ async function restartCasinoSettings() {
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
         const user = await client.users.fetch(results[i].userId)
-        console.log(user)
         if (user) {
           user.casino.setup = true
           user.casino.balance = results[i].balance || 0
