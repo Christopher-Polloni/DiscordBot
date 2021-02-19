@@ -74,10 +74,11 @@ module.exports = class slotsCommand extends Commando.Command {
             if (jackpot(slotsWinningRow)) {
                 if ((slotsWinningRow[0] == "🍌") && args == 1) {
                     const embed = new Discord.MessageEmbed()
+                        .setTitle('<:a:alert_light-1:812214621162438706> Slot Machine <a:alert_light:812211459357802506>')
                         .setColor('RED')
                         .setDescription(slotMachine)
-                        .addField('Profit', `**0** credits`, true)
-                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
+                        .addField('Winnings', `**1** credits`, true)
+                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
                     return receivedMessage.say(embed)
                 }
@@ -85,10 +86,11 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[slotsWinningRow[0]].jackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
+                        .setTitle('<a:alert_light:812211459357802506> Slot Machine <a:alert_light:812211459357802506>')
                         .setColor('RED')
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
-                        .addField('Profit', `**${winnings}** credits`, true)
-                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
+                        .addField('Winnings', `**${winnings}** credits`, true)
+                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
                     return receivedMessage.say(embed)
                 }
@@ -99,20 +101,21 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[getDuplicate(slotsWinningRow)].semiJackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
-                        .setColor('RED')
+                        .setTitle('<a:alert_light:812211459357802506> Slot Machine <a:alert_light:812211459357802506>')
+                        .setColor('GREEN')
                         .setDescription(slotMachine + '\n**-- YOU WON --**')
-                        .addField('Profit', `**${winnings}** credits`, true)
-                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
+                        .addField('Winnings', `**${winnings}** credits`, true)
+                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
                     return receivedMessage.say(embed)
                 }
                 else {
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args
                     const embed = new Discord.MessageEmbed()
+                        .setTitle(':slot_machine: Slot Machine :slot_machine:')
                         .setColor('RED')
                         .setDescription(slotMachine + '\n**-- YOU LOST --**')
-                        .addField('Profit', `**-${args}** credits`, true)
-                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance} credits`, true)
+                        .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
                     return receivedMessage.say(embed)
                 }
