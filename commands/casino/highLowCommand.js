@@ -57,7 +57,6 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
             .setTitle('High-Low')
             .setColor('RED')
             .addField('Incorrect!', `**Guess:** ${choice}\n**Number:** ${number}`, true)
-            .addField('Profit', `**-${bet}** credits`, true)
             .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
             .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
         updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -85,13 +84,13 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
                     return continueGame(receivedMessage, bet, 'low', multiplier + 2)
                 }
                 else {
-                    const profit = bet * multiplier
-                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - bet + profit
+                    const winnings = bet * multiplier
+                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - bet + winnings
                     const embed = new Discord.MessageEmbed()
                         .setTitle('High-Low')
                         .setColor('GREEN')
                         .addField('Stopped at', `**${multiplier}x**`, true)
-                        .addField('Profit', `**${profit.toLocaleString()}** credits`, true)
+                        .addField('Winnings', `**${winnings.toLocaleString()}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -100,26 +99,20 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
             })
             .catch((e) => {
                 console.error('High-low timed out waiting for response.', e);
-                const profit = bet * multiplier
-                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - bet + profit
+                const winnings = bet * multiplier
+                    receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - bet + winnings
                     const embed = new Discord.MessageEmbed()
                         .setTitle('High-Low')
                         .setColor('GREEN')
                         .addField('Stopped at', `**${multiplier}x**`, true)
-                        .addField('Profit', `**${profit.toLocaleString()}** credits`, true)
+                        .addField('Winnings', `**${winnings.toLocaleString()}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
-                    return receivedMessage.say(embed)
-                
+                    return receivedMessage.say(embed) 
             });
-
         return
     }
-
-
-
-
 }
 
 async function updateBalanceDB(userId, balance) {
