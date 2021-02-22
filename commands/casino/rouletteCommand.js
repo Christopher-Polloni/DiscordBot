@@ -36,6 +36,9 @@ module.exports = class rouletteCommand extends Commando.Command {
         else if (!Number.isInteger(Number(args[0])) || (args[0] > receivedMessage.author.casino.balance) || (args[0] < 0)) {
             return receivedMessage.say('The amount you bet must be a valid integer below or equal to your current balance. To view your balance use the `credits` command.')
         }
+        else if (!args[1]) {
+            return receivedMessage.say('Your bet type was missing. To see the type of bets allowed, run the `roulette` command.')
+        }
         else if (!acceptedGuesses.includes(args[1].toLowerCase()) && !allNumbers.includes(Number(args[1])) && args[1] != '00') {
             return receivedMessage.say('Your bet type was not valid. To see the type of bets allowed, run the `roulette` command.')
         }

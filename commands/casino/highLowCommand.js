@@ -10,7 +10,7 @@ module.exports = class highLowCommand extends Commando.Command {
             aliases: ['hl', 'h-l'],
             group: 'casino',
             memberName: 'high-low',
-            description: 'Guess if the number generated is high or low (Low = 1 - 5, High = 6 - 10)',
+            description: 'Bet if the number generated is high or low (Low = 1 - 5, High = 6 - 10)',
             examples: ['high-low <bet> <high/low>', 'high-low 100 high', 'high-low 100 low'],
             guildOnly: false,
             argsType: 'multiple'
@@ -25,7 +25,7 @@ module.exports = class highLowCommand extends Commando.Command {
             const embed = new Discord.MessageEmbed()
                 .setColor('BLUE')
                 .setTitle('High-Low')
-                .setDescription('Guess if the number generated is high or low.\nLow = 1 - 5\nHigh = 6 - 10')
+                .setDescription('Bet if the number generated is high or low.\nLow = 1 - 5\nHigh = 6 - 10')
                 .addField('Usage', 'high-low <bet> <high/low>')
                 .addField('Example', 'high-low 100 high')
                 .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
@@ -34,8 +34,11 @@ module.exports = class highLowCommand extends Commando.Command {
         else if (!Number.isInteger(Number(args[0])) || (args[0] > receivedMessage.author.casino.balance) || (args[0] < 0)) {
             return receivedMessage.say('The amount you bet must be a valid integer below or equal to your current balance. To view your balance use the `credits` command.')
         }
+        else if (!args[1]) {
+            return receivedMessage.say('Your bet type was missing. Your bet type must be high/low, or h/l respectively. An example is `high-low 100 high`')
+        }
         else if (!acceptedGuesses.includes(args[1].toLowerCase())) {
-            return receivedMessage.say('Your guess must be high/low, or h/l respectively. An example is `high-low 100 high`')
+            return receivedMessage.say('Your bet type must be high/low, or h/l respectively. An example is `high-low 100 high`')
         }
         else {
             return continueGame(receivedMessage, args[0], args[1].toLowerCase(), 2)
@@ -56,7 +59,7 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
         const embed = new Discord.MessageEmbed()
             .setTitle('High-Low')
             .setColor('RED')
-            .addField('Incorrect!', `**Guess:** ${choice}\n**Number:** ${number}`, true)
+            .addField('Incorrect!', `**Bet Type:** ${choice}\n**Number:** ${number}`, true)
             .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
             .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
         updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -66,7 +69,7 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
         const embed = new Discord.MessageEmbed()
             .setTitle('High-Low')
             .setColor('GREEN')
-            .addField('Correct!', `**Guess:** ${choice}\n**Number:** ${number}`, true)
+            .addField('Correct!', `**Bet Type:** ${choice}\n**Number:** ${number}`, true)
             .addField('Multiplier', `**${multiplier}x**`, true)
             .addField('Continue', `Say **high** or **low** to guess again and increase the multiplier if you are correct.\nSay **stop** to end the game and collect your winnings.\nWinnings will be claimed if no response within 30 seconds.`)
             .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
