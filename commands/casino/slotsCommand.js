@@ -74,9 +74,9 @@ module.exports = class slotsCommand extends Commando.Command {
             if (jackpot(slotsWinningRow)) {
                 if ((slotsWinningRow[0] == "🍌") && args == 1) {
                     const embed = new Discord.MessageEmbed()
-                        .setTitle('<:a:alert_light-1:812214621162438706> Slot Machine <a:alert_light:812211459357802506>')
+                        .setTitle('Slot Machine')
                         .setColor('RED')
-                        .setDescription(slotMachine)
+                        .setDescription(slotMachine + + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**1** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -86,9 +86,9 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[slotsWinningRow[0]].jackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
-                        .setTitle('<a:alert_light:812211459357802506> Slot Machine <a:alert_light:812211459357802506>')
+                        .setTitle('Slot Machine')
                         .setColor('RED')
-                        .setDescription(slotMachine + '\n**-- YOU WON --**')
+                        .setDescription(slotMachine + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -101,9 +101,9 @@ module.exports = class slotsCommand extends Commando.Command {
                     const winnings = Math.ceil(args * payout[getDuplicate(slotsWinningRow)].semiJackpot)
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args + winnings
                     const embed = new Discord.MessageEmbed()
-                        .setTitle('<a:alert_light:812211459357802506> Slot Machine <a:alert_light:812211459357802506>')
+                        .setTitle('Slot Machine')
                         .setColor('GREEN')
-                        .setDescription(slotMachine + '\n**-- YOU WON --**')
+                        .setDescription(slotMachine + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
@@ -112,9 +112,9 @@ module.exports = class slotsCommand extends Commando.Command {
                 else {
                     receivedMessage.author.casino.balance = receivedMessage.author.casino.balance - args
                     const embed = new Discord.MessageEmbed()
-                        .setTitle(':slot_machine: Slot Machine :slot_machine:')
+                        .setTitle('Slot Machine')
                         .setColor('RED')
-                        .setDescription(slotMachine + '\n**-- YOU LOST --**')
+                        .setDescription(slotMachine + '\n\n**-- YOU LOST --**')
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                     updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
                     return receivedMessage.say(embed)
