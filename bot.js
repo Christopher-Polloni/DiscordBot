@@ -98,18 +98,18 @@ const client = new Commando.Client({
 client.registry
   // Registers your custom command groups
   .registerGroups([
-    ['miscellaneous', 'Miscellaneous Commands'],
+    ['casino', 'Casino Commands'],
+    ['games', 'Game Commands'],
     ['reddit', 'Reddit Image Commands'],
+    ['miscellaneous', 'Miscellaneous Commands'],
     ['reminders', 'Personal Reminder Commands'],
     ['serverreminders', 'Server Reminder Commands'],
-    ['translation', 'Translation Commands'],
     ['moderation', 'Moderation Commands'],
-    ['reaction roles', 'Reaction Role Commands'],
     ['moderation logs', 'Moderation Log Commands'],
-    ['games', 'Game Commands'],
+    ['reaction roles', 'Reaction Role Commands'],
+    ['translation', 'Translation Commands'],
     ['cleverbot', 'Cleverbot Commands'],
-    ['coc', 'Clash Of Clans Commands'],
-    ['casino', 'Casino Commands']
+    ['coc', 'Clash Of Clans Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
