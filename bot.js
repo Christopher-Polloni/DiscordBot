@@ -99,7 +99,6 @@ client.registry
   // Registers your custom command groups
   .registerGroups([
     ['miscellaneous', 'Miscellaneous Commands'],
-    ['music', 'Music Commands'],
     ['reddit', 'Reddit Image Commands'],
     ['reminders', 'Personal Reminder Commands'],
     ['serverreminders', 'Server Reminder Commands'],
