@@ -6,12 +6,11 @@ const Discord = require('discord.js');
 module.exports = class botInviteCommand extends Commando.Command {
     constructor(client) {
         super(client, {
-            name: 'botinfo',
-            aliases: ['bot-info'],
+            name: 'bot-info',
             group: 'util',
-            memberName: 'botinfo',
+            memberName: 'bot-info',
             description: 'Receive information about the bot, including an invite link, support server link and a link to upvote boop on top.gg',
-            examples: [`botinvite`],
+            examples: [`botinfo`],
             guildOnly: false,
         })
     }
