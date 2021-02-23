@@ -18,7 +18,7 @@ module.exports = class botInviteCommand extends Commando.Command {
     async run(receivedMessage) {
         const embed = new Discord.MessageEmbed()
             .setColor('BLUE')
-            .addField('Bot Invite', '[Click Here](https://discord.com/oauth2/authorize?client_id=575416249400426506&permissions=8&scope=bot)', true)
+            .addField('Bot Invite', '[Click Here](https://discord.com/oauth2/authorize?client_id=575416249400426506&permissions=2081418495&scope=bot)', true)
             .addField('Support Server Invite', '[Click Here](https://discord.gg/HKUPd8Wgfk)', true)
             .addField('Upvote Link', '[Click Here](https://top.gg/bot/575416249400426506/vote)', true)
             .attachFiles({
