@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const casinoFunctions = require('../../util/casino');
 
 module.exports = class casinoSetupCommand extends Commando.Command {
     constructor(client) {
@@ -20,7 +21,7 @@ module.exports = class casinoSetupCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        if (receivedMessage.author.casino.setup) {
+        if (receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
             return receivedMessage.say('You already initialized your casino account. This command only needs to be run once.')
         }
         else {

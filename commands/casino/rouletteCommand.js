@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const casinoFunctions = require('../../util/casino');
 
 module.exports = class rouletteCommand extends Commando.Command {
     constructor(client) {
@@ -20,7 +21,7 @@ module.exports = class rouletteCommand extends Commando.Command {
         const acceptedGuesses = ['even', 'odd', 'black', 'red', '0', '00', '1-12', '13-24', '25-36', '1-18', '19-36', 'c1', 'c2', 'c3']
         const allNumbers = ['00', 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36]
 
-        if (!receivedMessage.author.casino.setup) {
+        if (!receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
             return receivedMessage.say('You must first set up your casino account before using any casino commands. To do this, simply run the `casino-setup` command.')
         }
         else if (args.length == 0) {
@@ -84,11 +85,11 @@ async function winner(receivedMessage, bet, betType, roll, multiplier) {
     const embed = new Discord.MessageEmbed()
         .setColor('GREEN')
         .setTitle('Roulette')
-        .addField('Correct!', `**Bet Type:** ${betType}\n**Number Rolled:** ${roll}`) 
+        .addField('Correct!', `**Bet Type:** ${betType}\n**Number Rolled:** ${roll}`)
         .addField('Winnings', `**${winnings.toLocaleString()}** credits`, true)
         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Roulette')
     return receivedMessage.say(embed)
 }
 
@@ -100,19 +101,6 @@ async function loser(receivedMessage, bet, betType, roll) {
         .addField('Incorrect!', `**Bet Type:** ${betType}\n**Number Rolled:** ${roll}`)
         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Roulette')
     return receivedMessage.say(embed)
-}
-
-async function updateBalanceDB(userId, balance) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance } }, { upsert: true });
-        await client2.close();
-    } catch (e) {
-        console.error(`Roulette update error. User: ${userId} Balance: ${balance}\n`, e)
-    }
 }

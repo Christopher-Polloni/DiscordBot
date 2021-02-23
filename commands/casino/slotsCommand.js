@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const casinoFunctions = require('../../util/casino');
 
 module.exports = class slotsCommand extends Commando.Command {
     constructor(client) {
@@ -17,7 +18,7 @@ module.exports = class slotsCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        if (!receivedMessage.author.casino.setup) {
+        if (!receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
             return receivedMessage.say('You must first set up your casino account before using any casino commands. To do this, simply run the `casino-setup` command.')
         }
         if (!args) {
@@ -79,7 +80,7 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**1** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Slot')
                     return receivedMessage.say(embed)
                 }
                 else {
@@ -91,7 +92,7 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Slot')
                     return receivedMessage.say(embed)
                 }
             }
@@ -106,7 +107,7 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setDescription(slotMachine + '\n\n**<a:alert_light:812211459357802506> YOU WON <a:alert_light:812211459357802506>**')
                         .addField('Winnings', `**${winnings}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`, true)
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Slot')
                     return receivedMessage.say(embed)
                 }
                 else {
@@ -116,7 +117,7 @@ module.exports = class slotsCommand extends Commando.Command {
                         .setColor('RED')
                         .setDescription(slotMachine + '\n\n**-- YOU LOST --**')
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'Slot')
                     return receivedMessage.say(embed)
                 }
             }
@@ -125,26 +126,11 @@ module.exports = class slotsCommand extends Commando.Command {
     }
 };
 
-
-
 function getDuplicate(array) {
     if (array[0] === array[1] || array[0] === array[2]) {
         return array[0]
     }
     else {
         return array[1]
-    }
-}
-
-async function updateBalanceDB(userId, balance) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance } }, { upsert: true });
-        await client2.close();
-    } catch (e) {
-        console.error(`Slot update error. User: ${userId} Balance: ${balance}\n`, e)
     }
 }

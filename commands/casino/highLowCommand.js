@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const casinoFunctions = require('../../util/casino');
 
 module.exports = class highLowCommand extends Commando.Command {
     constructor(client) {
@@ -18,7 +19,7 @@ module.exports = class highLowCommand extends Commando.Command {
     }
     async run(receivedMessage, args) {
         const acceptedGuesses = ['high', 'h', 'low', 'l']
-        if (!receivedMessage.author.casino.setup) {
+        if (!receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
             return receivedMessage.say('You must first set up your casino account before using any casino commands. To do this, simply run the `casino-setup` command.')
         }
         else if (args.length == 0) {
@@ -62,7 +63,7 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
             .addField('Incorrect!', `**Bet Type:** ${choice}\n**Number:** ${number}`, true)
             .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
             .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-        updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+        casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'High-Low')
         return receivedMessage.say(embed)
     }
     else {
@@ -96,7 +97,7 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
                         .addField('Winnings', `**${winnings.toLocaleString()}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'High-Low')
                     return receivedMessage.say(embed)
                 }
             })
@@ -111,22 +112,9 @@ async function continueGame(receivedMessage, bet, choice, multiplier) {
                         .addField('Winnings', `**${winnings.toLocaleString()}** credits`, true)
                         .addField('Credits', `You now have ${receivedMessage.author.casino.balance.toLocaleString()} credits`)
                         .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
-                    updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance)
+                    casinoFunctions.updateBalanceDB(receivedMessage.author.id, receivedMessage.author.casino.balance, 'High-Low')
                     return receivedMessage.say(embed) 
             });
         return
-    }
-}
-
-async function updateBalanceDB(userId, balance) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance } }, { upsert: true });
-        await client2.close();
-    } catch (e) {
-        console.error(`High-Low update error. User: ${userId} Balance: ${balance}\n`, e)
     }
 }

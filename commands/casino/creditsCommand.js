@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const casinoFunctions = require('../../util/casino');
 
 module.exports = class creditsCommand extends Commando.Command {
     constructor(client) {
@@ -17,7 +18,7 @@ module.exports = class creditsCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        if (!receivedMessage.author.casino.setup) {
+        if (!receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
             return receivedMessage.say('You must first set up your casino account before using any casino commands. To do this, simply run the `casino-setup` command.')
         }
         else {
