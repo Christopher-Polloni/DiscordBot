@@ -48,7 +48,7 @@ async function getDate(receivedMessage) {
         const day = dateInput[1];
 
         if (!moment([year, month, day]).isValid()){
-          receivedMessage.reply('The date for this reminder is not valid.')
+          receivedMessage.author.send('The date for this reminder is not valid.')
           return getDate(receivedMessage);
         }
 
@@ -56,7 +56,7 @@ async function getDate(receivedMessage) {
 
         const difference = date - new Date();
         if (difference <= 0) {
-          return receivedMessage.reply('The date for this reminder has already passed!');
+          return receivedMessage.author.send('The date for this reminder has already passed!');
         }
 
         return getTime(receivedMessage, month, day, year);
@@ -78,18 +78,13 @@ async function getTime(receivedMessage, month, day, year) {
       .then(messages => {
 
         const completeTime = messages.first().content.split(" ");
-        console.log(`completedTime = ${completeTime}`);
         const timeOfDay = completeTime[1];
-        console.log(`timeOfDay = ${timeOfDay}`);
         const timeOfDayAccepted = ["am", "a.m.", "pm", "p.m."];
         const possibleHours = ["1","2","3","4","5","6","7","8","9","10","11","12"];
         const militaryHours = ["0","13","14","15","16","17","18","19","20","21","22","23"];
         const time = completeTime[0].split(':');
-        console.log(`time = ${time}`);
         let hours = time[0];
-        console.log(`hours = ${hours}`);
         const minutes = time[1];
-        console.log(`minutes = ${minutes}`);
 
         if (timeOfDayAccepted.includes(timeOfDay.toLowerCase())) {
           if (timeOfDay.toLowerCase() == 'am' || timeOfDay.toLowerCase() == 'a.m.'){
@@ -132,14 +127,14 @@ async function getTime(receivedMessage, month, day, year) {
         }
 
         if (!moment([year, month, day, hours, minutes]).isValid()){
-          receivedMessage.reply('The time for this reminder is not valid.')
+          receivedMessage.author.send('The time for this reminder is not valid.')
           return getTime(receivedMessage, year, month, day);
         }
 
         const date = new Date(year, month, day, hours, minutes, 00);
         const difference = date - new Date();
         if (difference <= 0) {
-          return receivedMessage.reply('The date and time for this reminder has already passed!');
+          return receivedMessage.author.send('The date and time for this reminder has already passed!')
         }
         else {
           getReminder(receivedMessage, date);
@@ -157,7 +152,6 @@ async function getTime(receivedMessage, month, day, year) {
 
 async function getReminder(receivedMessage, date) {
 
-  console.log(date);
   receivedMessage.author.send("Please enter message for your reminder.").then((newmsg) => {
     const filter = m => receivedMessage.author.id === m.author.id;
 
@@ -195,8 +189,6 @@ async function createNewReminder(newReminder, receivedMessage) {
     await client2.connect();
 
     let result = await client2.db("DiscordBot").collection("Personal Reminders").insertOne(newReminder);
-    console.log(`${result.insertedCount} new listing(s) created with the following id(s):`);
-    console.log(result.insertedId);
     const embed = new Discord.MessageEmbed()
       .setColor('#FFFF00')
       .setTitle('Reminder Set!')
@@ -205,10 +197,6 @@ async function createNewReminder(newReminder, receivedMessage) {
       .setFooter(`To delete this reminder: $deletereminder ${result.insertedId}`)
     receivedMessage.author.send(embed)
     receivedMessage.react('✅');
-
-    console.log('reminder_' + result.insertedId);
-
-
 
     schedule.scheduleJob('reminder_' + result.insertedId, newReminder.date, async function () {
       const embed = new Discord.MessageEmbed()
@@ -224,7 +212,7 @@ async function createNewReminder(newReminder, receivedMessage) {
 
   } catch (e) {
     console.error(e);
-    receivedMessage.reply('There was an error uploading your reminder. Please try again')
+    receivedMessage.author.send('There was an error uploading your reminder. Please try again')
   } finally {
     await client2.close();
   }
