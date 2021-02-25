@@ -13,9 +13,7 @@ module.exports = class changeMyMindCommand extends Commando.Command {
             description: 'Sends a "Change My Mind" meme with the text of your choice.',
             examples: ['change-my-mind <text>'],
             guildOnly: false,
-            argsType: 'single',
-            ownerOnly: true,
-            hidden: true
+            argsType: 'single'
         })
     }
     async run(receivedMessage, arg) {
