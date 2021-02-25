@@ -44,3 +44,17 @@ exports.wantedImage = async (receivedMessage, img1) => {
     }
 
 }
+
+exports.invertImage = async (receivedMessage, img1) => {
+
+    const img = await Canvacord.invert(img1)
+
+    if (img) {
+        const attachment = new Discord.MessageAttachment(img);
+        return receivedMessage.say(attachment);
+    }
+    else {
+        return receivedMessage.say('There was an error creating the image. If using an image instead of mentioning a user, try to use a `.png` or `.jpg` file.')
+    }
+
+}
