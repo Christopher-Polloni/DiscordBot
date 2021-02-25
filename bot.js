@@ -98,6 +98,7 @@ const client = new Commando.Client({
 client.registry
   // Registers your custom command groups
   .registerGroups([
+    ['imagemanipulation', 'Image Manipulation Commands'],
     ['casino', 'Casino Commands'],
     ['games', 'Game Commands'],
     ['reddit', 'Reddit Image Commands'],
