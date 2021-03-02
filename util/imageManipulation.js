@@ -78,7 +78,7 @@ exports.getJimpFontSize = async (text, maxWidth, maxHeight) => {
 
     const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK)
     const font2 = await Jimp.loadFont(Jimp.FONT_SANS_16_BLACK)
-    if (Jimp.measureTextHeight(font, text, maxWidth) <= maxHeight){
+    if (Jimp.measureTextHeight(font, text, maxWidth) <= maxHeight) {
         return font
     }
     else if (Jimp.measureTextHeight(font2, text, maxWidth) <= maxHeight) {
@@ -87,5 +87,15 @@ exports.getJimpFontSize = async (text, maxWidth, maxHeight) => {
     else {
         return false
     }
+
+}
+
+exports.rotateImage = async (receivedMessage, img, degrees) => {
+
+    const image = await Jimp.read(img);
+    image.rotate(degrees);
+    const imagetoSend = await image.getBufferAsync(Jimp.MIME_PNG)
+    const attachment = new Discord.MessageAttachment(imagetoSend);
+    return receivedMessage.say(attachment);
 
 }
