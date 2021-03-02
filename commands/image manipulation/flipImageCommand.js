@@ -13,7 +13,7 @@ module.exports = class flipImageCommand extends Commando.Command {
             group: 'imagemanipulation',
             memberName: 'flip-image',
             description: 'Sends another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided) flipped over the x-axis, y-axis, or both.',
-            examples: ['flip <type> <@UserMention>', 'rotate <type> <image>', 'rotate <type>', ''],
+            examples: ['flip-image <type> <@UserMention>', 'flip-image <type> <image>', 'flip-image <type>', 'Types include horizontal, vertical or both'],
             guildOnly: false,
             argsType: 'multiple'
         })
