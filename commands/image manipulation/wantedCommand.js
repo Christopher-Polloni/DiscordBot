@@ -10,7 +10,7 @@ module.exports = class wantedCommand extends Commando.Command {
             name: 'wanted',
             group: 'imagemanipulation',
             memberName: 'wanted',
-            description: 'Sends a wanted poster with another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided) as a blurry image, and trash as the clear image.',
+            description: 'Sends a wanted poster with another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided).',
             examples: ['wanted <@UserMention>', 'wanted <image>', 'wanted'],
             guildOnly: false,
             argsType: 'single'
