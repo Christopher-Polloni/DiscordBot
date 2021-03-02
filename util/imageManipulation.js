@@ -99,3 +99,13 @@ exports.rotateImage = async (receivedMessage, img, degrees) => {
     return receivedMessage.say(attachment);
 
 }
+
+exports.flipImage = async (receivedMessage, img, flips) => {
+
+    const image = await Jimp.read(img);
+    image.flip(flips.horizontalFlip, flips.verticalFlip);
+    const imagetoSend = await image.getBufferAsync(Jimp.MIME_PNG)
+    const attachment = new Discord.MessageAttachment(imagetoSend);
+    return receivedMessage.say(attachment);
+
+}
