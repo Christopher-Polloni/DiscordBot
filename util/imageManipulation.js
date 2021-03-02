@@ -60,7 +60,7 @@ exports.invertImage = async (receivedMessage, img1) => {
 
 }
 
-exports.deleteImage = async (receivedMessage, img1) => {
+exports.deleteFileImage = async (receivedMessage, img1) => {
 
     const img = await Canvacord.delete(img1)
 
