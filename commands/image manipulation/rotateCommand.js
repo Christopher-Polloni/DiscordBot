@@ -21,7 +21,7 @@ module.exports = class rotateCommand extends Commando.Command {
     async run(receivedMessage, args) {
 
         if (!args || isNaN(args[0]) || Number(args[0]) < 1 || Number(args[0]) > 359){
-            return receivedMessage.say('Proper usage of this command requires the amount of degrees (1-359) to rotate the image.\n```rotate <degrees>\nrotate <degrees> <@UserMention>\nrotate <degrees>```\nExample: rotate 90 <@575416249400426506>')
+            return receivedMessage.say('Proper usage of this command requires the amount of degrees (1-359) to rotate the image.\n```rotate <degrees> <@UserMention>\nrotate <degrees> <image>\nrotate <degrees>```\nExample: rotate 90 <@575416249400426506>')
         }
         if (receivedMessage.mentions.members.first()){
             return imageManipulationFunctions.rotateImage(receivedMessage, receivedMessage.mentions.members.first().user.displayAvatarURL({ format: 'png' }), Number(args[0]))
