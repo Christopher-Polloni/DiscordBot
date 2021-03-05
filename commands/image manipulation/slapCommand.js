@@ -19,10 +19,10 @@ module.exports = class slapCommand extends Commando.Command {
     async run(receivedMessage, arg) {
         const batman = receivedMessage.author.displayAvatarURL({ format: 'png' })
         if (receivedMessage.mentions.members.first()){
-            return imageManipulationFunctions.slapImage(receivedMessage, batman, receivedMessage.mentions.members.first().user.displayAvatarURL({ format: 'png' }))
+            return imageManipulationFunctions.slapImage(receivedMessage, receivedMessage.mentions.members.first().user.displayAvatarURL({ format: 'png' }))
         }
         else if (receivedMessage.attachments.first()) {
-            return imageManipulationFunctions.slapImage(receivedMessage, batman, receivedMessage.attachments.first().url)
+            return imageManipulationFunctions.slapImage(receivedMessage, receivedMessage.attachments.first().url)
         }
         else {
             return receivedMessage.say('You must mention another user to slap or send an image with the command.')

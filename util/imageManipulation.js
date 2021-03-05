@@ -1,8 +1,35 @@
 const Canvacord = require("canvacord").Canvas;
 const Discord = require('discord.js');
 const Jimp = require('jimp')
+const path = require('path');
 
-exports.slapImage = async (receivedMessage, img1, img2) => {
+exports.slapImage = async (receivedMessage, img2) => {
+
+    const acceptedResponses = ['no', 'n']
+    const filter = m => receivedMessage.author.id === m.author.id && (acceptedResponses.includes(m.content.toLowerCase()) || m.attachments.first() || m.mentions.members.first())
+
+    receivedMessage.say("Would you like to provide an image to replace Batman as the person doing the slapping?\nType **no** to receive the image with Batman doing the slapping.\nTo have another user's avatar replace Batman, send a message mentioning that user.\nTo have any image replace Batman, send that image.\nIf there is no response meeting these requirements within the next 15 seconds, the command will proceed as if you typed no.")
+    receivedMessage.channel.awaitMessages(filter, { time: 15000, max: 1, errors: ['time'] })
+        .then(async (message, batman) => {
+            if (acceptedResponses.includes(message.first().content.toLowerCase())) {
+                this.createSlapImage(receivedMessage, path.join(__dirname, '..', 'images', 'transparent.png'), img2)
+            }
+            else if (message.first().mentions.members.first()) {
+                const batman = await Canvacord.circle(message.first().mentions.members.first().user.displayAvatarURL({ format: 'png' }))
+                this.createSlapImage(receivedMessage, batman, img2)
+            }
+            else {
+                const batman = await Canvacord.circle(message.first().attachments.first().url)
+                this.createSlapImage(receivedMessage, batman, img2)
+            }
+        })
+        .catch(async (e) => {
+            this.createSlapImage(receivedMessage, path.join(__dirname, '..', 'images', 'transparent.png'), img2)
+        });
+
+}
+
+exports.createSlapImage = async (receivedMessage, img1, img2) => {
 
     const batman = await Canvacord.circle(img1)
     const robin = await Canvacord.circle(img2)
