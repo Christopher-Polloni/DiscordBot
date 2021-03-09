@@ -12,8 +12,8 @@ module.exports = class flipImageCommand extends Commando.Command {
             name: 'flip-image',
             group: 'imagemanipulation',
             memberName: 'flip-image',
-            description: 'Sends another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided) flipped over the x-axis, y-axis, or both.',
-            examples: ['flip-image <type> <@UserMention>', 'flip-image <type> <image>', 'flip-image <type>', 'Types include horizontal, vertical or both'],
+            description: 'Sends a user\'s avatar or an image of your choice flipped over the x-axis, y-axis, or both.',
+            examples: ['flip-image <type> <@UserMention>', 'flip-image <type> <image>', 'Types include horizontal, vertical or both'],
             guildOnly: false,
             argsType: 'multiple'
         })
@@ -36,7 +36,7 @@ module.exports = class flipImageCommand extends Commando.Command {
             return imageManipulationFunctions.flipImage(receivedMessage, receivedMessage.attachments.first().url, getFlips(type))
         }
         else {
-            return imageManipulationFunctions.flipImage(receivedMessage, receivedMessage.author.displayAvatarURL({ format: 'png' }), getFlips(type))
+            return receivedMessage.say("You must provide the image to be used in this command. Run the command again and either mention the user who's avatar you'd like to be used or send an image at the same time.\nExample: flip-image <@575416249400426506>")
         }
     }
 };

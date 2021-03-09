@@ -10,8 +10,8 @@ module.exports = class deleteFileCommand extends Commando.Command {
             name: 'delete-file',
             group: 'imagemanipulation',
             memberName: 'delete-file',
-            description: 'Sends an image with another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided) as a file you are deleting from your computer.',
-            examples: ['delete-file <@UserMention>', 'delete-file <image>', 'delete-file'],
+            description: 'Sends an image with a user\'s avatar or an image of your choice as a file you are deleting from your computer.',
+            examples: ['delete-file <@UserMention>', 'delete-file <image>'],
             guildOnly: false,
             argsType: 'single'
         })
@@ -24,7 +24,7 @@ module.exports = class deleteFileCommand extends Commando.Command {
             return imageManipulationFunctions.deleteFileImage(receivedMessage, receivedMessage.attachments.first().url)
         }
         else {
-            return imageManipulationFunctions.deleteFileImage(receivedMessage, receivedMessage.author.displayAvatarURL({ format: 'png' }))
+            return receivedMessage.say("You must provide the image to be used in this command. Run the command again and either mention the user who's avatar you'd like to be used or send an image at the same time.\nExample: delete-file <@575416249400426506>")
         }
     }
 };

@@ -10,7 +10,7 @@ module.exports = class wantedCommand extends Commando.Command {
             name: 'wanted',
             group: 'imagemanipulation',
             memberName: 'wanted',
-            description: 'Sends a wanted poster with another user\'s avatar, an image of your choice, or your own avatar (if neither of the previous two options are provided).',
+            description: 'Sends a wanted poster with a user\'s avatar or an image of your choice.',
             examples: ['wanted <@UserMention>', 'wanted <image>', 'wanted'],
             guildOnly: false,
             argsType: 'single'
@@ -24,7 +24,7 @@ module.exports = class wantedCommand extends Commando.Command {
             return imageManipulationFunctions.wantedImage(receivedMessage, receivedMessage.attachments.first().url)
         }
         else {
-            return imageManipulationFunctions.wantedImage(receivedMessage, receivedMessage.author.displayAvatarURL({ format: 'png' }))
+            return receivedMessage.say("You must provide the image to be used in this command. Run the command again and either mention the user who's avatar you'd like to be used or send an image at the same time.\nExample: wanted <@575416249400426506>")
         }
     }
 };
