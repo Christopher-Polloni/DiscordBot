@@ -136,3 +136,27 @@ exports.flipImage = async (receivedMessage, img, flips) => {
     return receivedMessage.say(attachment);
 
 }
+
+exports.getJimpFontSizeBart = async (text, maxWidth) => {
+
+    const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE)
+    
+    if (Jimp.measureText(font, text) > maxWidth) {
+        return {fits: false}
+    }
+    else {
+        let longerText = text;
+        let fits = true;
+        do {
+            if (Jimp.measureText(font, `${longerText} ${text}`) > maxWidth) {
+                fits = false
+            }
+            else {
+                longerText = `${longerText} ${text}`
+            }
+          }
+          while (fits);    
+        return {fits: true, font: font, text: longerText}
+    }
+
+}
