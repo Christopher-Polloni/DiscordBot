@@ -10,6 +10,7 @@ module.exports = class lisaPresentationCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'lisa-presentation',
+            aliases: ['lisa'],
             group: 'imagemanipulation',
             memberName: 'lisa-presentation',
             description: 'Sends a Lisa (from The Simpsons) presentation meme with the text you provide.',
