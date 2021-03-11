@@ -10,7 +10,7 @@ module.exports = class slapCommand extends Commando.Command {
             name: 'slap',
             group: 'imagemanipulation',
             memberName: 'slap',
-            description: 'Sends a Batman/Robin slap meme with a user\'s avatar or image of your choice as Robin. You will then be prompted for the imag to replace Batman, which is optional.',
+            description: 'Sends a Batman/Robin slap meme with a user\'s avatar or image of your choice as Robin. You will then be prompted for the image to replace Batman, which is optional.',
             examples: ['slap <@UserMention>', 'slap <image>'],
             guildOnly: false,
             argsType: 'single'
