@@ -34,7 +34,7 @@ module.exports = class bartChalkboardCommand extends Commando.Command {
         for (let i = 16; i <= 226; i += 35) {
             img.print(result.font, 16, i, {
                 text: result.text,
-                alignmentX: Jimp.HORIZONTAL_ALIGN_RIGHT,
+                alignmentX: Jimp.HORIZONTAL_ALIGN_LEFT,
                 alignmentY: Jimp.VERTICAL_ALIGN_TOP
             }, 510, 10);
         }
