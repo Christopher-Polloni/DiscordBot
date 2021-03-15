@@ -7,7 +7,7 @@ module.exports = {
   translationEndpoint: process.env.TRANSLATION_ENDPOINT,
   translationSubscriptionKey: process.env.TRANSLATION_SUBSCRIPTION_KEY,
   openWeatherMapKey: process.env.OPEN_WEATHER_API_KEY,
-  timeZone: "EST",
+  timeZone: "EDT",
   bitlyApiKey: process.env.BITLY_KEY,
   topggApiKey: process.env.TOP_GG_API_KEY,
   cleverBotApiKey: process.env.CLEVER_BOT_API_KEY,
