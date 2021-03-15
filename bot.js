@@ -257,6 +257,21 @@ client.on('guildBanRemove', async (guild, user) => {
 client.on('guildCreate', async (guild) => {
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
+  if (guild.systemChannel) {
+    const joinEmbed = new Discord.MessageEmbed()
+      .setColor('BLUE')
+      .setDescription(`**Hello there! Thanks for the invite, I'm <@575416249400426506>!**\n\nDefault Prefix: $
+      All commands must start with the prefix of the server or <@575416249400426506>
+      To see a list of all my commands, run the \`help all\` command.
+      Example: $help all or <@575416249400426506>help all\n
+    **Important Links**
+    [Support Server](https://discord.gg/HKUPd8Wgfk) - Get bot support if you're having issues, leave feedback or feature requests, report bugs, and be informed about new features!
+    [Patreon](https://www.patreon.com/discord_bot_boop) - Help support the bot development and even get some free merchandise after your first 3 pledges to a tier!
+    [Top.gg](https://Top.gg/bot/575416249400426506) - <@575416249400426506>'s page on Top.gg!
+    [Top.gg Vote](https://Top.gg/bot/575416249400426506/vote) - Vote for <@575416249400426506> on Top.gg to get it trending!
+    [Invite](https://discord.com/oauth2/authorize?client_id=575416249400426506&permissions=2081418495&scope=bot) - Add the bot to another server!`)
+    guild.systemChannel.send(joinEmbed);
+  }
   const channel = client.channels.cache.get('787920254969315328');
   const totalCount = client.guilds.cache.map((g) => g.memberCount || 0).reduce((accumulator, currentValue) => accumulator + currentValue)
   const owner = await client.users.fetch(guild.ownerID)
@@ -469,10 +484,10 @@ dbl.webhook.on('ready', hook => {
 dbl.webhook.on('vote', vote => {
   const channel = client.channels.cache.get('781259759109799968');
   if (vote.isWeekend) {
-    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> 2x on top.gg!`);
+    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> 2x on Top.gg!`);
   }
   else {
-    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> on top.gg!`);
+    return channel.send(`<@${vote.user}> has just upvoted <@575416249400426506> on Top.gg!`);
   }
 });
 
