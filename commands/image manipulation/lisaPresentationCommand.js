@@ -25,14 +25,18 @@ module.exports = class lisaPresentationCommand extends Commando.Command {
             return receivedMessage.say('You must provide text with this command.\n`lisa-presentation <text>`')
         }
 
-        const font = await imageManipulationFunctions.getJimpFontSize(arg, 375, 252)
+        var properArg = arg
+            .replace(/[\u2018\u2019]/g, "'")
+            .replace(/[\u201C\u201D]/g, '"');
+
+        const font = await imageManipulationFunctions.getJimpFontSize(properArg, 375, 252)
 
         if (!font) {
             return receivedMessage.say('The text you provided is too long and would be hard to read. Shorten it a bit and try again.')
         }
         const img = await Jimp.read(path.join(__dirname, '..', '..', 'images', 'lisa-presentation.png'))
         img.print(font, 110, 45, {
-            text: arg,
+            text: properArg,
             alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
             alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE
         }, 450, 252);

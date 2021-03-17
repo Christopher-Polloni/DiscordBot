@@ -25,7 +25,10 @@ module.exports = class bartChalkboardCommand extends Commando.Command {
             return receivedMessage.say('You must provide text with this command.\n`bart-chalkboard <text>`')
         }
 
-        const result = await imageManipulationFunctions.getJimpFontSizeBart(arg, 485)
+        var properArg = arg
+            .replace(/[\u2018\u2019]/g, "'")
+            .replace(/[\u201C\u201D]/g, '"');
+        const result = await imageManipulationFunctions.getJimpFontSizeBart(properArg, 485)
 
         if (!result.fits) {
             return receivedMessage.say('The text you provided is too long. Shorten it a bit and try again.')
