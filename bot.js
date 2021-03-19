@@ -138,6 +138,7 @@ client.on('ready', () => {
   restartClashOfClansReminders();
   restartModerationLogSettings();
   restartReactionRoles();
+  restartPollResults()
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -829,6 +830,47 @@ async function restartReactionRoles() {
           guild.guildSettings.reactionRoles.push(results[i])
         }
       }
+    }
+  } catch (e) {
+    console.error(e)
+  }
+}
+
+async function restartPollResults() {
+  try {
+    const MongoClient = require('mongodb').MongoClient;
+    const uri = config.mongoUri;
+    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    await client2.connect();
+    let results = await client2.db("DiscordBot").collection("Polls")
+      .find()
+      .toArray()
+    await client2.close();
+    for (let i = 0; i < results.length; i++) {
+
+      schedule.scheduleJob('poll_' + results[i]._id, results[i].date, async function () {
+        const guild = client.guilds.cache.get(results[i].guildId)
+        const channel = guild.channels.cache.find(ch => ch.id === results[i].channelId)
+        const message = await channel.messages.fetch(results[i].messageId)
+        let votes = []
+        for (let j = 0; j < results[i].numberOptions; j++) {
+          votes.push(message.reactions.cache.get(results[i].reactions[j]).count - 1)
+        }
+        let pollResults = ''
+        for (let k = 0; k < votes.length; k++) {
+          pollResults = pollResults + `${results[i].reactions[k]}\t\t${votes[k]}\n`
+        }
+        const embed = new Discord.MessageEmbed()
+          .setColor('BLUE')
+          .setTitle('📊 Poll Results')
+          .setDescription(`[${results[i].question}](${message.url})\n${results[i].pollOptions}\n\`\`\`Option\tNumber of Votes\n${pollResults}\`\`\``)
+        channel.send(embed)
+        const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        await mongoClient.connect();
+        deletion = await mongoClient.db("DiscordBot").collection("Polls")
+          .deleteOne({ "_id": ObjectId(results[i]._id) });
+        await mongoClient.close();
+      });
     }
   } catch (e) {
     console.error(e)
