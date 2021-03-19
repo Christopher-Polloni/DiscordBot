@@ -107,6 +107,7 @@ client.registry
     ['serverreminders', 'Server Reminder Commands'],
     ['moderation', 'Moderation Commands'],
     ['moderation logs', 'Moderation Log Commands'],
+    ['server poll', 'Server Poll Commands'],
     ['reaction roles', 'Reaction Role Commands'],
     ['translation', 'Translation Commands'],
     ['cleverbot', 'Cleverbot Commands'],

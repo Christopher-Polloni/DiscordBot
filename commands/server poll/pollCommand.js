@@ -10,7 +10,7 @@ module.exports = class pollCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'poll',
-            group: 'miscellaneous',
+            group: 'server poll',
             memberName: 'poll',
             description: 'Set up a poll in a channel.',
             examples: [`poll <#channel>\n<question>\n<option 1>\n<option 2>\n<option 3>`],
