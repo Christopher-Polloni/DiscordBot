@@ -221,6 +221,7 @@ async function setupPoll(receivedMessage, pollSettings) {
             message.react(pollSettings.reactions[i])
         }
         pollSettings.messageId = message.id
+        pollSettings.messageUrl = message.url
         pollSettings.guildId = receivedMessage.guild.id
     })
 
