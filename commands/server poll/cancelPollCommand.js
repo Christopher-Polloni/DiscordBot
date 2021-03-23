@@ -18,6 +18,7 @@ module.exports = class cancelPollCommand extends Commando.Command {
             description: 'Cancel the scheduled announcement of results for a server poll.',
             examples: ['cancel-poll <ID>'],
             guildOnly: true,
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage, args) {
