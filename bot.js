@@ -119,7 +119,7 @@ client.registry
   .registerDefaultCommands({
     unknownCommand: false,
     prefix: true,
-    help: true,
+    help: false,
     eval: false,
     ping: false,
     commandState: false
@@ -128,7 +128,7 @@ client.registry
 
 client.on('ready', () => {
   console.log("Connected as " + client.user.tag)
-  client.user.setActivity(`@boop help all`)
+  client.user.setActivity(`@boop help`)
   restartPersonalReminders();
   restartServerMessages();
   restartTranslationSettings();
@@ -264,8 +264,8 @@ client.on('guildCreate', async (guild) => {
       .setColor('BLUE')
       .setDescription(`**Hello there! Thanks for the invite, I'm <@575416249400426506>!**\n\nDefault Prefix: $
       All commands must start with the prefix of the server or <@575416249400426506>
-      To see a list of all my commands, run the \`help all\` command.
-      Example: $help all or <@575416249400426506>help all\n
+      To see a list of all my commands, run the \`help\` command.
+      Example: $help or <@575416249400426506>help\n
     **Important Links**
     [Support Server](https://discord.gg/HKUPd8Wgfk) - Get bot support if you're having issues, leave feedback or feature requests, report bugs, and be informed about new features!
     [Patreon](https://www.patreon.com/discord_bot_boop) - Help support the bot development and even get some free merchandise after your first 3 pledges to a tier!
