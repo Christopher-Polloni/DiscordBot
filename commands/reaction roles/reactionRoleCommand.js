@@ -7,7 +7,7 @@ module.exports = class reactionRolesCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'reaction-roles',
-            aliases: ['reaction-role', 'reactionroles', 'reactionrole', 'rr'],
+            aliases: ['reaction-role', 'rr'],
             group: 'reaction roles',
             memberName: 'reaction-roles',
             description: 'Set up a message so members can add/remove roles by reacting to the message.',
