@@ -4,10 +4,11 @@ const config = require('../../config.js');
 const fetch = require("node-fetch");
 const Discord = require('discord.js');
 
-module.exports = class memeCommand extends Commando.Command {
+module.exports = class puppyCommand extends Commando.Command {
     constructor(client) {
         super(client, {
             name: 'puppy',
+            aliases: ['puppies', 'dog', 'dogs'],
             group: 'reddit',
             memberName: 'puppy',
             description: 'Retrieve an image from r/puppy.',
