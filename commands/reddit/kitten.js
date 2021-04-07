@@ -4,14 +4,15 @@ const config = require('../../config.js');
 const fetch = require("node-fetch");
 const Discord = require('discord.js');
 
-module.exports = class memeCommand extends Commando.Command {
+module.exports = class catCommand extends Commando.Command {
     constructor(client) {
         super(client, {
-            name: 'kitten',
+            name: 'cat',
+            aliases: ['cats', 'kitten', 'kittens'],
             group: 'reddit',
-            memberName: 'kitten',
-            description: 'Retrieve an image from r/kittens.',
-            examples: ['kitten'],
+            memberName: 'cat',
+            description: 'Retrieve an image from r/cats.',
+            examples: ['cat'],
             guildOnly: false,
             argsType: 'multiple'
         })
@@ -26,7 +27,7 @@ async function getKitten(receivedMessage) {
     const sortByTimeOptions = ["hour", "day", "week", "month", "year", "all"];
     const sortByTime = sortByTimeOptions[Math.floor(Math.random() * sortByTimeOptions.length)];
 
-    const url = `https://api.reddit.com/r/kittens/top.json?sort=top&t=${sortByTime}&limit=100`
+    const url = `https://api.reddit.com/r/cats/top.json?sort=top&t=${sortByTime}&limit=100`
 
     fetch(url)
         .then(response => response.json())
@@ -35,7 +36,7 @@ async function getKitten(receivedMessage) {
             console.log(response.data.children[i].data.url)
             if ((response.data.children[i].data.url.endsWith('.jpg')) || (response.data.children[i].data.url.endsWith('.png'))) {
                 const embed = new Discord.MessageEmbed()
-                    .setTitle(`r/kittens`)
+                    .setTitle(`r/cats`)
                     .setColor('RANDOM')
                     .setImage(response.data.children[i].data.url)
                     .setFooter(receivedMessage.author.username, receivedMessage.author.displayAvatarURL())
