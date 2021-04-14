@@ -12,11 +12,11 @@ const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
-      name: 'schedulemessage',
+      name: 'schedule-message',
       group: 'serverreminders',
-      memberName: 'schedulemessage',
+      memberName: 'schedule-message',
       description: 'Schedule a message for a channel in a server',
-      examples: ['servermessage'],
+      examples: ['server-message'],
       guildOnly: true,
       argsType: 'multiple'
     })

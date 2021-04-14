@@ -12,11 +12,11 @@ const ObjectId = require('mongodb').ObjectID;
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
-      name: 'deleteservermessage',
+      name: 'delete-server-message',
       group: 'serverreminders',
-      memberName: 'deleteservermessage',
+      memberName: 'delete-server-message',
       description: 'Delete one of your scheduled server messages.',
-      examples: ['deleteservermessage <messageID>'],
+      examples: ['delete-server-message <messageID>'],
       guildOnly: true,
     })
   }
@@ -56,7 +56,7 @@ async function deleteServerMessage(receivedMessage, id) {
       const embed = new Discord.MessageEmbed()
         .setColor('#FF0000')
         .setTitle('Scheduled Message Deleted!')
-        .setDescription(`The following reminder has been deleted!\n\nDate: ${results[0].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[0].channelID}>\nMessage:\n${results[0].message}`)
+        .setDescription(`The following message has been deleted!\n\nDate: ${results[0].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[0].channelID}>\nMessage:\n${results[0].message}`)
       receivedMessage.say(embed)
 
       const thisJob = 'message_' + id;

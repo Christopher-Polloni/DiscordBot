@@ -9,11 +9,11 @@ const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology
 module.exports = class scheduleCommand extends Commando.Command {
     constructor(client) {
         super(client, {
-            name: 'viewservermessages',
+            name: 'view-server-messages',
             group: 'serverreminders',
-            memberName: 'viewservermessages',
+            memberName: 'view-server-messages',
             description: 'View your scheduled messages for the server you run the command in.',
-            examples: ['viewservermessages'],
+            examples: ['view-server-messages'],
             guildOnly: true,
         })
     }
@@ -55,7 +55,7 @@ async function viewScheduledMessages(receivedMessage) {
                 .setTitle("Upcoming Server Message")
                 .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
                 .setDescription(`Date: ${results[i].date.toLocaleString()} ${config.timeZone}\nChannel: <#${results[i].channelID}>\nMessage:\n${results[i].message}`)
-                .setFooter(`${i + 1}/${results.length} Messages | $deleteservermessage ${results[i]._id}`)
+                .setFooter(`${i + 1}/${results.length} Messages | delete-server-message ${results[i]._id}`)
             receivedMessage.say(embed);
         }
     } catch (e) {

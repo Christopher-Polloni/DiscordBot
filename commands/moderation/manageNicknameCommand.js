@@ -5,11 +5,11 @@ const config = require('../../config.js');
 module.exports = class nicknameCommand extends Commando.Command {
     constructor(client) {
         super(client, {
-            name: 'managenickname',
+            name: 'manage-nickname',
             group: 'moderation',
-            memberName: 'managenickname',
+            memberName: 'manage-nickname',
             description: 'Change the nickname of a member in a server.',
-            examples: ['managenickname <user> <new nickname>'],
+            examples: ['manage-nickname <user> <new nickname>'],
             guildOnly: true,
             argsType: 'multiple',
             userPermissions: ['MANAGE_NICKNAMES']
@@ -17,7 +17,7 @@ module.exports = class nicknameCommand extends Commando.Command {
     }
     async run(receivedMessage, args) {
         if (!args) {
-            return receivedMessage.say(`You didn't mention who's nickname to change or what to change it to.\n\`managenickname <user> <new nickname>\``)
+            return receivedMessage.say(`You didn't mention who's nickname to change or what to change it to.\n\`manage-nickname <user> <new nickname>\``)
         }
         else {
             const user = receivedMessage.mentions.users.first();
@@ -42,7 +42,7 @@ module.exports = class nicknameCommand extends Commando.Command {
                 }
             }
             else {
-                return receivedMessage.say(`You either didn't mention who's nickname to change or what to change it to.\n\`managenickname <user> <new nickname>\``);
+                return receivedMessage.say(`You either didn't mention who's nickname to change or what to change it to.\n\`manage-nickname <user> <new nickname>\``);
             }
 
         }

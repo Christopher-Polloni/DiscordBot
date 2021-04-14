@@ -5,11 +5,11 @@ const config = require('../../config.js');
 module.exports = class translationReactionToggleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
-      name: 'toggletranslation',
+      name: 'toggle-translation',
       group: 'translation',
-      memberName: 'toggletranslation',
+      memberName: 'toggle-translation',
       description: 'Toggle whether translation occurs in a server when reacting to a message with specific country flags.',
-      examples: ['toggletranslation', 'toggletranslation on', 'toggletranslation off'],
+      examples: ['toggle-translation', 'toggle-translation on', 'toggle-translation off'],
       guildOnly: true,
       argsType: 'single',
       userPermissions: ['MANAGE_GUILD']
