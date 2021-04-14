@@ -147,6 +147,23 @@ client.setProvider(
   MongoClient.connect(uri).then(client => new MongoDBProvider(client, 'DiscordBot'))
 ).catch(console.error);
 
+client.on('commandRun', async (command) => {
+  console.log(command)
+    try {
+        await client2.connect();
+        result = await client2.db("DiscordBot").collection("Command Leaderboard").findOne({ commandName: command.name });
+        
+        if (result) {
+          updatedResult = await client2.db("DiscordBot").collection("Command Leaderboard").updateOne({ commandName: command.name }, { $inc: { numberOfUses: 1 } });
+        }
+        else {
+          updatedResult = await client2.db("DiscordBot").collection("Command Leaderboard").updateOne({ commandName: command.name }, { $set: { numberOfUses: 1 } }, { upsert: true });
+        }
+    } catch (e) {
+        console.error(`Error incrementing ${command.name} usage count.`, e);
+    }
+})
+
 client.on('message', async (message) => {
   if (message.channel.type == 'dm') {
     return
