@@ -11,11 +11,11 @@ const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
-      name: 'viewreminders',
+      name: 'view-reminders',
       group: 'reminders',
-      memberName: 'viewreminders',
+      memberName: 'view-reminders',
       description: 'View your scheduled reminders.',
-      examples: ['viewreminders'],
+      examples: ['view-reminders'],
       guildOnly: false,
     })
   }

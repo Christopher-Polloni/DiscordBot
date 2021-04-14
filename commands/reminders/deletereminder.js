@@ -12,11 +12,11 @@ const ObjectId = require('mongodb').ObjectID;
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
     super(client, {
-      name: 'deletereminder',
+      name: 'delete-reminder',
       group: 'reminders',
-      memberName: 'deletereminder',
+      memberName: 'delete-reminder',
       description: 'Delete one of your reminders.',
-      examples: ['deletereminder <reminderID>'],
+      examples: ['delete-reminder <reminder ID>'],
       guildOnly: false,
     })
   }
