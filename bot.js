@@ -148,7 +148,6 @@ client.setProvider(
 ).catch(console.error);
 
 client.on('commandRun', async (command) => {
-  console.log(command)
     try {
         await client2.connect();
         result = await client2.db("DiscordBot").collection("Command Leaderboard").findOne({ commandName: command.name });

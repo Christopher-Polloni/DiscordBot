@@ -10,7 +10,7 @@ module.exports = class botInviteCommand extends Commando.Command {
             group: 'util',
             memberName: 'bot-info',
             description: 'Receive information about the bot, including an invite link, support server link and a link to upvote boop on top.gg',
-            examples: [`botinfo`],
+            examples: [`bot-info`],
             guildOnly: false,
         })
     }
