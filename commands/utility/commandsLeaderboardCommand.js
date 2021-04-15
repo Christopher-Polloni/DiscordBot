@@ -6,12 +6,13 @@ const MongoClient = require('mongodb').MongoClient;
 const uri = config.mongoUri;
 const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const paginationEmbed = require('discord.js-pagination');
+const commandLeaderboardSchema = require('../../schemas/commandUsesSchema')
 
 module.exports = class commandsLeaderboardCommand extends Commando.Command {
     constructor(client) {
         super(client, {
-            name: 'commands-leaderboard',
-            aliases: ['command-leaderboard', 'top-used-commands'],
+            name: 'command-leaderboard',
+            aliases: ['commands-leaderboard', 'top-used-commands'],
             group: 'util',
             memberName: 'commands-leaderboard',
             description: 'See which commands are used the most!',
@@ -21,15 +22,8 @@ module.exports = class commandsLeaderboardCommand extends Commando.Command {
     }
     async run(receivedMessage) {
 
-        let result
-        try {
-            await client2.connect();
-            result = await client2.db("DiscordBot").collection("Command Leaderboard").find().sort({ numberOfUses: -1 }).toArray();
-            
-        } catch (e) {
-            receivedMessage.say('Something went wrong retrieving the information. PLease try again.')
-            console.error(`Error incrementing ${command.name} usage count.`, e);
-        }
+        
+        let result = await commandLeaderboardSchema.find().sort({ numberOfUses: -1 })
 
         let leaderboard = []
         for (let i=0; i<result.length; i++){

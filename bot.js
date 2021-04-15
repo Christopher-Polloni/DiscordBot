@@ -16,7 +16,9 @@ const Canvas = require('canvas');
 const DBL = require("dblapi.js");
 const express = require('express');
 const http = require('http');
-const moment = require('moment')
+const moment = require('moment');
+const mongo = require('./util/mongo');
+const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
 
 
 Structures.extend('Guild', Guild => {
@@ -126,9 +128,10 @@ client.registry
   })
   .registerCommandsIn(path.join(__dirname, 'commands'));
 
-client.on('ready', () => {
+client.on('ready', async () => {
   console.log("Connected as " + client.user.tag)
   client.user.setActivity(`@boop help`)
+  const connection = await mongo()
   restartPersonalReminders();
   restartServerMessages();
   restartTranslationSettings();
@@ -148,19 +151,15 @@ client.setProvider(
 ).catch(console.error);
 
 client.on('commandRun', async (command) => {
-    try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Command Leaderboard").findOne({ commandName: command.name });
-        
+  
+        result = await commandLeaderboardSchema.findOne({ commandName: command.name });
         if (result) {
-          updatedResult = await client2.db("DiscordBot").collection("Command Leaderboard").updateOne({ commandName: command.name }, { $inc: { numberOfUses: 1 } });
+          updatedResult = await commandLeaderboardSchema.updateOne({ commandName: command.name }, { $inc: { numberOfUses: 1 } });
         }
         else {
-          updatedResult = await client2.db("DiscordBot").collection("Command Leaderboard").updateOne({ commandName: command.name }, { $set: { numberOfUses: 1 } }, { upsert: true });
+          updatedResult = await commandLeaderboardSchema.updateOne({ commandName: command.name }, { $set: { numberOfUses: 1 } }, { upsert: true });
         }
-    } catch (e) {
-        console.error(`Error incrementing ${command.name} usage count.`, e);
-    }
+    
 })
 
 client.on('message', async (message) => {
