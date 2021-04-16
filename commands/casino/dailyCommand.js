@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
 const casinoFunctions = require('../../util/casino');
+const casinoSchema = require('../../schemas/casinoSchema');
 
 module.exports = class dailyCommand extends Commando.Command {
     constructor(client) {
@@ -65,14 +66,7 @@ module.exports = class dailyCommand extends Commando.Command {
 };
 
 async function updateDailyCooldownDB(userId, balance, dailyCooldown) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: userId }, { $set: { balance: balance, dailyCooldown: dailyCooldown } }, { upsert: true });
-        await client2.close();
-    } catch (e) {
-        console.error(`Daily Cooldown update error. User: ${userId} Balance: ${balance} Daily Cooldown: ${dailyCooldown}\n`, e)
-    }
+    
+    result = await casinoSchema.updateOne({ userId: userId }, { $set: { balance: balance, dailyCooldown: dailyCooldown } }, { upsert: true });
+    
 }

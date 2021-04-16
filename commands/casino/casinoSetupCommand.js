@@ -3,6 +3,7 @@ const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
 const casinoFunctions = require('../../util/casino');
+const casinoSchema = require('../../schemas/casinoSchema');
 
 module.exports = class casinoSetupCommand extends Commando.Command {
     constructor(client) {
@@ -21,7 +22,9 @@ module.exports = class casinoSetupCommand extends Commando.Command {
         })
     }
     async run(receivedMessage, args) {
-        if (receivedMessage.author.casino.setup && !await casinoFunctions.loadCasinoSettings(receivedMessage)) {
+        if (receivedMessage.author.casino.setup || await casinoFunctions.loadCasinoSettings(receivedMessage)) {
+            console.log(receivedMessage.author.casino.setup)
+            console.log(await casinoFunctions.loadCasinoSettings(receivedMessage))
             return receivedMessage.say('You already initialized your casino account. This command only needs to be run once.')
         }
         else {
@@ -33,14 +36,13 @@ module.exports = class casinoSetupCommand extends Commando.Command {
 
 
 async function initializeUserCasino(receivedMessage) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    try {
-        receivedMessage.channel.startTyping(5)
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Casino").updateOne({ userId: receivedMessage.author.id }, { $set: { userId: receivedMessage.author.id, balance: 10000 } }, { upsert: true });
-        await client2.close();
+    
+    result = await casinoSchema.updateOne({ userId: receivedMessage.author.id }, { $set: { userId: receivedMessage.author.id, balance: 10000 } }, { upsert: true });
+    
+    if (!result) {
+        return receivedMessage.say("An error occurred. Please run the command again.")
+    }
+    else {
         receivedMessage.author.casino.setup = true
         receivedMessage.author.casino.balance = 10000
         receivedMessage.channel.stopTyping(true)
@@ -49,8 +51,5 @@ async function initializeUserCasino(receivedMessage) {
             .setDescription('**Your account has been created and given 10,000 credits!**')
             .setFooter(receivedMessage.author.tag, receivedMessage.author.displayAvatarURL())
         return receivedMessage.say(embed)
-    } catch (e) {
-        console.error(e);
-        receivedMessage.say("An error occurred. Please run the command again.")
     }
 }
