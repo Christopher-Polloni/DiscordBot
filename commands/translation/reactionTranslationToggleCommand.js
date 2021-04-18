@@ -1,6 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
+const translationSettingsSchema = require('../../schemas/translationSettingsSchema');
 
 module.exports = class translationReactionToggleCommand extends Commando.Command {
   constructor(client) {
@@ -56,11 +57,11 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
 
 
 async function upsertTranslatorSetting(guildId, updatedSetting) {
-  const MongoClient = require('mongodb').MongoClient;
-  const uri = config.mongoUri;
-  const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-  await client2.connect();
-  result = await client2.db("DiscordBot").collection("Translator Settings").updateOne({ guild: guildId }, { $set: updatedSetting }, { upsert: true });
-  await client2.close();
-  return
+  try {
+    result = await translationSettingsSchema.updateOne({ guildId: guildId }, { $set: updatedSetting }, { upsert: true });
+  }
+  catch (error) {
+    console.error(`Error updating translation setting. Guild Id: ${guildId} ${updatedSetting}`, error)
+  }
+  
 }

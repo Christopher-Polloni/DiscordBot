@@ -19,6 +19,7 @@ const http = require('http');
 const moment = require('moment');
 const mongo = require('./util/mongo');
 const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
+const translationSettingsSchema = require('./schemas/translationSettingsSchema');
 
 
 Structures.extend('Guild', Guild => {
@@ -633,27 +634,16 @@ async function restartServerMessages() {
 }
 
 async function restartTranslationSettings() {
-  try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Translator Settings")
-      .find({ reactionTranslator: false })
-      .toArray()
-    await client2.close();
+    let results = await translationSettingsSchema.find({ reactionTranslator: false })
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
-        if (guilds.includes(results[i].guild)) {
-          let guild = client.guilds.cache.get(results[i].guild);
-          guild.guildSettings.translatorData.reactionTranslator = false;
+        if (guilds.includes(results[i].guildId)) {
+          let guild = client.guilds.cache.get(results[i].guildId);
+          guild.guildSettings.reactionTranslator = false;
         }
       }
     }
-  } catch (e) {
-    console.error(e)
-  }
 }
 
 async function restartWelcomeSettings() {
