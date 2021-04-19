@@ -18,8 +18,8 @@ const express = require('express');
 const http = require('http');
 const moment = require('moment');
 const mongo = require('./util/mongo');
-const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
 const translationSettingsSchema = require('./schemas/translationSettingsSchema');
+const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema.js');
 
 
 Structures.extend('Guild', Guild => {
@@ -698,14 +698,7 @@ async function restartCleverbotSettings() {
 
 async function restartClashOfClansSettings() {
   try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Clash of Clans Settings")
-      .find()
-      .toArray()
-    await client2.close();
+    let results = await moderationLogsSettingsSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
@@ -772,43 +765,21 @@ async function restartClashOfClansReminders() {
 
 async function restartModerationLogSettings() {
   try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Moderation Log Settings")
-      .find()
-      .toArray()
-    await client2.close();
+    let results = await moderationLogsSettingsSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
         if (guilds.includes(results[i].guildId)) {
           let guild = client.guilds.cache.get(results[i].guildId);
-          if (results[i].memberLeaveLogChannelId) {
-            guild.guildSettings.moderationLogs.memberLeaveLogChannelId = results[i].memberLeaveLogChannelId;
-          }
-          if (results[i].memberJoinLogChannelId) {
-            guild.guildSettings.moderationLogs.memberJoinLogChannelId = results[i].memberJoinLogChannelId;
-          }
-          if (results[i].memberNicknameChangeLogChannelId) {
-            guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = results[i].memberNicknameChangeLogChannelId;
-          }
-          if (results[i].banLogChannelId) {
-            guild.guildSettings.moderationLogs.banLogChannelId = results[i].banLogChannelId;
-          }
-          if (results[i].messageEditLogChannelId) {
-            guild.guildSettings.moderationLogs.messageEditLogChannelId = results[i].messageEditLogChannelId;
-          }
-          if (results[i].messageDeleteLogChannelId) {
-            guild.guildSettings.moderationLogs.messageDeleteLogChannelId = results[i].messageDeleteLogChannelId;
-          }
-          if (results[i].messageDeleteLogIgnoreStartsWith) {
-            guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith = results[i].messageDeleteLogIgnoreStartsWith;
-          }
-          if (results[i].messageDeleteLogIgnoreIncludes) {
-            guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = results[i].messageDeleteLogIgnoreIncludes;
-          }
+          results[i].memberLeaveLogChannelId ? guild.guildSettings.moderationLogs.memberLeaveLogChannelId = results[i].memberLeaveLogChannelId : guild.guildSettings.moderationLogs.memberLeaveLogChannelId = null;
+          results[i].memberJoinLogChannelId ? guild.guildSettings.moderationLogs.memberJoinLogChannelId = results[i].memberJoinLogChannelId : guild.guildSettings.moderationLogs.memberJoinLogChannelId = null;
+          results[i].memberNicknameChangeLogChannelId ? guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = results[i].memberNicknameChangeLogChannelId : guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = null;
+          results[i].banLogChannelId ? guild.guildSettings.moderationLogs.banLogChannelId = results[i].banLogChannelId : guild.guildSettings.moderationLogs.banLogChannelId = null;
+          results[i].messageEditLogChannelId ? guild.guildSettings.moderationLogs.messageEditLogChannelId = results[i].messageEditLogChannelId : guild.guildSettings.moderationLogs.messageEditLogChannelId = null;
+          results[i].messageDeleteLogChannelId ? guild.guildSettings.moderationLogs.messageDeleteLogChannelId = results[i].messageDeleteLogChannelId : guild.guildSettings.moderationLogs.messageDeleteLogChannelId = null;
+          results[i].messageDeleteLogIgnoreStartsWith ? guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith = results[i].messageDeleteLogIgnoreStartsWith : guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith = null;
+          results[i].messageDeleteLogIgnoreIncludes ? guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = results[i].messageDeleteLogIgnoreIncludes : guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = null;
+          
         }
       }
     }

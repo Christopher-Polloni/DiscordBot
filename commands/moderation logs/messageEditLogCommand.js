@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js')
+const moderationLogsSettingsSchema = require('../../schemas/moderationLogsSettingsSchema');
 
 module.exports = class messageEditLogCommand extends Commando.Command {
     constructor(client) {
@@ -66,13 +67,8 @@ async function getChannel(receivedMessage) {
 }
 
 async function upsertModerationLogSetting(receivedMessage, channelId) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageEditLogChannelId: channelId } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageEditLogChannelId: channelId } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId = channelId;
         return receivedMessage.say(`Moderation Log Settings were updated for users editing messages.`);
     } catch (e) {
@@ -85,13 +81,8 @@ async function deleteBanLogSetting(receivedMessage) {
     if (!receivedMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId) {
         return receivedMessage.say(`Moderation Log Setting for messages being edited was already turned off`);
     }
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageEditLogChannelId: null } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageEditLogChannelId: null } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.messageEditLogChannelId = null;
         return receivedMessage.say(`Moderation Log Setting for users editing messages is now turned off`);
     } catch (e) {

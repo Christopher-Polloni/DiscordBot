@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js')
+const moderationLogsSettingsSchema = require('../../schemas/moderationLogsSettingsSchema');
 
 module.exports = class memberNicknameChangeLogCommand extends Commando.Command {
     constructor(client) {
@@ -66,17 +67,12 @@ async function getChannel(receivedMessage) {
 }
 
 async function upsertModerationLogSetting(receivedMessage, channelId) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, memberNicknameChangeLogChannelId: channelId } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, memberNicknameChangeLogChannelId: channelId } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = channelId;
         return receivedMessage.say(`Moderation Log Settings were updated for members changing their nickname`);
     } catch (e) {
-        console.error(e);
+        console.error(`Error updating Moderation Log (nickname log). Guild ID: ${receivedMessage.guild.id}`, e);
         return receivedMessage.say("There was an error updating the settings. You can restart the process with `nickname-log update`")
     }
 }
@@ -85,17 +81,12 @@ async function deleteMemberNicknameChangeLogSetting(receivedMessage) {
     if (!receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId) {
         return receivedMessage.say(`Moderation Log Setting for members changing their nickname was already turned off`);
     }
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, memberNicknameChangeLogChannelId: null } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, memberNicknameChangeLogChannelId: null } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.memberNicknameChangeLogChannelId = null;
         return receivedMessage.say(`Moderation Log Setting for members changing their nickname is now turned off`);
     } catch (e) {
-        console.error(e);
+        console.error(`Error turning off Moderation Log (nickname log). Guild ID: ${receivedMessage.guild.id}`, e);
         return receivedMessage.say("There was an error updating the settings. You can restart the process with `nickname-log off`")
     }
 }

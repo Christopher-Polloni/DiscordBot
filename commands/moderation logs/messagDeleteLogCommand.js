@@ -1,10 +1,8 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
-const MongoClient = require('mongodb').MongoClient;
-const uri = config.mongoUri;
-const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 const Discord = require('discord.js');
+const moderationLogsSettingsSchema = require('../../schemas/moderationLogsSettingsSchema');
 
 module.exports = class messageDeleteLogCommand extends Commando.Command {
     constructor(client) {
@@ -151,9 +149,7 @@ async function addStartsWith(receivedMessage) {
                 }
                 try {
                     receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.unshift(messages.first().content)
-                    await client2.connect();
-                    result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreStartsWith: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith } }, { upsert: true });
-                    await client2.close();
+                    result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreStartsWith: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith } }, { upsert: true });
                     receivedMessage.say(`That phrase has been added to the ignore list.`);
                     return addStartsWith(receivedMessage)
                 } catch (e) {
@@ -183,9 +179,7 @@ async function addIncludes(receivedMessage) {
                 }
                 try {
                     receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.unshift(messages.first().content)
-                    await client2.connect();
-                    result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreIncludes: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes } }, { upsert: true });
-                    await client2.close();
+                    result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreIncludes: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes } }, { upsert: true });
                     receivedMessage.say(`That phrase has been added to the ignore list.`);
                     return addStartsWith(receivedMessage)
                 } catch (e) {
@@ -214,10 +208,8 @@ async function removeStartsWith(receivedMessage) {
                     return receivedMessage.say("That phrase is not in the ignore list. To view a list of phrases that are set to be ignored, run the `message-delete-log` command")
                 }
                 try {
-                    receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.splice(receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.indexOf(messages.first().content), receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.indexOf(messages.first().content) + 1)
-                    await client2.connect();
-                    result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreStartsWith: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith } }, { upsert: true });
-                    await client2.close();
+                    receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.splice(receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith.indexOf(messages.first().content), 1)
+                    result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreStartsWith: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith } }, { upsert: true });
                     receivedMessage.say("That phrase has been removed from the ignore list. To view a list of phrases that are set to be ignored, run the `message-delete-log` command");
                     return removeStartsWith(receivedMessage)
                 } catch (e) {
@@ -246,10 +238,8 @@ async function removeIncludes(receivedMessage) {
                     return receivedMessage.say("That phrase is not in the ignore list. To view a list of phrases that are set to be ignored, run the `message-delete-log` command")
                 }
                 try {
-                    receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.splice(receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.indexOf(messages.first().content), receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.indexOf(messages.first().content) + 1)
-                    await client2.connect();
-                    result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreIncludes: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes } }, { upsert: true });
-                    await client2.close();
+                    receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.splice(receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes.indexOf(messages.first().content), 1)
+                    result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogIgnoreIncludes: receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes } }, { upsert: true });
                     receivedMessage.say("That phrase has been removed from the ignore list. To view a list of phrases that are set to be ignored, run the `message-delete-log` command");
                     return removeIncludes(receivedMessage)
                 } catch (e) {
@@ -266,13 +256,8 @@ async function removeIncludes(receivedMessage) {
 }
 
 async function upsertModerationLogSetting(receivedMessage, channelId) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogChannelId: channelId } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogChannelId: channelId } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogChannelId = channelId;
         return receivedMessage.say(`Moderation Log Settings were updated for message deletion.`);
     } catch (e) {
@@ -285,14 +270,11 @@ async function deleteMessageDeleteLogSetting(receivedMessage) {
     if (!receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogChannelId) {
         return receivedMessage.say(`Moderation Log Setting for message deletion was already turned off`);
     }
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Moderation Log Settings").updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogChannelId: null } }, { upsert: true });
-        await client2.close();
+        result = await moderationLogsSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { guildId: receivedMessage.guild.id, messageDeleteLogChannelId: null, messageDeleteLogIgnoreStartsWith: [], messageDeleteLogIgnoreIncludes: [] } }, { upsert: true });
         receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogChannelId = null;
+        receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreStartsWith = [];
+        receivedMessage.guild.guildSettings.moderationLogs.messageDeleteLogIgnoreIncludes = [];
         return receivedMessage.say(`Moderation Log Setting for message deletion is now turned off`);
     } catch (e) {
         console.error(e);
