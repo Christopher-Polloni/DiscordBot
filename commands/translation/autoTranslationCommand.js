@@ -48,7 +48,7 @@ module.exports = class autotranslationCommand extends Commando.Command {
       }
 
 async function getTranslateFromChannel(receivedMessage) {
-        receivedMessage.say(`Please enter the channel where all sent messages will be auto-translated (using the format <#${receivedMessage.channel.id}>).`).then((newmsg) => {
+        receivedMessage.say(`Please enter the channel (using the format <#${receivedMessage.channel.id}>) where all messages sent by users will be auto-translated. You will then be asked where the translation should be sent to and in what language.`).then((newmsg) => {
         const filter = m => receivedMessage.author.id === m.author.id;
     newmsg.channel.awaitMessages(filter, { time: 60000, max: 1, errors: ['time'] })
         .then(messages => {
@@ -69,7 +69,7 @@ async function getTranslateFromChannel(receivedMessage) {
 }
 
 async function getTranslateToChannel(receivedMessage, translateFromChannelId) {
-    receivedMessage.say(`Please enter the channel where all auto-translated messages from <#${translateFromChannelId}> will be sent to.`).then((newmsg) => {
+    receivedMessage.say(`Please enter the channel where all auto-translated messages from <#${translateFromChannelId}> will be sent to. You will then be asked what language you would like to use for the translation.`).then((newmsg) => {
         const filter = m => receivedMessage.author.id === m.author.id;
 
     newmsg.channel.awaitMessages(filter, { time: 60000, max: 1, errors: ['time'] })
