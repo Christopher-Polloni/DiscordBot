@@ -19,8 +19,8 @@ const http = require('http');
 const moment = require('moment');
 const mongo = require('./util/mongo');
 const translationSettingsSchema = require('./schemas/translationSettingsSchema');
-const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema.js');
-const { settings } = require('cluster');
+const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema');
+const commandLeaderboardSchema = require('./schemas/commandUsesSchema')
 
 
 Structures.extend('Guild', Guild => {

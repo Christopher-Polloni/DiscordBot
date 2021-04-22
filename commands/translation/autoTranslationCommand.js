@@ -129,6 +129,7 @@ async function addAutoTranslationSetting(receivedMessage, translateFromChannelId
     receivedMessage.guild.guildSettings.translationSettings.autoTranslateToggle = true
     try {
       result = await translationSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { autoTranslateSettings: receivedMessage.guild.guildSettings.translationSettings.autoTranslateSettings }}, { upsert: true });
+      return receivedMessage.say('Auto-translate setting successfully added!')
     }
     catch (error) {
       console.error(`Error updating auto-translation setting. Guild Id: ${receivedMessage.guild.id} ${newSetting}`, error)
@@ -175,7 +176,8 @@ async function removeAutoTranslationSetting(receivedMessage, arrayPosition) {
     const removedSetting = receivedMessage.guild.guildSettings.translationSettings.autoTranslateSettings.splice(arrayPosition,1)
     if (receivedMessage.guild.guildSettings.translationSettings.autoTranslateSettings.length == 0) { receivedMessage.guild.guildSettings.translationSettings.autoTranslateToggle = false }
     try {
-      result = await translationSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { autoTranslateSettings: receivedMessage.guild.guildSettings.translationSettings.autoTranslateSettings }}, { upsert: true });
+        result = await translationSettingsSchema.updateOne({ guildId: receivedMessage.guild.id }, { $set: { autoTranslateSettings: receivedMessage.guild.guildSettings.translationSettings.autoTranslateSettings }}, { upsert: true });
+        return receivedMessage.say(`Succesfully removed setting to translate messages from <#${removedSetting[0].translateFromChannelId}> to ${removedSetting[0].language} in <#${removedSetting[0].translateToChannelId}>.`)
     }
     catch (error) {
       console.error(`Error removing auto-translation setting. Guild Id: ${receivedMessage.guild.id}`, error)
