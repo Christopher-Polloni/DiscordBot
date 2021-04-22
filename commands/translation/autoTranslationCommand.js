@@ -13,7 +13,8 @@ module.exports = class autotranslationCommand extends Commando.Command {
             description: 'This feature allows all messages sent in a channel to be auto-translated to the language of your choice. The translated messages can be sent to any channel.',
             examples: ['auto-translate', 'auto-translate add', 'auto-translate remove'],
             guildOnly: true,
-            argsType: 'single'
+            argsType: 'single',
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage, arg) {
