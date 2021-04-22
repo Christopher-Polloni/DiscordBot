@@ -20,6 +20,7 @@ const moment = require('moment');
 const mongo = require('./util/mongo');
 const translationSettingsSchema = require('./schemas/translationSettingsSchema');
 const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema.js');
+const { settings } = require('cluster');
 
 
 Structures.extend('Guild', Guild => {
@@ -42,7 +43,11 @@ Structures.extend('Guild', Guild => {
     constructor(client, data) {
       super(client, data);
       this.guildSettings = {
-        reactionTranslator: true,
+        translationSettings: {
+          reactionTranslator: true,
+          autoTranslateToggle: false,
+          autoTranslateSettings: []
+        },
         reactionRoles: [],
         welcomeSettings: {
           welcomeChannelId: null,
@@ -167,20 +172,58 @@ client.on('message', async (message) => {
   if (message.channel.type == 'dm') {
     return
   }
-  if (!message.guild.guildSettings.cleverbotSettings.enabled) {
-    return
+  if (message.guild.guildSettings.cleverbotSettings.enabled) {
+    let cleverbotChannel = message.guild.guildSettings.cleverbotSettings.cleverbotChannelId;
+    if (cleverbotChannel == message.channel.id && !message.isCommand && !message.author.bot) {
+      const url = `http://www.cleverbot.com/getreply?key=${config.cleverBotApiKey}&input=${message.content}`
+      axios.get(url)
+        .then(function (response) {
+          return message.channel.send(response.data.output)
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }  
   }
-  let cleverbotChannel = message.guild.guildSettings.cleverbotSettings.cleverbotChannelId;
-  if (!message.isCommand && !message.author.bot && cleverbotChannel == message.channel.id) {
-    const url = `http://www.cleverbot.com/getreply?key=${config.cleverBotApiKey}&input=${message.content}`
-    axios.get(url)
-      .then(function (response) {
-        return message.channel.send(response.data.output)
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
+  if (message.guild.guildSettings.translationSettings.autoTranslateToggle && !message.isCommand && !message.author.bot) {
+    const filteredSettings = message.guild.guildSettings.translationSettings.autoTranslateSettings.filter(settings => settings.translateFromChannelId == message.channel.id);
+    for (let i=0; i<filteredSettings.length; i++){
+      const translateToChannel = message.guild.channels.cache.get(filteredSettings[i].translateToChannelId)
+      const languageCode = filteredSettings[i].languageCode
+      const language = filteredSettings[i].language
+      axios({
+        baseURL: config.translationEndpoint,
+        url: '/translate',
+        method: 'post',
+        headers: {
+            'Ocp-Apim-Subscription-Key': config.translationSubscriptionKey,
+            'Content-type': 'application/json',
+            'X-ClientTraceId': uuidv4.v4().toString(),
+            'Ocp-Apim-Subscription-Region': 'eastus'
+        },
+        params: {
+            'api-version': '3.0',
+            'to': languageCode
+        },
+        data: [{
+            'text': message.content
+        }],
+        responseType: 'json'
+    }).then(function (response) {
+      const embed = new Discord.MessageEmbed()
+        .setColor('BLUE')
+        .setAuthor(message.author.username, message.author.displayAvatarURL())
+        .setDescription(`[Original Message](${message.url}) in <#${message.channel.id}>\n${response.data[0].translations[0].text}`)
+        .setFooter(`Auto-Translated`, message.client.user.displayAvatarURL())
+        .setTimestamp()
+      translateToChannel.send(embed)
+          
+    }).catch(function (error) {
+        console.error(`There was an error auto-translating a message. Guild: ${message.guild.id} Translate from ${filteredSettings[i].translateFromChannelId} to ${filteredSettings[i].translateToChannelId}\n`, error);
+    })
+    }
   }
+  
 });
 
 client.on('guildMemberAdd', async (member) => {
@@ -420,7 +463,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
   if (user.bot) {
     return
   }
-  if (config.languages[reaction.emoji.name] && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.reactionTranslator)) {
+  if (config.languages[reaction.emoji.name] && (!reaction.message.channel.guild || reaction.message.channel.guild.guildSettings.translationSettings.reactionTranslator)) {
     axios({
       baseURL: config.translationEndpoint,
       url: '/translate',
@@ -634,13 +677,17 @@ async function restartServerMessages() {
 }
 
 async function restartTranslationSettings() {
-    let results = await translationSettingsSchema.find({ reactionTranslator: false })
+    let results = await translationSettingsSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
         if (guilds.includes(results[i].guildId)) {
           let guild = client.guilds.cache.get(results[i].guildId);
-          guild.guildSettings.reactionTranslator = false;
+          guild.guildSettings.translationSettings.reactionTranslator = results[i].reactionTranslator || true;
+          if (results[i].autoTranslateSettings && results[i].autoTranslateSettings.length > 0) {
+            guild.guildSettings.translationSettings.autoTranslateToggle = true
+            guild.guildSettings.translationSettings.autoTranslateSettings = results[i].autoTranslateSettings;
+          }
         }
       }
     }

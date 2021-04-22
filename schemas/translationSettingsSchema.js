@@ -4,6 +4,7 @@ const translationSettingsSchema = mongoose.Schema(
   {
     guildId: String,
     reactionTranslator: Boolean,
+    autoTranslateSettings: Array
   }
 )
 

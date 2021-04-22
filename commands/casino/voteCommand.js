@@ -4,7 +4,6 @@ const config = require('../../config.js');
 const Discord = require('discord.js');
 const DBL = require("dblapi.js");
 const casinoFunctions = require('../../util/casino');
-const casinoSchema = require('../../schemas/casinoSchema')
 
 module.exports = class voteCommand extends Commando.Command {
     constructor(client) {
@@ -108,6 +107,5 @@ module.exports = class voteCommand extends Commando.Command {
 async function updateVoteCooldownDB(userId, balance, voteCooldown) {
     
     result = await casinoSchema.updateOne({ userId: userId }, { $set: { balance: balance, voteCooldown: voteCooldown } }, { upsert: true });
-    
-    
+       
 }

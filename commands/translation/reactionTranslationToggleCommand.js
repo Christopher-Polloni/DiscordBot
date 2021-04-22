@@ -18,7 +18,7 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
   }
   async run(receivedMessage, arg) {
     if (!arg) {
-      if (receivedMessage.guild.guildSettings.reactionTranslator == true) {
+      if (receivedMessage.guild.guildSettings.translationSettings.reactionTranslator == true) {
         return receivedMessage.say(`The ability to translate messages using reactions is currently enabled!`);
       }
       else {
@@ -30,17 +30,17 @@ module.exports = class translationReactionToggleCommand extends Commando.Command
     }
     else {
       try {
-        if (arg.toLowerCase() == 'on' && receivedMessage.guild.guildSettings.reactionTranslator) {
+        if (arg.toLowerCase() == 'on' && receivedMessage.guild.guildSettings.translationSettings.reactionTranslator) {
           return receivedMessage.say(`The ability to translate messages using reactions is already enabled!`);
         }
-        else if (arg.toLowerCase() == 'on' && !receivedMessage.guild.guildSettings.reactionTranslator) {
+        else if (arg.toLowerCase() == 'on' && !receivedMessage.guild.guildSettings.translationSettings.reactionTranslator) {
           await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: true });
-          receivedMessage.guild.guildSettings.reactionTranslator = true;
+          receivedMessage.guild.guildSettings.translationSettings.reactionTranslator = true;
           return receivedMessage.say(`The ability to translate messages using reactions is now enabled!`);
         }
-        else if (arg.toLowerCase() == 'off' && receivedMessage.guild.guildSettings.reactionTranslator) {
+        else if (arg.toLowerCase() == 'off' && receivedMessage.guild.guildSettings.translationSettings.reactionTranslator) {
           await upsertTranslatorSetting(receivedMessage.guild.id, { reactionTranslator: false });
-          receivedMessage.guild.guildSettings.reactionTranslator = false;
+          receivedMessage.guild.guildSettings.translationSettings.reactionTranslator = false;
           return receivedMessage.say(`The ability to translate messages using reactions is now disabled!`);
         }
         else {
