@@ -119,7 +119,6 @@ client.registry
     ['server poll', 'Server Poll Commands'],
     ['reaction roles', 'Reaction Role Commands'],
     ['translation', 'Translation Commands'],
-    ['cleverbot', 'Cleverbot Commands'],
     ['coc', 'Clash Of Clans Commands']
   ])
   // .registerDefaults()
@@ -143,7 +142,6 @@ client.on('ready', async () => {
   restartServerMessages();
   restartTranslationSettings();
   restartWelcomeSettings();
-  restartCleverbotSettings();
   restartClashOfClansSettings();
   restartClashOfClansReminders();
   restartModerationLogSettings();
@@ -712,30 +710,6 @@ async function restartWelcomeSettings() {
   }
 }
 
-async function restartCleverbotSettings() {
-  try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Cleverbot Settings")
-      .find()
-      .toArray()
-    await client2.close();
-    let guilds = client.guilds.cache.map(guild => guild.id)
-    if (results.length !== 0) {
-      for (let i = 0; i < results.length; i++) {
-        if (guilds.includes(results[i].guild)) {
-          let guild = client.guilds.cache.get(results[i].guild);
-          guild.guildSettings.cleverbotSettings.enabled = true;
-          guild.guildSettings.cleverbotSettings.cleverbotChannelId = results[i].channelId;
-        }
-      }
-    }
-  } catch (e) {
-    console.error(e)
-  }
-}
 
 async function restartClashOfClansSettings() {
   try {

@@ -98,7 +98,7 @@ async function upsertWelcomeSetting(receivedMessage, updatedSetting) {
 
 async function deleteWelcomeSetting(receivedMessage) {
     try {
-        result = await serverWelcomeSettingsSchema.deleteOne({ guild: receivedMessage.guild.id });
+        result = await serverWelcomeSettingsSchema.deleteOne({ guildId: receivedMessage.guild.id });
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId = null;
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeMessage = null;
         return receivedMessage.say(`Welcome settings are now turned off`);
