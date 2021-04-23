@@ -2,6 +2,7 @@ const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
+const reactionRolesSchema = require('../../schemas/reactionRolesSchema.js');
 
 module.exports = class reactionRolesCommand extends Commando.Command {
     constructor(client) {
@@ -89,13 +90,8 @@ module.exports = class reactionRolesCommand extends Commando.Command {
 
 
 async function addReactionRoleMessage(data, receivedMessage, message) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Reaction Roles").insertOne(data);
-        await client2.close();
+        result = await reactionRolesSchema.create(data);
         message.guild.guildSettings.reactionRoles.push(data)
         return
     } catch (e) {

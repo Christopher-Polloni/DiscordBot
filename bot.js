@@ -22,6 +22,7 @@ const translationSettingsSchema = require('./schemas/translationSettingsSchema')
 const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema');
 const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
 const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSchema');
+const reactionRolesSchema = require('./schemas/reactionRolesSchema');
 
 
 Structures.extend('Guild', Guild => {
@@ -146,7 +147,7 @@ client.on('ready', async () => {
   restartClashOfClansReminders();
   restartModerationLogSettings();
   restartReactionRoles();
-  restartPollResults()
+  restartPollResults();
   const dbl = new DBL(config.topggApiKey, client);
   dbl.postStats(client.guilds.cache.size)
 })
@@ -805,14 +806,7 @@ async function restartModerationLogSettings() {
 
 async function restartReactionRoles() {
   try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Reaction Roles")
-      .find()
-      .toArray()
-    await client2.close();
+    let results = await reactionRolesSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
@@ -823,7 +817,7 @@ async function restartReactionRoles() {
       }
     }
   } catch (e) {
-    console.error(e)
+    console.error('Error restarting reaction roles\n', e)
   }
 }
 
