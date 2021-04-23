@@ -20,7 +20,8 @@ const moment = require('moment');
 const mongo = require('./util/mongo');
 const translationSettingsSchema = require('./schemas/translationSettingsSchema');
 const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSchema');
-const commandLeaderboardSchema = require('./schemas/commandUsesSchema')
+const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
+const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSchema');
 
 
 Structures.extend('Guild', Guild => {
@@ -695,26 +696,19 @@ async function restartTranslationSettings() {
 
 async function restartWelcomeSettings() {
   try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Server Welcome Settings")
-      .find()
-      .toArray()
-    await client2.close();
+    let results = await serverWelcomeSettingsSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
       for (let i = 0; i < results.length; i++) {
-        if (guilds.includes(results[i].guild)) {
-          let guild = client.guilds.cache.get(results[i].guild);
+        if (guilds.includes(results[i].guildId)) {
+          let guild = client.guilds.cache.get(results[i].guildId);
           guild.guildSettings.welcomeSettings.welcomeChannelId = results[i].welcomeChannelId;
           guild.guildSettings.welcomeSettings.welcomeMessage = results[i].welcomeMessage;
         }
       }
     }
   } catch (e) {
-    console.error(e)
+    console.error('Error restarting welcome settings\n', e)
   }
 }
 

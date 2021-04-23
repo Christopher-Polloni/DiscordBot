@@ -1,6 +1,7 @@
 const Commando = require('discord.js-commando');
 const path = require('path');
 const config = require('../../config.js');
+const serverWelcomeSettingsSchema = require ('../../schemas/serverWelcomeSettingsSchema')
 
 module.exports = class welcomeCommand extends Commando.Command {
     constructor(client) {
@@ -72,7 +73,7 @@ async function getWelcomeMessage(receivedMessage, channelId) {
                 const updatedSetting = {
                     welcomeChannelId: channelId,
                     welcomeMessage: message,
-                    guild: receivedMessage.guild.id
+                    guildId: receivedMessage.guild.id
                 }
                 return upsertWelcomeSetting(receivedMessage, updatedSetting);
             })
@@ -84,35 +85,25 @@ async function getWelcomeMessage(receivedMessage, channelId) {
 }
 
 async function upsertWelcomeSetting(receivedMessage, updatedSetting) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Server Welcome Settings").updateOne({ guild: updatedSetting.guild }, { $set: updatedSetting }, { upsert: true });
-        await client2.close();
+        result = await serverWelcomeSettingsSchema.updateOne({ guildId: updatedSetting.guild }, { $set: updatedSetting }, { upsert: true });
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId = updatedSetting.welcomeChannelId;
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeMessage = updatedSetting.welcomeMessage;
         return receivedMessage.say(`Welcome settings were updated`);
     } catch (e) {
-        console.error(e);
+        console.error(`Error updating welcome message. Guild: ${receivedMessage.guild.id}\n`, e);
         return receivedMessage.say("There was an error updating the settings. You can restart the process with `welcome update`")
     }
 }
 
 async function deleteWelcomeSetting(receivedMessage) {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
     try {
-        await client2.connect();
-        result = await client2.db("DiscordBot").collection("Server Welcome Settings").deleteOne({ guild: receivedMessage.guild.id });
-        await client2.close();
+        result = await serverWelcomeSettingsSchema.deleteOne({ guild: receivedMessage.guild.id });
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeChannelId = null;
         receivedMessage.guild.guildSettings.welcomeSettings.welcomeMessage = null;
         return receivedMessage.say(`Welcome settings are now turned off`);
     } catch (e) {
-        console.error(e);
+        console.error(`Error deleting welcome message. Guild: ${receivedMessage.guild.id}\n`, e);
         return receivedMessage.say("There was an error updating the settings. You can restart the process with `welcome off`")
     }
 }
