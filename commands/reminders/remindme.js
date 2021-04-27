@@ -4,9 +4,7 @@ const path = require('path');
 const config = require('../../config.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const MongoClient = require('mongodb').MongoClient;
-const uri = config.mongoUri;
-const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const personalRemindersSchema = require('../../schemas/personalRemindersSchema');
 
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
@@ -30,7 +28,9 @@ module.exports = class scheduleCommand extends Commando.Command {
 
 
 async function getDate(receivedMessage) {
-
+  if (receivedMessage.channel.type !== 'dm') {
+    receivedMessage.say(`Check your DM to continue creating your reminder.`)
+  }
   receivedMessage.author.send("Please enter the day for your reminder using the format 'MM/DD/YY'.").then((newmsg) => {
     const filter = m => receivedMessage.author.id === m.author.id;
 
@@ -63,7 +63,7 @@ async function getDate(receivedMessage) {
       })
       .catch((e) => {
         console.error(e);
-        newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $remindme");
+        newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `remindme`");
       });
   });
 
@@ -144,7 +144,7 @@ async function getTime(receivedMessage, month, day, year) {
       })
       .catch((e) => {
         console.log(e)
-        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $remindme");
+        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `remindme`");
       });
   });
 
@@ -162,10 +162,9 @@ async function getReminder(receivedMessage, date) {
         
         return createNewReminder(
           {
-            authorId: receivedMessage.author.id,
+            userId: receivedMessage.author.id,
             date: date,
-            reminder: reminder,
-            command: 'remindme'
+            reminder: reminder
           },
           receivedMessage
         )
@@ -173,7 +172,7 @@ async function getReminder(receivedMessage, date) {
       })
       .catch((e) => {
         console.log(e)
-        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $remindme");
+        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `remindme`");
       });
   });
 
@@ -183,22 +182,15 @@ async function getReminder(receivedMessage, date) {
 async function createNewReminder(newReminder, receivedMessage) {
 
   try {
-
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    // Connect to the MongoDB cluster
-    await client2.connect();
-
-    let result = await client2.db("DiscordBot").collection("Personal Reminders").insertOne(newReminder);
+    let result = await personalRemindersSchema.create(newReminder);
     const embed = new Discord.MessageEmbed()
       .setColor('#FFFF00')
       .setTitle('Reminder Set!')
       .addField('Scheduled For:', `${newReminder.date.toLocaleString()} ${config.timeZone}`)
       .addField('Reminder:', newReminder.reminder)
-      .setFooter(`To delete this reminder: $deletereminder ${result.insertedId}`)
     receivedMessage.author.send(embed)
-    receivedMessage.react('✅');
 
-    schedule.scheduleJob('reminder_' + result.insertedId, newReminder.date, async function () {
+    schedule.scheduleJob('reminder_' + result._id, newReminder.date, async function () {
       const embed = new Discord.MessageEmbed()
         .setColor('#4cbb17')
         .setTitle('🚨Reminder🚨')
@@ -206,15 +198,10 @@ async function createNewReminder(newReminder, receivedMessage) {
         .addField('Reminder:', newReminder.reminder)
       receivedMessage.author.send(embed)
 
-      deletion = await client2.db("DiscordBot").collection("Personal Reminders")
-        .deleteOne({ _id: result.insertedId });
+      deletion = await personalRemindersSchema.deleteOne({ _id: result._id });
     });
-
   } catch (e) {
     console.error(e);
     receivedMessage.author.send('There was an error uploading your reminder. Please try again')
-  } finally {
-    await client2.close();
   }
-
 }

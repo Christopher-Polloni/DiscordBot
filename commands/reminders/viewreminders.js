@@ -3,10 +3,7 @@ const Discord = require('discord.js');
 const path = require('path');
 const config = require('../../config.js');
 const moment = require('moment');
-const schedule = require('node-schedule');
-const MongoClient = require('mongodb').MongoClient;
-const uri = config.mongoUri;
-const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const personalRemindersSchema = require('../../schemas/personalRemindersSchema');
 
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
@@ -20,57 +17,38 @@ module.exports = class scheduleCommand extends Commando.Command {
     })
   }
   async run(receivedMessage) {
-
-    const author = receivedMessage.author.id.toString();
-    console.log(author)
-    viewReminders(receivedMessage, author);
-
-
+    viewReminders(receivedMessage);
 
   };
 
 }
 
 
-async function viewReminders(receivedMessage, author) {
+async function viewReminders(receivedMessage) {
 
   try {
+    
+    let results = await personalRemindersSchema.find({ userId: receivedMessage.author.id }).sort({ date: 1 })
 
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    // Connect to the MongoDB cluster
-    await client2.connect();
-
-    let results = await client2.db("DiscordBot").collection("Personal Reminders")
-      .find({ authorId: author })
-      .sort({ date: 1 })
-      .toArray()
-    console.log(results)
-
-    const embed = new Discord.MessageEmbed()
-      .setColor('#0000FF')
-      .setTitle("Upcoming Personal Reminders")
-    for (let i = 0; i < 5; i++) {
-      if (i < results.length) {
-        let title = i + 1;
-        let time = results[i].date;
-        let id = results[i]._id;
-        let reminder = results[i].reminder;
-        let info = `Date: ${time.toLocaleString()} ${config.timeZone}\nID: ${id}\nReminder: ${reminder}`
-        embed.addField(title, info)
-        embed.setFooter(`Showing ${title}/${results.length} Reminders`)
-      }
-      else {
-        break
-      }
+    if (results.length == 0){
+      return receivedMessage.send(`You don't currently have any active reminders set.`)
     }
 
-    receivedMessage.author.send(embed);
+    if (receivedMessage.channel.type !== 'dm') {
+      receivedMessage.say(`Check your DM to view your reminders.`)
+    }
+    receivedMessage.author.send(`Here are all of your active reminders: `)
+    for (let i=0; i<results.length; i++){
+      let embed = new Discord.MessageEmbed()
+        .setColor('BLUE')
+        .setDescription(`**Reminder Number:** ${i+1}\n**Date:** ${results[i].date.toLocaleString()} ${config.timeZone}\n**Reminder:**\n${results[i].reminder}`)
+       await receivedMessage.author.send(embed)
+    }
 
+        
   } catch (e) {
-    console.error(e);
-    receivedMessage.reply('There was an error uploading your reminder. Please try again')
-  } finally {
-    await client2.close();
+    console.error(`Error viewing personal reminders. User: ${receivedMessage.author.id}`, e);
+    receivedMessage.say('There was an error retrieving your reminders. Please try again.')
   }
 
 }

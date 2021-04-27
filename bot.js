@@ -23,6 +23,7 @@ const moderationLogsSettingsSchema = require('./schemas/moderationLogsSettingsSc
 const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
 const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSchema');
 const reactionRolesSchema = require('./schemas/reactionRolesSchema');
+const personalRemindersSchema = require('./schemas/personalRemindersSchema');
 
 
 Structures.extend('Guild', Guild => {
@@ -494,7 +495,7 @@ client.on('messageReactionAdd', async (reaction, user) => {
       console.log(error);
     })
   }
-  else if (reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
+  else if (reaction.message.guild && reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
     const reactionRoleMessage = reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)
     if (reactionRoleMessage.emoji.includes(reaction.emoji.id || reaction.emoji.name)) {
       if (reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name) !== -1) {
@@ -519,7 +520,7 @@ client.on('messageReactionRemove', async (reaction, user) => {
       return;
     }
   }
-  if (reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
+  if (reaction.message.guild && reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)) {
     const reactionRoleMessage = reaction.message.guild.guildSettings.reactionRoles.find(m => m.messageId == reaction.message.id)
     if (reactionRoleMessage.emoji.includes(reaction.emoji.id || reaction.emoji.name)) {
       if (reactionRoleMessage.emoji.indexOf(reaction.emoji.id || reaction.emoji.name) !== -1) {
@@ -563,55 +564,42 @@ client.login(config.token);
 
 async function restartPersonalReminders() {
   try {
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Personal Reminders")
-      .find({ command: 'remindme' })
-      .sort({ date: 1 })
-      .toArray()
+    let results = await personalRemindersSchema.find().sort({ date: 1 })
     for (let i = 0; i < results.length; i++) {
       const reminderDate = results[i].date;
       const difference = reminderDate - new Date();
-      const user = client.users.cache.get(results[i].authorId);
-      if (difference <= 0) {
-        console.log(results[i]);
-        console.log('The above has passed')
-        const embed = new Discord.MessageEmbed()
-          .setColor('#8B0000')
-          .setTitle("Missed Reminder!")
-          .setDescription("Oops! It appears I was not online when I was supposed to remind you of something! I'm terribly sorry for this!")
-          .addField('Date', `${results[i].date.toLocaleString()} ${config.timeZone}`)
-          .addField('Reminder', results[i].reminder)
-
-        user.send(embed);
-
-        deletion = await client2.db("DiscordBot").collection("Personal Reminders")
-          .deleteOne({ "_id": ObjectId(results[i]._id) });
-      }
-      else {
-        schedule.scheduleJob('reminder_' + results[i]._id, results[i].date, async function () {
+      const user = await client.users.fetch(results[i].userId);
+      if (user) {
+        if (difference <= 0) {
+          console.log(results[i]);
+          console.log('The above has passed')
           const embed = new Discord.MessageEmbed()
-            .setColor('#4cbb17')
-            .setTitle('🚨Reminder🚨')
-            .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
-            .addField('Reminder:', results[i].reminder)
-          user.send(embed)
-
-          const MongoClient = require('mongodb').MongoClient;
-          const uri = config.mongoUri;
-          const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-          await client2.connect();
-          deletion = await client2.db("DiscordBot").collection("Personal Reminders")
-            .deleteOne({ "_id": ObjectId(results[i]._id) });
-          await client2.close();
-        });
+            .setColor('#8B0000')
+            .setTitle("Missed Reminder!")
+            .setDescription("Oops! It appears I was not online when I was supposed to remind you of something! I'm terribly sorry for this!")
+            .addField('Date', `${results[i].date.toLocaleString()} ${config.timeZone}`)
+            .addField('Reminder', results[i].reminder)
+  
+          user.send(embed);
+  
+          deletion = await personalRemindersSchema.deleteOne({ "_id": ObjectId(results[i]._id) });
+        }
+        else {
+          schedule.scheduleJob('reminder_' + results[i]._id, results[i].date, async function () {
+            const embed = new Discord.MessageEmbed()
+              .setColor('#4cbb17')
+              .setTitle('🚨Reminder🚨')
+              .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
+              .addField('Reminder:', results[i].reminder)
+            user.send(embed)
+  
+            deletion = await personalRemindersSchema.deleteOne({ "_id": ObjectId(results[i]._id) });
+          });
+        }
       }
-
     }
-
   } catch (e) {
     console.error(e);
-  } finally {
-    await client2.close();
   }
 }
 

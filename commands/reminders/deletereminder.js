@@ -4,10 +4,7 @@ const path = require('path');
 const config = require('../../config.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const MongoClient = require('mongodb').MongoClient;
-const uri = config.mongoUri;
-const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-const ObjectId = require('mongodb').ObjectID;
+const personalRemindersSchema = require('../../schemas/personalRemindersSchema');
 
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
@@ -16,69 +13,84 @@ module.exports = class scheduleCommand extends Commando.Command {
       group: 'reminders',
       memberName: 'delete-reminder',
       description: 'Delete one of your reminders.',
-      examples: ['delete-reminder <reminder ID>'],
+      examples: ['delete-reminder'],
       guildOnly: false,
     })
   }
   async run(receivedMessage, args) {
 
-    const author = receivedMessage.author.id.toString();
-    const id = args;
-    console.log(id);
-    // console.log(author)
-    deleteReminder(receivedMessage, id, author);
-
-
+    viewReminders(receivedMessage);
 
   };
 
 }
 
-
-async function deleteReminder(receivedMessage, id, author) {
+async function viewReminders(receivedMessage) {
 
   try {
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    // Connect to the MongoDB cluster
-    await client2.connect();
 
-    let results = await client2.db("DiscordBot").collection("Personal Reminders")
-      .find({"_id": ObjectId(id)})
-      .toArray()
-    console.log('Results');
-    console.log(results);
-    if (results.length == 0) {
-      receivedMessage.author.send(`This reminder does not exist.`)
+    let results = await personalRemindersSchema.find({ userId: receivedMessage.author.id }).sort({ date: 1 })
+
+    if (results.length == 0){
+      return receivedMessage.send(`You don't currently have any active reminders set.`)
     }
-    else if (results[0].authorId == author) {
+    if (receivedMessage.channel.type !== 'dm') {
+      receivedMessage.say(`Check your DM to continue deleting one of your reminders.`)
+    }
+    receivedMessage.author.send(`Here are all of your active reminders: `)
+    for (let i=0; i<results.length; i++){
+      let embed = new Discord.MessageEmbed()
+        .setColor('BLUE')
+        .setDescription(`**Reminder Number:** ${i+1}\n**Date:** ${results[i].date.toLocaleString()} ${config.timeZone}\n**Reminder:**\n${results[i].reminder}`)
+       await receivedMessage.author.send(embed)
+    }
 
-      deletion = await client2.db("DiscordBot").collection("Personal Reminders")
-        .deleteOne({"_id": ObjectId(id)});
+    return selectReminderToDelete(receivedMessage, results)
+        
+  } catch (e) {
+    console.error(`Error viewing personal reminders. User: ${receivedMessage.author.id}`, e);
+    receivedMessage.say('There was an error retrieving your reminders. Please try again.')
+  }
 
+}
+
+async function selectReminderToDelete(receivedMessage, reminders) {
+  receivedMessage.author.send(`Please enter the number of the reminder you'd like to remove.`).then((newmsg) => {
+  const filter = m => receivedMessage.author.id === m.author.id;  
+  newmsg.channel.awaitMessages(filter, { time: 60000, max: 1, errors: ['time'] })
+      .then(messages => {
+          if (!isNaN(messages.first().content) && messages.first().content > 0 && messages.first().content <= reminders.length) {
+              return deleteReminder(receivedMessage, reminders, messages.first().content-1)
+          }
+          else {
+              receivedMessage.say('A valid reminder number was not provided.')
+             return selectReminderToDelete(receivedMessage)
+          }
+      })
+      .catch((e) => {
+          console.log(e)
+          return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `delete-reminder`");
+      });
+  });
+}
+
+async function deleteReminder(receivedMessage, reminders, arrayPosition) {
+  try {
+      result = await personalRemindersSchema.deleteOne({ _id: reminders[arrayPosition]._id });
       const embed = new Discord.MessageEmbed()
         .setColor('#FF0000')
         .setTitle('Reminder Deleted!')
         .setDescription('The following reminder has been deleted!')
-        .addField('Scheduled For:', `${results[0].date.toLocaleString()} ${config.timeZone}`)
-        .addField('Reminder:', results[0].reminder)
-      receivedMessage.author.send(embed)
+        .addField('Scheduled For:', `${reminders[arrayPosition].date.toLocaleString()} ${config.timeZone}`)
+        .addField('Reminder:', reminders[arrayPosition].reminder)
 
-      const thisJob = 'reminder_' + id;
-      console.log(thisJob);
+      const thisJob = 'reminder_' + reminders[arrayPosition]._id;
       schedule.cancelJob(thisJob);
-
-    }
-    else {
-      receivedMessage.author.send(`You must be the one who set the reminder in order to delete it.`)
-
-    }
-
-  } catch (e) {
-    console.error(e);
-    receivedMessage.reply('There was an error deleting your reminder. Please try again')
-  } finally {
-    await client2.close();
+      return receivedMessage.author.send(embed)
   }
-
+  catch (error) {
+    console.error(`Error deleting personal reminder. User: ${receivedMessage.author.id} MongoId: ${reminders[arrayPosition]._id}`, error)
+    return receivedMessage.say('Something went wrong deleting the reminders. Please try again.')
+  }
+  
 }
