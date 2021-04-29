@@ -656,6 +656,7 @@ async function restartServerMessages() {
 }
 
 async function restartTranslationSettings() {
+  try {
     let results = await translationSettingsSchema.find()
     let guilds = client.guilds.cache.map(guild => guild.id)
     if (results.length !== 0) {
@@ -669,6 +670,9 @@ async function restartTranslationSettings() {
           }
         }
       }
+    } 
+  } catch (e) {
+      console.error('Error restarting translation settings\n', e)
     }
 }
 
