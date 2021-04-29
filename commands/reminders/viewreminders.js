@@ -41,7 +41,7 @@ async function viewReminders(receivedMessage) {
     for (let i=0; i<results.length; i++){
       let embed = new Discord.MessageEmbed()
         .setColor('BLUE')
-        .setDescription(`**Reminder Number:** ${i+1}\n**Date:** ${results[i].date.toLocaleString()} ${config.timeZone}\n**Reminder:**\n${results[i].reminder}`)
+        .setDescription(`**Reminder Number:** ${i+1}\n**Scheduled For:** ${results[i].date.toLocaleString()} ${config.timeZone}\n**Reminder:**\n${results[i].reminder}`)
        await receivedMessage.author.send(embed)
     }
 

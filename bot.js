@@ -24,7 +24,7 @@ const commandLeaderboardSchema = require('./schemas/commandUsesSchema');
 const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSchema');
 const reactionRolesSchema = require('./schemas/reactionRolesSchema');
 const personalRemindersSchema = require('./schemas/personalRemindersSchema');
-
+const serverMessagesSchema = require('./schemas/serverMessagesSchema');
 
 Structures.extend('Guild', Guild => {
   class MusicGuild extends Guild {
@@ -605,18 +605,14 @@ async function restartPersonalReminders() {
 
 async function restartServerMessages() {
   try {
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Server Messages")
-      .find({ command: 'schedulemessage' })
-      .sort({ date: 1 })
-      .toArray()
+    let results = await serverMessagesSchema.find().sort({ date: 1 })
     for (let i = 0; i < results.length; i++) {
       const reminderDate = results[i].date;
       const difference = reminderDate - new Date();
-      const channel = client.channels.cache.get(results[i].channelID)
-      const user = client.users.cache.get(results[i].authorId)
+      const channel = client.channels.cache.get(results[i].channelId)
+      const user = await client.users.fetch(results[i].userId)
       if (difference <= 0) {
-        const embed = new Discord.MessageEmbed()
+        let embed = new Discord.MessageEmbed()
           .setColor('#8B0000')
           .setTitle("Missed Message!")
           .setDescription(`Oops! It appears I was not online when I was supposed to send a message! I'm terribly sorry for this!\n\n
@@ -624,44 +620,39 @@ async function restartServerMessages() {
 
         user.send(embed);
 
-        deletion = await client2.db("DiscordBot").collection("Server Messages")
-          .deleteOne({ "_id": ObjectId(results[i]._id) });
+        deletion = await serverMessagesSchema.deleteOne({ "_id": results[i]._id });
       }
       else {
         schedule.scheduleJob('message_' + results[i]._id, results[i].date, async function () {
-          const embed = new Discord.MessageEmbed()
+          let embed = new Discord.MessageEmbed()
             .setColor('#4cbb17')
-            .setTitle(`Scheduled Message`)
             .setAuthor(results[i].authorName, results[i].authorAvatarUrl)
-            .setDescription(`${results[i].date.toLocaleString()} ${config.timeZone}`)
-            .addField('Message:', results[i].message)
-          if (results[i].message !== '') {
-            embed.addField('Message:', results[i].message)
-          }
-          else {
-            embed.addField('Message:', '\u200B')
-          }
-          if (results[i].gif) {
-            embed.setImage(results[i].gif)
-          }
-          channel.send(embed)
-          if (results[i].mentions !== '') {
-            channel.send(`The following were mentioned above: ${results[i].mentions}`);
+            .setFooter(`${results[i].date.toLocaleString()} ${config.timeZone}`)
+          if (results[i].message){
+            embed.setDescription(results[i].message)
           }
 
-          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-          await mongoClient.connect();
-          deletion = await mongoClient.db("DiscordBot").collection("Server Messages")
-            .deleteOne({ "_id": ObjectId(results[i]._id) });
-          await mongoClient.close();
+          if (results[i].image){
+            embed.setImage(results[i].image)
+          } 
+          else if (results[i].gif){
+            embed.setImage(results[i].gif)
+          }
+          
+          if (results[i].mentions) {
+            channel.send(`${results[i].mentions}`, embed);
+          }
+          else {
+            channel.send(embed)
+          }
+
+          deletion = await serverMessagesSchema.deleteOne({ "_id": results[i]._id });
         });
       }
     }
   } catch (e) {
-    console.error(e);
-  } finally {
-    await client2.close();
-  }
+    console.error(`Error server scheduled messages\n`, e);
+  } 
 }
 
 async function restartTranslationSettings() {

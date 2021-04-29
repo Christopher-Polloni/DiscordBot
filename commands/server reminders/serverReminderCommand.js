@@ -4,10 +4,7 @@ const path = require('path');
 const config = require('../../config.js');
 const moment = require('moment');
 const schedule = require('node-schedule');
-const MongoClient = require('mongodb').MongoClient;
-const { indexOf } = require('ffmpeg-static');
-const uri = config.mongoUri;
-const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+const serverMessagesSchema = require('../../schemas/serverMessagesSchema.js');
 
 module.exports = class scheduleCommand extends Commando.Command {
   constructor(client) {
@@ -23,17 +20,12 @@ module.exports = class scheduleCommand extends Commando.Command {
   }
   async run(receivedMessage) {
 
-    // console.log(receivedMessage.channel.name)
-
     if (receivedMessage.channel.name.toLowerCase() == 'scheduler') {
       return getDate(receivedMessage);
     }
     else {
       return receivedMessage.say(`This command can only be used in a channel named 'scheduler'.\nOnly those with access to this channel can use the command.\nFuture messages may contain mentions, so limit the number of people who have access to #scheduler to avoid preemptive mass pings.`)
     }
-
-    // const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === '628064028706734090');
-    // channel.send('hi');
 
   };
 
@@ -76,7 +68,7 @@ async function getDate(receivedMessage) {
       })
       .catch((e) => {
         console.error(e);
-        newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $schedulemessage");
+        newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `schedule-message`");
       });
   });
 
@@ -91,18 +83,13 @@ async function getTime(receivedMessage, month, day, year) {
       .then(messages => {
 
         const completeTime = messages.first().content.split(" ");
-        console.log(`completedTime = ${completeTime}`);
         const timeOfDay = completeTime[1];
-        console.log(`timeOfDay = ${timeOfDay}`);
         const timeOfDayAccepted = ["am", "a.m.", "pm", "p.m."];
         const possibleHours = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"];
         const militaryHours = ["0", "13", "14", "15", "16", "17", "18", "19", "20", "21", "22", "23"];
         const time = completeTime[0].split(':');
-        console.log(`time = ${time}`);
         let hours = time[0];
-        console.log(`hours = ${hours}`);
         let minutes = time[1];
-        console.log(`minutes = ${minutes}`);
 
         if (timeOfDayAccepted.includes(timeOfDay.toLowerCase())) {
           if (timeOfDay.toLowerCase() == 'am' || timeOfDay.toLowerCase() == 'a.m.') {
@@ -163,7 +150,7 @@ async function getTime(receivedMessage, month, day, year) {
       })
       .catch((e) => {
         console.log(e)
-        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $schedulemessage");
+        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `schedule-message`");
       });
   });
 
@@ -171,36 +158,35 @@ async function getTime(receivedMessage, month, day, year) {
 
 async function getChannel(receivedMessage, date) {
 
-  receivedMessage.say(`Please enter the channel for your message to be sent in using the format <#${receivedMessage.channel.id}>.`).then((newmsg) => {
+  receivedMessage.say(`Please enter the channel for your message to be sent in (using the format <#${receivedMessage.channel.id}>).`).then((newmsg) => {
     const filter = m => receivedMessage.author.id === m.author.id;
 
     newmsg.channel.awaitMessages(filter, { time: 600000, max: 1, errors: ['time'] })
       .then(messages => {
 
         if (messages.first().mentions.channels.first()) {
-          const channelID = messages.first().mentions.channels.first().id;
+          const channelId = messages.first().mentions.channels.first().id;
           const channelName = messages.first().mentions.channels.first().name;
 
-          return getMessage(receivedMessage, date, channelID, channelName)
+          return getMessage(receivedMessage, date, channelId, channelName)
         }
         else {
           receivedMessage.say("You didn't properly mention a channel.")
-          return getChannel(receivedMessage)
+          return getChannel(receivedMessage, date)
         }
 
 
       })
       .catch((e) => {
         console.log(e)
-        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $schedulemessage");
+        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `schedule-message`");
       });
   });
 
 }
 
-async function getMessage(receivedMessage, date, channelID, channelName) {
+async function getMessage(receivedMessage, date, channelId, channelName) {
 
-  console.log(date);
   receivedMessage.say("Please enter message for your reminder.").then((newmsg) => {
     const filter = m => receivedMessage.author.id === m.author.id;
 
@@ -218,6 +204,7 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
         for (let i = 0; i < roleMentionsArray.length; i++) {
           mentions = mentions.concat(` <@&${roleMentionsArray[i].id}>`)
         }
+        if (mentions == '') { mentions = null}
 
         const messageArgs = messages.first().content.split(" ");
         const regex = /((http:\/\/(giphy\.com\/gifs\/.*|gph\.is\/.*|media\.giphy\.com\/media\/.*|tenor\.co\/.*|tenor\.com\/.*))|(https:\/\/(giphy\.com\/gifs\/.*|gph\.is\/.*|media\.giphy\.com\/media\/.*|tenor\.co\/.*|tenor\.com\/.*)))/i
@@ -228,29 +215,31 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
             index = messageArgs.indexOf(element)
           }
         });
-        if (index){
+        if (index || index == 0){
           gif = messageArgs[index]
+          messageArgs.splice(index, 1)
         }
         else {
           gif = null
         }
-        messageArgs.splice(index, 1)
         const message = messageArgs.join(" ")
+        let image = null
+        if (messages.first().attachments.first()) { image = messages.first().attachments.first().url }
 
-        return createnewMessage(
+        return createNewMessage(
           {
-            authorId: receivedMessage.author.id,
+            userId: receivedMessage.author.id,
             authorName: receivedMessage.author.username,
             authorAvatarUrl: receivedMessage.author.displayAvatarURL(),
             date: date,
-            channelID: channelID,
+            channelId: channelId,
             channelName: channelName,
-            guildID: receivedMessage.guild.id,
+            guildId: receivedMessage.guild.id,
             guildName: receivedMessage.guild.name,
             message: message,
+            image: image,
             gif: gif,
-            mentions: mentions,
-            command: 'schedulemessage'
+            mentions: mentions
           },
           receivedMessage
         )
@@ -258,95 +247,80 @@ async function getMessage(receivedMessage, date, channelID, channelName) {
       })
       .catch((e) => {
         console.log(e)
-        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with $schedulemessage");
+        return newmsg.channel.send("Too much time has elapsed! You'll need to restart the command with `schedule-message`");
       });
   });
 
 }
 
 
-async function createnewMessage(newMessage, receivedMessage) {
+async function createNewMessage(newMessage, receivedMessage) {
 
   try {
 
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    // Connect to the MongoDB cluster
-    await client2.connect();
-
-    let result = await client2.db("DiscordBot").collection("Server Messages").insertOne(newMessage);
-    console.log(`${result.insertedCount} new listing(s) created with the following id(s):`);
-    console.log(result.insertedId);
-    const embed = new Discord.MessageEmbed()
+    let result = await serverMessagesSchema.create(newMessage);
+    let embed = new Discord.MessageEmbed()
       .setColor('#FFFF00')
       .setTitle('Message Set!')
-      .addField('Scheduled For:', `${newMessage.date.toLocaleString()} ${config.timeZone}`)
-      .addField('Channel:', `<#${newMessage.channelID}>`)
-      .setFooter(`To delete this scheduled message: $deleteservermessage ${result.insertedId}`)
-      if (newMessage.message !== ''){
-        embed.addField('Message:', newMessage.message)
-      }
-      else {
-        embed.addField('Message:', '\u200B')
-      }
-      if (newMessage.gif){
+      .setDescription(`**Scheduled For:** ${newMessage.date.toLocaleString()} ${config.timeZone}\n**Channel:** <#${newMessage.channelId}>\n**Message:**\n${newMessage.message || ''}`)
+      if (newMessage.image){
+        embed.setImage(newMessage.image)
+      } 
+      else if (newMessage.gif){
         embed.setImage(newMessage.gif)
       }
     receivedMessage.say(embed)
-    receivedMessage.react('✅');
 
-    console.log('message_' + result.insertedId);
-
-    const embed2 = new Discord.MessageEmbed()
+    let embed2 = new Discord.MessageEmbed()
       .setColor('#4cbb17')
-      .setTitle(`Scheduled Message`)
       .setAuthor(newMessage.authorName, newMessage.authorAvatarUrl)
-      .setDescription(`${newMessage.date.toLocaleString()} ${config.timeZone}`)
-      if (newMessage.message !== ''){
-        embed2.addField('Message:', newMessage.message)
+      .setFooter(`${newMessage.date.toLocaleString()} ${config.timeZone}`)
+      if (newMessage.message){
+        embed2.setDescription(newMessage.message)
       }
-      else {
-        embed2.addField('Message:', '\u200B')
-      }
-      if (newMessage.gif){
+      if (newMessage.image){
+        embed2.setImage(newMessage.image)
+      } 
+      else if (newMessage.gif){
         embed2.setImage(newMessage.gif)
       }
-    const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelID}`);
+    const channel = receivedMessage.guild.channels.cache.find(channel => channel.id === `${newMessage.channelId}`);
     
     const difference = newMessage.date - new Date();
 
     if (difference <= 0) {
       try {
-        channel.send(embed2);
-        if (newMessage.mentions !== '') {
-          channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+        if (newMessage.mentions) {
+          channel.send(`${newMessage.mentions}`, embed2);
+        }
+        else {
+          channel.send(embed2)
         }
       } catch (e) {
         console.error(e);
       } finally {
-        deletion = await client2.db("DiscordBot").collection("Server Messages")
-          .deleteOne({ _id: result.insertedId });
+        deletion = serverMessagesSchema.deleteOne({ _id: result._id });
       }
     }
     else {
-      schedule.scheduleJob('message_' + result.insertedId, newMessage.date, async function () {
+      schedule.scheduleJob('message_' + result._id, newMessage.date, async function () {
         try {
-          channel.send(embed2);
-          if (newMessage.mentions !== '') {
-            channel.send(`The following were mentioned above: ${newMessage.mentions}`);
+          if (newMessage.mentions) {
+            channel.send(`${newMessage.mentions}`, embed2);
+          }
+          else {
+            channel.send(embed2)
           }
         } catch (e) {
           console.error(e);
         } finally {
-          deletion = await client2.db("DiscordBot").collection("Server Messages")
-            .deleteOne({ _id: result.insertedId });
+          deletion = await serverMessagesSchema.deleteOne({ _id: result._id });
         }
       });
     }
   } catch (e) {
     console.error(e);
     receivedMessage.reply('There was an error uploading your message. Please try again')
-  } finally {
-    await client2.close();
   }
 
 }
