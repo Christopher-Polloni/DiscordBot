@@ -25,6 +25,7 @@ const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSche
 const reactionRolesSchema = require('./schemas/reactionRolesSchema');
 const personalRemindersSchema = require('./schemas/personalRemindersSchema');
 const serverMessagesSchema = require('./schemas/serverMessagesSchema');
+const pollSchema = require('./schemas/pollSchema')
 
 Structures.extend('Guild', Guild => {
   class MusicGuild extends Guild {
@@ -806,22 +807,16 @@ async function restartReactionRoles() {
 
 async function restartPollResults() {
   try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Polls")
-      .find()
-      .toArray()
-    await client2.close();
-    for (let i = 0; i < results.length; i++) {
+    let results = await pollSchema.find()
 
+    for (let i = 0; i < results.length; i++) {
       const resultDate = results[i].date;
       const difference = resultDate - new Date();
+      const guild = client.guilds.cache.get(results[i].guildId)
+      const channel = guild.channels.cache.find(ch => ch.id === results[i].channelId)
+      const message = await channel.messages.fetch(results[i].messageId).catch((err) => console.error(`Poll message not found. MongoId: ${results[i]._id}\n`, err));
+      if (!message) continue
       if (difference <= 0) {
-          const guild = client.guilds.cache.get(results[i].guildId)
-          const channel = guild.channels.cache.find(ch => ch.id === results[i].channelId)
-          const message = await channel.messages.fetch(results[i].messageId)
           let votes = []
           for (let j = 0; j < results[i].numberOptions; j++) {
             votes.push(message.reactions.cache.get(results[i].reactions[j]).count - 1)
@@ -835,17 +830,10 @@ async function restartPollResults() {
             .setTitle('📊 Poll Results')
             .setDescription(`[${results[i].question}](${message.url})\n${results[i].pollOptions}\n\`\`\`Option\tNumber of Votes\n${pollResults}\`\`\``)
           channel.send(embed)
-          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-          await mongoClient.connect();
-          deletion = await mongoClient.db("DiscordBot").collection("Polls")
-            .deleteOne({ "_id": ObjectId(results[i]._id) });
-          await mongoClient.close();
+          deletion = await pollSchema.deleteOne({ "_id": results[i]._id });
       }
       else {
         schedule.scheduleJob('poll_' + results[i]._id, results[i].date, async function () {
-          const guild = client.guilds.cache.get(results[i].guildId)
-          const channel = guild.channels.cache.find(ch => ch.id === results[i].channelId)
-          const message = await channel.messages.fetch(results[i].messageId)
           let votes = []
           for (let j = 0; j < results[i].numberOptions; j++) {
             votes.push(message.reactions.cache.get(results[i].reactions[j]).count - 1)
@@ -859,15 +847,11 @@ async function restartPollResults() {
             .setTitle('📊 Poll Results')
             .setDescription(`[${results[i].question}](${message.url})\n${results[i].pollOptions}\n\`\`\`Option\tNumber of Votes\n${pollResults}\`\`\``)
           channel.send(embed)
-          const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-          await mongoClient.connect();
-          deletion = await mongoClient.db("DiscordBot").collection("Polls")
-            .deleteOne({ "_id": ObjectId(results[i]._id) });
-          await mongoClient.close();
+          deletion = await pollSchema.deleteOne({ "_id": results[i]._id });
         });
       }
     }
   } catch (e) {
-    console.error(e)
+    console.error(`Error restarting poll results\n`, e)
   }
 }

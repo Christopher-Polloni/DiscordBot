@@ -5,6 +5,8 @@ const Discord = require('discord.js');
 const moment = require('moment');
 const MongoClient = require('mongodb').MongoClient;
 const schedule = require('node-schedule');
+const paginationEmbed = require('discord.js-pagination');
+const pollSchema = require('../../schemas/pollSchema');
 
 module.exports = class viewPollsCommand extends Commando.Command {
     constructor(client) {
@@ -21,33 +23,29 @@ module.exports = class viewPollsCommand extends Commando.Command {
     async run(receivedMessage, args) {
         try {
 
-            const client2 = new MongoClient(config.mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+            let results = await pollSchema.find( {guildId: receivedMessage.guild.id}).sort({ date: 1 })
 
-            await client2.connect();
-
-            let filter = {
-                guildId: receivedMessage.guild.id
+            if (results.length == 0){
+                return receivedMessage.say(`There are not currently any active polls set for ${receivedMessage.guild.name}.`)
             }
 
-            let results = await client2.db("DiscordBot").collection("Polls")
-                .find(filter)
-                .sort({ date: 1 })
-                .toArray()
+            const numberPages = Math.ceil(results.length/3)
 
-            let description = ''
+            let polls = []
+            let pages = []
             for (let i = 0; i < results.length; i++) {
-                let question = results[i].question
-                if (question.length > 50){
-                    question = question.substring(0, 99) + '...'
-                }
-                description = description + `[${question}](${results[i].messageUrl})\nResult Date: ${results[i].date.toLocaleString()} ${config.timeZone}\nID: ${results[i].messageId}\n\n`
+                polls.push(`**${i+1}.** [${results[i].question}](${results[i].messageUrl})\n**Result Date:** ${results[i].date.toLocaleString()} ${config.timeZone}\n`)
             }
-            const embed = new Discord.MessageEmbed()
+            
+            for (let i=0; i<numberPages; i++){
+                let embed = new Discord.MessageEmbed()
                 .setColor('BLUE')
-                .setTitle("📊 Upcoming Poll Results")
-                .setDescription(description)
-                .setFooter('To cancel the automatic announcment of results on a poll: cancel-poll <ID>')
-            receivedMessage.say(embed);
+                .setTitle('📊 Upcoming Poll Results')
+                .setDescription(paginate(polls, 3, i))
+                pages.push(embed)
+            }
+    
+            paginationEmbed(receivedMessage, pages, ['◀️', '▶️'], 120000);
 
         } catch (e) {
             console.error(e);
@@ -56,4 +54,6 @@ module.exports = class viewPollsCommand extends Commando.Command {
     }
 };
 
-
+function paginate (array, page_size, page_number) {
+    return array.slice(page_number * page_size, page_number * page_size + page_size).join('\n');
+  };

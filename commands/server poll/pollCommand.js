@@ -3,8 +3,8 @@ const path = require('path');
 const config = require('../../config.js');
 const Discord = require('discord.js');
 const moment = require('moment');
-const MongoClient = require('mongodb').MongoClient;
 const schedule = require('node-schedule');
+const pollSchema = require('../../schemas/pollSchema');
 
 module.exports = class pollCommand extends Commando.Command {
     constructor(client) {
@@ -211,31 +211,32 @@ async function getTime(receivedMessage, pollSettings, month, day, year) {
 }
 
 async function setupPoll(receivedMessage, pollSettings) {
+    pollSettings.messageId = null
+    pollSettings.messageUrl = null
+    pollSettings.guildId = receivedMessage.guild.id
     const channel = receivedMessage.guild.channels.cache.find(ch => ch.id === pollSettings.channelId);
     const embed = new Discord.MessageEmbed()
         .setColor('BLUE')
         .setDescription(pollSettings.pollOptions)
         .setFooter(`Results will be announced on ${pollSettings.date.toLocaleString()} ${config.timeZone}`)
-    channel.send(`📊 ${pollSettings.question}`, embed).then(function (message) {
-        for (let i = 0; i < pollSettings.numberOptions; i++) {
-            message.react(pollSettings.reactions[i])
-        }
-        pollSettings.messageId = message.id
-        pollSettings.messageUrl = message.url
-        pollSettings.guildId = receivedMessage.guild.id
-    })
-
+    
+    message = await channel.send(`📊 ${pollSettings.question}`, embed)
+    for (let i = 0; i < pollSettings.numberOptions; i++) {
+        message.react(pollSettings.reactions[i])
+    }
+    pollSettings.messageId = message.id
+    pollSettings.messageUrl = message.url
+    
     try {
+        console.log(pollSettings)
+        let result = await pollSchema.create(pollSettings);
 
-        const client2 = new MongoClient(config.mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
-
-        await client2.connect();
-        let result = await client2.db("DiscordBot").collection("Polls").insertOne(pollSettings);
-
-        schedule.scheduleJob('poll_' + result.insertedId, pollSettings.date, async function () {
+        schedule.scheduleJob('poll_' + result._id, pollSettings.date, async function () {
             try {
                 let channel = receivedMessage.guild.channels.cache.find(ch => ch.id === pollSettings.channelId);
+                if (!channel) return
                 let message = await channel.messages.fetch(pollSettings.messageId)
+                if (!message) return
                 let votes = []
                 for (let i = 0; i < pollSettings.numberOptions; i++) {
                     votes.push(message.reactions.cache.get(pollSettings.reactions[i]).count - 1)
@@ -252,8 +253,7 @@ async function setupPoll(receivedMessage, pollSettings) {
             } catch (e) {
                 console.error(e);
             } finally {
-                let deletion = await client2.db("DiscordBot").collection("Polls")
-                    .deleteOne({ _id: result.insertedId });
+                let deletion = pollSchema.deleteOne({ _id: result._id });
             }
         });
 
