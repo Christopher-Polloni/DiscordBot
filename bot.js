@@ -26,7 +26,6 @@ const reactionRolesSchema = require('./schemas/reactionRolesSchema');
 const personalRemindersSchema = require('./schemas/personalRemindersSchema');
 const serverMessagesSchema = require('./schemas/serverMessagesSchema');
 const pollSchema = require('./schemas/pollSchema');
-const clashOfClansSettingsSchema = require('./schemas/clashOfClansSettingsSchema');
 
 Structures.extend('Guild', Guild => {
   class MusicGuild extends Guild {
@@ -145,8 +144,6 @@ client.on('ready', async () => {
   restartServerMessages();
   restartTranslationSettings();
   restartWelcomeSettings();
-  restartClashOfClansSettings();
-  restartClashOfClansReminders();
   restartModerationLogSettings();
   restartReactionRoles();
   restartPollResults();
