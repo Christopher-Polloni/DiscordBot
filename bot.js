@@ -25,7 +25,8 @@ const serverWelcomeSettingsSchema = require('./schemas/serverWelcomeSettingsSche
 const reactionRolesSchema = require('./schemas/reactionRolesSchema');
 const personalRemindersSchema = require('./schemas/personalRemindersSchema');
 const serverMessagesSchema = require('./schemas/serverMessagesSchema');
-const pollSchema = require('./schemas/pollSchema')
+const pollSchema = require('./schemas/pollSchema');
+const clashOfClansSettingsSchema = require('./schemas/clashOfClansSettingsSchema');
 
 Structures.extend('Guild', Guild => {
   class MusicGuild extends Guild {
@@ -121,8 +122,7 @@ client.registry
     ['moderation logs', 'Moderation Log Commands'],
     ['server poll', 'Server Poll Commands'],
     ['reaction roles', 'Reaction Role Commands'],
-    ['translation', 'Translation Commands'],
-    ['coc', 'Clash Of Clans Commands']
+    ['translation', 'Translation Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
@@ -692,74 +692,6 @@ async function restartWelcomeSettings() {
     }
   } catch (e) {
     console.error('Error restarting welcome settings\n', e)
-  }
-}
-
-
-async function restartClashOfClansSettings() {
-  try {
-    let results = await moderationLogsSettingsSchema.find()
-    let guilds = client.guilds.cache.map(guild => guild.id)
-    if (results.length !== 0) {
-      for (let i = 0; i < results.length; i++) {
-        if (guilds.includes(results[i].guild)) {
-          let guild = client.guilds.cache.get(results[i].guild);
-          guild.guildSettings.clashOfClansSettings.clanTag = results[i].clanTag;
-          guild.guildSettings.clashOfClansSettings.clanName = results[i].clanName;
-          guild.guildSettings.clashOfClansSettings.cocReminderChannelId = results[i].cocReminderChannelId;
-          guild.guildSettings.clashOfClansSettings.preparationEndWarning = results[i].preparationEndWarning;
-          guild.guildSettings.clashOfClansSettings.preparationEndWarningMentions = results[i].preparationEndWarningMentions;
-          guild.guildSettings.clashOfClansSettings.warEndWarning = results[i].warEndWarning;
-          guild.guildSettings.clashOfClansSettings.warEndWarningMentions = results[i].warEndWarningMentions;
-        }
-      }
-    }
-  } catch (e) {
-    console.error(e)
-  }
-}
-
-async function restartClashOfClansReminders() {
-  try {
-    const MongoClient = require('mongodb').MongoClient;
-    const uri = config.mongoUri;
-    const client2 = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-    await client2.connect();
-    let results = await client2.db("DiscordBot").collection("Clash of Clans Reminders")
-      .find()
-      .toArray()
-    await client2.close();
-    for (let i = 0; i < results.length; i++) {
-      const channel = client.channels.cache.get(results[i].cocReminderChannelId)
-      const embed = new Discord.MessageEmbed()
-        .setColor("RED")
-        .setTitle(`Clash of Clans Reminder\n${results[i].clanName} vs ${results[i].opponent}`)
-        .setThumbnail('https://cdn.freelogovectors.net/wp-content/uploads/2019/01/clash_of_clans_logo.png')
-      if (results[i].type == 'preparation') {
-        embed.addField('Preparation Ends in 30 Minutes', results[i].preparationEndWarning)
-      }
-      if (results[i].type == 'war') {
-        embed.addField('War Ends in 30 Minutes', results[i].warEndWarning)
-      }
-      schedule.scheduleJob('cocReminder_' + results[i]._id, results[i].messageTime, async function () {
-        embed.setTimestamp()
-        channel.send(embed)
-        if (results[i].preparationEndWarningMentions !== '' && results[i].type == 'preparation') {
-          channel.send(`The following were mentioned above: ${results[i].preparationEndWarningMentions}`);
-        }
-        if (results[i].warEndWarningMentions !== '' && results[i].type == 'war') {
-          channel.send(`The following were mentioned above: ${results[i].warEndWarningMentions}`);
-        }
-
-        const mongoClient = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-        await mongoClient.connect();
-        deletion = await mongoClient.db("DiscordBot").collection("Clash of Clans Reminders")
-          .deleteOne({ "_id": ObjectId(results[i]._id) });
-        await mongoClient.close();
-      });
-    }
-  } catch (e) {
-    console.error(e)
   }
 }
 
