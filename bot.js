@@ -67,18 +67,13 @@ Structures.extend('Guild', Guild => {
           messageDeleteLogIgnoreStartsWith: [],
           messageDeleteLogIgnoreIncludes: []
         },
-        cleverbotSettings: {
-          enabled: false,
-          cleverbotChannelId: null
-        },
-        clashOfClansSettings: {
-          clanTag: null,
-          clanName: null,
-          cocReminderChannelId: null,
-          preparationEndWarning: null,
-          preparationEndWarningMentions: null,
-          warEndWarning: null,
-          warEndWarningMentions: null
+        permissionsSettings: {
+          disabledCommands: [],
+          disabledCommandGroups: [],
+          enabledCommands: [],
+          channelOverrides: [],
+          roleOverrides: [],
+          userOverrides: []
         }
       };
     }
@@ -121,7 +116,8 @@ client.registry
     ['moderation logs', 'Moderation Log Commands'],
     ['server poll', 'Server Poll Commands'],
     ['reaction roles', 'Reaction Role Commands'],
-    ['translation', 'Translation Commands']
+    ['translation', 'Translation Commands'],
+    ['permissions', 'Permissions Commands']
   ])
   // .registerDefaults()
   .registerDefaultTypes()
@@ -155,6 +151,105 @@ client.setProvider(
   MongoClient.connect(uri).then(client => new MongoDBProvider(client, 'DiscordBot'))
 ).catch(console.error);
 
+// client.dispatcher.addInhibitor(msg => {
+//   if (msg.guild){
+//     if (!msg.command) {
+//       return false
+//     }
+//     // if (msg.guild.ownerID == msg.author.id) {
+//     //   return false
+//     // }
+//     const permissionsSettings = msg.guild.guildSettings.permissionsSettings;
+//     const disabledCommand = msg.guild.guildSettings.permissionsSettings.disabledCommands.includes(msg.command.name) ? true : false
+//     const enabledCommand = msg.guild.guildSettings.permissionsSettings.enabledCommands.includes(msg.command.name) ? true : false
+//     const disabledCommandGroup = msg.guild.guildSettings.permissionsSettings.disabledCommandGroups.includes(msg.command.group.name) ? true : false
+//     const commandEnabledInChannel = msg.guild.guildSettings.permissionsSettings.channelOverrides.filter(channelOverride => ((channelOverride.command == msg.command.name) && (channelOverride.channelId == msg.channel.id) && (channelOverride.access == 'allow'))).length > 0 ? true : false
+//     const commandDisabledInChannel = msg.guild.guildSettings.permissionsSettings.disabledCommandGroups.filter(channelOverride => ((channelOverride.command == msg.command.name) && (channelOverride.channelId == msg.channel.id) && (channelOverride.access == 'deny'))).length > 0 ? true : false
+//     const commandGroupEnabledInChannel = msg.guild.guildSettings.permissionsSettings.channelOverrides.filter(channelOverride => ((channelOverride.commandGroup == msg.command.group.name) && (channelOverride.channelId == msg.channel.id) && (channelOverride.access == 'allow'))).length > 0 ? true : false
+//     const commandGroupDisabledInChannel = msg.guild.guildSettings.permissionsSettings.channelOverrides.filter(channelOverride => ((channelOverride.commandGroup == msg.command.group.name) && (channelOverride.channelId == msg.channel.id) && (channelOverride.access == 'deny'))).length > 0 ? true : false
+//     const commandEnabledForRole = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.command == msg.command.name) && (roleOverride.access == 'allow'))).length > 0 ? true : false
+//     const commandDisabledForRole = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.command == msg.command.name) && (roleOverride.access == 'deny'))).length > 0 ? true : false
+//     const commandGroupEnabledForRole = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.commandGroup == msg.command.group.name) && (roleOverride.access == 'allow'))).length > 0 ? true : false
+//     const commandGroupDisabledForRole = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.commandGroup == msg.command.group.name) && (roleOverride.access == 'deny'))).length > 0 ? true : false
+//     const userEnabledCommand = msg.guild.guildSettings.permissionsSettings.userOverrides.filter(userOverride => ((userOverride.command == msg.command.name) && (userOverride.userId == msg.author.id) && (userOverride.access == 'allow'))).length > 0 ? true : false
+//     const userDisabledCommand = msg.guild.guildSettings.permissionsSettings.userOverrides.filter(userOverride => ((userOverride.command == msg.command.name) && (userOverride.userId == msg.author.id) && (userOverride.access == 'deny'))).length > 0 ? true : false
+//     const userEnabledCommandGroup = msg.guild.guildSettings.permissionsSettings.userOverrides.filter(userOverride => ((userOverride.commandGroup == msg.command.group.name) && (userOverride.userId == msg.author.id) && (userOverride.access == 'allow'))).length > 0 ? true : false
+//     const userDisabledCommandGroup = msg.guild.guildSettings.permissionsSettings.userOverrides.filter(userOverride => ((userOverride.commandGroup == msg.command.group.name) && (userOverride.userId == msg.author.id) && (userOverride.access == 'deny'))).length > 0 ? true: false
+
+//     let userHasRoleEnablingCommand
+//     let userHasRoleEnablingCommandGroup
+//     let userHasRoleDisablingCommand
+//     let userHasRoleDisablingCommandGroup
+
+//     if (commandEnabledForRole) {
+//       const arrayOfRoles = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.command == msg.command.name) && (roleOverride.access == 'allow'))).map(roleOverrides => roleOverrides.roleId)
+//       for (let i=0; i<arrayOfRoles.length; i++) {
+//         if (msg.member.roles.cache.has(arrayOfRoles[i])) { userHasRoleEnablingCommand = true }
+//       }
+//     }
+//     if (commandDisabledForRole) {
+//       const arrayOfRoles = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.command == msg.command.name) && (roleOverride.access == 'deny'))).map(roleOverrides => roleOverrides.roleId)
+//       for (let i=0; i<arrayOfRoles.length; i++) {
+//         if (msg.member.roles.cache.has(arrayOfRoles[i])) { userHasRoleDisablingCommand = true }
+//       }
+//     }
+//     if (commandGroupEnabledForRole) {
+//       const arrayOfRoles = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.command == msg.command.group.name) && (roleOverride.access == 'allow'))).map(roleOverrides => roleOverrides.roleId)
+//       for (let i=0; i<arrayOfRoles.length; i++) {
+//         if (msg.member.roles.cache.has(arrayOfRoles[i])) { userHasRoleEnablingCommandGroup = true }
+//       }
+//     }
+//     if (commandGroupDisabledForRole) {
+//       const arrayOfRoles = msg.guild.guildSettings.permissionsSettings.roleOverrides.filter(roleOverride => ((roleOverride.commandGroup == msg.command.group.name) && (roleOverride.access == 'deny'))).map(roleOverrides => roleOverrides.roleId)
+//       for (let i=0; i<arrayOfRoles.length; i++) {
+//         if (msg.member.roles.cache.has(arrayOfRoles[i])) { userHasRoleDisablingCommandGroup = true }
+//       }
+//     }
+
+
+//     if (disabledCommand || disabledCommandGroup) {
+//       if (commandEnabledInChannel || (commandGroupEnabledInChannel && !commandDisabledInChannel)) {
+//         if (userHasRoleDisablingCommand) { 
+//           if (userEnabledCommand) {
+//             return false
+//           }
+//           else {
+//             return {reason: 'blocked', response: msg.say('You do not have the required permissions to use this command.')}
+//           }
+//         }
+//         else if (userHasRoleDisablingCommandGroup) {
+//           if (userEnabledCommand || userEnabledCommandGroup) {
+//             return false
+//           }
+//           else {
+//             return {reason: 'blocked', response: msg.say('You do not have the required permissions to use this command.')}
+//           }
+//         }
+//       }
+//       else {
+//         return {reason: 'blocked', response: msg.say('You do not have the required permissions to use this command.')}
+//       }
+//     }
+//     else {
+//       if (commandGroupDisabledInChannel){
+//         if (commandEnabledInChannel) {
+
+//           return false
+//         }
+//         else {
+//           return {reason: 'blocked', response: msg.say('You do not have the required permissions to use this command.')}
+//         }
+//       }
+//       else if (commandDisabledInChannel) {
+//         return {reason: 'blocked', response: msg.say('You do not have the required permissions to use this command.')}
+//       }
+//     }
+    
+
+//   }
+	
+// });
+
 client.on('commandRun', async (command) => {
   
         result = await commandLeaderboardSchema.findOne({ commandName: command.name });
@@ -170,19 +265,6 @@ client.on('commandRun', async (command) => {
 client.on('message', async (message) => {
   if (message.channel.type == 'dm') {
     return
-  }
-  if (message.guild.guildSettings.cleverbotSettings.enabled) {
-    let cleverbotChannel = message.guild.guildSettings.cleverbotSettings.cleverbotChannelId;
-    if (cleverbotChannel == message.channel.id && !message.isCommand && !message.author.bot) {
-      const url = `http://www.cleverbot.com/getreply?key=${config.cleverBotApiKey}&input=${message.content}`
-      axios.get(url)
-        .then(function (response) {
-          return message.channel.send(response.data.output)
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }  
   }
   if (message.guild.guildSettings.translationSettings.autoTranslateToggle && !message.isCommand && !message.author.bot) {
     const filteredSettings = message.guild.guildSettings.translationSettings.autoTranslateSettings.filter(settings => settings.translateFromChannelId == message.channel.id);
