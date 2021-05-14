@@ -22,6 +22,7 @@ module.exports = {
     "🇰🇷": { "language": "Korean", "abbreviation": "ko" },
     "🇵🇱": { "language": "Polish", "abbreviation": "pl" },
     "🇧🇷": { "language": "Portuguese", "abbreviation": "pt" },
+    "🇷🇴": { "language": "Romanian", "abbreviation": "ro" },
     "🇷🇺": { "language": "Russian", "abbreviation": "ru" },
     "🇪🇸": { "language": "Spanish", "abbreviation": "es" }
   }
