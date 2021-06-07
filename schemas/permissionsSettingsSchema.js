@@ -4,7 +4,9 @@ const permissionsSettingsSchema = mongoose.Schema(
   {
     guildId: String,
     disabledCommands: Array,
-    disabledCommandGroups: Array
+    disabledCommandGroups: Array,
+    enabledCommands: Array,
+    channelOverrides: Array
   }
 )
 

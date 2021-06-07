@@ -16,9 +16,15 @@ module.exports = class helpCommand extends Commando.Command {
     });
   }
   async run(receivedMessage, arg) {
-    const prefixInfo = receivedMessage.guild
+    let prefixInfo 
+    if (receivedMessage.guild) {
+      prefixInfo = receivedMessage.guild._commandPrefix 
       ? `Server: **${receivedMessage.guild.name}**\nPrefix: **${receivedMessage.guild._commandPrefix}** or ${this.client.user}`
-      : `Default Prefix: **$** or ${this.client.user}`;
+      : `Server: **${receivedMessage.guild.name}**\nDefault Prefix: **$** or ${this.client.user}`;
+    }
+    else {
+      prefixInfo = `Default Prefix: **$** or ${this.client.user}`
+    }
     const links =
       "[Support Server](https://discord.gg/HKUPd8Wgfk) | [Patreon](https://www.patreon.com/discord_bot_boop) | [Top.gg](https://Top.gg/bot/575416249400426506) | [Top.gg Vote](https://Top.gg/bot/575416249400426506/vote) | [Invite](https://discord.com/oauth2/authorize?client_id=575416249400426506&permissions=2081418495&scope=bot%20applications.commands)\n";
     const embed = new Discord.MessageEmbed()

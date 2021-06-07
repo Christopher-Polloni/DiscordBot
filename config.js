@@ -13,10 +13,16 @@ module.exports = {
   cleverBotApiKey: process.env.CLEVER_BOT_API_KEY,
   clashOfClansApiKey: process.env.CLASH_OF_CLANS_API_KEY,
   languages: {
+    "🇳🇱": { "language": "Dutch", "abbreviation": "nl" },
     "🇺🇸": { "language": "English", "abbreviation": "en" },
     "🇫🇷": { "language": "French",  "abbreviation": "fr" },
     "🇩🇪": { "language": "German",  "abbreviation": "de" },
     "🇬🇷": { "language": "Greek",   "abbreviation": "el" },
+    "🇭🇹": { "language": "Haitian Creole",   "abbreviation": "ht" },
+    "🇮🇱": { "language": "Hebrew",   "abbreviation": "he" },
+    "🇮🇳": { "language": "Hindi",   "abbreviation": "hi" },
+    "🇮🇩": { "language": "Indonesian",   "abbreviation": "id" },
+    "🇮🇪": { "language": "Irish", "abbreviation": "ga" },
     "🇮🇹": { "language": "Italian", "abbreviation": "it" },
     "🇯🇵": { "language": "Japanese", "abbreviation": "ja" },
     "🇰🇷": { "language": "Korean", "abbreviation": "ko" },
@@ -24,6 +30,8 @@ module.exports = {
     "🇧🇷": { "language": "Portuguese", "abbreviation": "pt" },
     "🇷🇴": { "language": "Romanian", "abbreviation": "ro" },
     "🇷🇺": { "language": "Russian", "abbreviation": "ru" },
-    "🇪🇸": { "language": "Spanish", "abbreviation": "es" }
+    "🇪🇸": { "language": "Spanish", "abbreviation": "es" },
+    "🇹🇷": { "language": "Turkish", "abbreviation": "tr" },
+    "🇻🇳": { "language": "Vietnamese", "abbreviation": "vi" }
   }
 }
