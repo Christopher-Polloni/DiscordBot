@@ -15,18 +15,14 @@ module.exports = class scheduleCommand extends Commando.Command {
       description: 'Schedule a message for a channel in a server',
       examples: ['server-message'],
       guildOnly: true,
-      argsType: 'multiple'
+      argsType: 'multiple',
+      userPermissions: ['MANAGE_GUILD']
     })
   }
   async run(receivedMessage) {
 
-    if (receivedMessage.channel.name.toLowerCase() == 'scheduler') {
-      return getDate(receivedMessage);
-    }
-    else {
-      return receivedMessage.say(`This command can only be used in a channel named 'scheduler'.\nOnly those with access to this channel can use the command.\nFuture messages may contain mentions, so limit the number of people who have access to #scheduler to avoid preemptive mass pings.`)
-    }
-
+    return getDate(receivedMessage);
+    
   };
 
 }

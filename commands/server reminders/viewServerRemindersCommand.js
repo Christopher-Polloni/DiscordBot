@@ -14,17 +14,13 @@ module.exports = class scheduleCommand extends Commando.Command {
             description: 'View your scheduled messages for the server you run the command in.',
             examples: ['view-server-messages'],
             guildOnly: true,
+            userPermissions: ['MANAGE_GUILD']
         })
     }
     async run(receivedMessage) {
 
-        if (receivedMessage.channel.name.toLowerCase() == 'scheduler') {
-            return viewScheduledMessages(receivedMessage);
-        }
-        else {
-            return receivedMessage.say(`This command can only be used in a channel named 'scheduler'.\nOnly those with access to this channel can use the command.\nThis is to prevent members of your server from seeing messages before they are supposed to.`)
-        }
-
+        return viewScheduledMessages(receivedMessage);
+        
     };
 
 }

@@ -16,16 +16,13 @@ module.exports = class scheduleCommand extends Commando.Command {
       description: 'Delete one of your scheduled server messages.',
       examples: ['delete-server-message'],
       guildOnly: true,
+      userPermissions: ['MANAGE_GUILD']
     })
   }
   async run(receivedMessage, args) {
 
-    if (receivedMessage.channel.name.toLowerCase() == 'scheduler') {
-        return viewMessages(receivedMessage, args);
-    }
-    else {
-        return receivedMessage.say(`This command can only be used in a channel named 'scheduler'.\nOnly those with access to this channel can use the command.\nThis is to prevent members of your server from seeing messages before they are supposed to.`)
-    }
+    return viewMessages(receivedMessage, args);
+    
   };
 
 }
