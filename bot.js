@@ -112,7 +112,7 @@ client.registry
     ['reddit', 'Reddit Image Commands'],
     ['miscellaneous', 'Miscellaneous Commands'],
     ['reminders', 'Personal Reminder Commands'],
-    ['serverreminders', 'Server Reminder Commands'],
+    ['serverreminders', 'Server Message Commands'],
     ['moderation', 'Moderation Commands'],
     ['moderation logs', 'Moderation Log Commands'],
     ['server poll', 'Server Poll Commands'],
