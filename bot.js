@@ -261,11 +261,14 @@ client.on('message', async (message) => {
         }],
         responseType: 'json'
     }).then(function (response) {
+      if (response.data[0].detectedLanguage.language == languageCode && translateToChannel == message.channel.id){
+        return
+      }
       const embed = new Discord.MessageEmbed()
         .setColor('BLUE')
         .setAuthor(message.author.username, message.author.displayAvatarURL())
         .setDescription(`[Original Message](${message.url}) in <#${message.channel.id}>\n${response.data[0].translations[0].text}`)
-        .setFooter(`Auto-Translated`, message.client.user.displayAvatarURL())
+        .setFooter(`Auto-Translated to ${language}`, message.client.user.displayAvatarURL())
         .setTimestamp()
       translateToChannel.send(embed)
           
