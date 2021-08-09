@@ -14,11 +14,11 @@ module.exports = class translateCommand extends Commando.Command {
             description: 'View what languages are available for translation or translate a message',
             examples: ['translate', 'translate <language code> <message>'],
             guildOnly: true,
-            argsType: 'single'
+            argsType: 'multiple'
         })
     }
-    async run(receivedMessage, arg) {
-        if (!arg) {
+    async run(receivedMessage, args) {
+        if (args.length == 0) {
             let message = `Emoji | Language Code | Language\n`
             for (let x in config.languages) {
                 message = message.concat(`${x} | ${config.languages[x].abbreviation} | ${config.languages[x].language}\n`)
@@ -31,13 +31,14 @@ module.exports = class translateCommand extends Commando.Command {
             return receivedMessage.say(embed)
         }
         else {
-            const languageCode = arg.slice(0, 2)
+            const languageCode = args[0]
             let isValid = false
             for (let x in config.languages) {
                 if (config.languages[x].abbreviation == languageCode) {
                     isValid = true
                 }
             }
+            const text = args.slice(1).join(" ")
             if (isValid) {
                 axios({
                     baseURL: config.translationEndpoint,
@@ -54,7 +55,7 @@ module.exports = class translateCommand extends Commando.Command {
                         'to': languageCode
                     },
                     data: [{
-                        'text': arg.substr(2)
+                        'text': text
                     }],
                     responseType: 'json'
                 }).then(function (response) {
