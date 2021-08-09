@@ -13,6 +13,8 @@ module.exports = {
   cleverBotApiKey: process.env.CLEVER_BOT_API_KEY,
   clashOfClansApiKey: process.env.CLASH_OF_CLANS_API_KEY,
   languages: {
+    "🇦🇪": { "language": "Arabic", "abbreviation": "ar" },
+    "🇨🇳": { "language": "Chinese Simplified", "abbreviation": "zh-Hans" },
     "🇳🇱": { "language": "Dutch", "abbreviation": "nl" },
     "🇺🇸": { "language": "English", "abbreviation": "en" },
     "🇫🇷": { "language": "French",  "abbreviation": "fr" },
