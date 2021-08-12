@@ -103,7 +103,7 @@ async function getLanguage(receivedMessage, translateFromChannelId, translateToC
             let isValid = false
             let language = ''
             for (let x in config.languages) {
-                if (config.languages[x].abbreviation == messages.first().content.toLowerCase()) {
+                if (config.languages[x].abbreviation.toLowerCase() == messages.first().content.toLowerCase()) {
                     isValid = true
                     language = config.languages[x].language
                 }
